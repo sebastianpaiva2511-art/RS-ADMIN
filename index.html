@@ -5,6 +5,54 @@
   <title>RS Admin - Sistema Comercial y Punto de Venta</title>
 
   <!-- ============================================================ -->
+  <!-- ARRANQUE SEGURO (GitHub Pages / HTTPS): almacenamiento con    -->
+  <!-- respaldo en memoria y carga de librerías con CDN alterno.     -->
+  <!-- Debe ir ANTES que cualquier otro script.                      -->
+  <!-- ============================================================ -->
+  <script>
+  (function () {
+    // 1) localStorage puede lanzar SecurityError si el navegador bloquea el
+    //    almacenamiento (cookies de terceros, modo privado estricto, iframes).
+    var disponible = false;
+    try {
+      var k = "__rs_test__";
+      window.localStorage.setItem(k, "1");
+      window.localStorage.removeItem(k);
+      disponible = true;
+    } catch (e) { disponible = false; }
+    if (!disponible) {
+      var mem = {};
+      var shim = {
+        getItem: function (key) { return Object.prototype.hasOwnProperty.call(mem, key) ? mem[key] : null; },
+        setItem: function (key, v) { mem[String(key)] = String(v); },
+        removeItem: function (key) { delete mem[key]; },
+        clear: function () { mem = {}; },
+        key: function (i) { var ks = Object.keys(mem); return i >= 0 && i < ks.length ? ks[i] : null; }
+      };
+      Object.defineProperty(shim, "length", { get: function () { return Object.keys(mem).length; } });
+      try {
+        Object.defineProperty(window, "localStorage", { value: shim, configurable: true, writable: true });
+        window.__RS_STORAGE_FALLBACK = true;
+      } catch (e2) { /* sin alternativa: la app mostrará su propio aviso */ }
+      try { console.warn("RS: localStorage bloqueado por el navegador; se usa memoria temporal (los datos locales no persistirán)."); } catch (e3) {}
+    }
+
+    // 2) Carga secuencial de librerías desde un CDN alterno si el principal falla.
+    window.rsCargarRespaldo = function (urls) {
+      var i = 0;
+      (function siguiente() {
+        if (i >= urls.length) return;
+        var sc = document.createElement("script");
+        sc.src = urls[i++];
+        sc.onload = siguiente;
+        sc.onerror = function () { try { console.error("RS: no se pudo cargar " + sc.src); } catch (e) {} siguiente(); };
+        document.head.appendChild(sc);
+      })();
+    };
+  })();
+  </script>
+
+  <!-- ============================================================ -->
   <!-- ESTILOS CSS PUROS AUTOCONTENIDOS                             -->
   <!-- ============================================================ -->
   <style>
@@ -2286,13 +2334,29 @@
   }
 </style>
 
-  <!-- FIREBASE_DISABLED_START: SDK de Firebase comentado para modo de diseño local -->
-  <!--
-  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js"></script>
-  -->
-  <!-- FIREBASE_DISABLED_END -->
+  <!-- Cargar librerías de Firebase CDN Compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Configuración e inicialización de RS-ADMIN -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAe4LpQ0WzRxBFbhtQXtvzS9dksMwFWeBw",
+      authDomain: "rs-admin-ea110.firebaseapp.com",
+      projectId: "rs-admin-ea110",
+      storageBucket: "rs-admin-ea110.firebasestorage.app",
+      messagingSenderId: "36666000485",
+      appId: "1:36666000485:web:967803d32e5a17cf93f28c",
+      measurementId: "G-7Z7RB2VPZD"
+    };
+
+    // Protegido: si el CDN de Firebase no cargó (red/bloqueador), no se rompe aquí;
+    // la capa de autenticación mostrará un aviso claro en pantalla.
+    if (typeof firebase !== "undefined" && !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+  </script>
 
 <!-- ============================================================ -->
 <!-- ESTILOS: CAPA DE AUTENTICACIÓN, PAGO Y AISLAMIENTO DE USUARIO -->
@@ -2437,9 +2501,9 @@
 .label-print-ticket .lpt-prices { font-size: 9px; font-weight: 800; margin-top: 2px; }
 .label-print-ticket .lpt-prices .lpt-bs { font-size: 7.5px; font-weight: 600; color: #333; display: block; }
 </style>
-<!-- NUEVO: Cropper.js v1.5.13 (editor / recortador del Logo de la Empresa) -->
+<!-- Cropper.js v1.5.13 (se conserva por compatibilidad; el editor de logo actual no depende de él) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" onerror="rsCargarRespaldo(['https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js'])"></script>
 <style id="rs-hv-styles">
 /* NUEVO: pestaña compacta "Devoluciones / Anulaciones" dentro de Historial de Ventas */
 .rs-hv-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
@@ -2465,7 +2529,7 @@
 <!-- PANTALLA DE BIENVENIDA CON LOGO (NUEVO) — ver CSS #rs-splash-logo -->
 <!-- ============================================================ -->
 <div id="rs-splash-logo" onclick="rsCerrarSplashLogo()" role="img" aria-label="RS Arming — Programa Empresarial — Mi Boutique">
-  <img id="rs-splash-logo-img" alt="RS Arming — Programa Empresarial — Mi Boutique" src="">
+  <img id="rs-splash-logo-img" alt="RS Arming — Programa Empresarial — Mi Boutique" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
 </div>
 <script>
 function rsCerrarSplashLogo() {
@@ -7113,9 +7177,9 @@ document.addEventListener("DOMContentLoaded", function () {
   <!-- ============================================================ -->
 </div> <!-- cierre de #rs-app-wrapper -->
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" onerror="rsCargarRespaldo(['https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js','https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js'])"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" onerror="if(window.jspdf)rsCargarRespaldo(['https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js'])"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" onerror="rsCargarRespaldo(['https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'])"></script>
 
   <!-- ============================================================ -->
   <!-- LÓGICA JAVASCRIPT PURA AUTOCONTENIDA                        -->
@@ -15279,12 +15343,14 @@ ${det}
               </div>
               <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
               <script>
-                JsBarcode("#barcode", "${barcode}", {
-                  format: "CODE128",
-                  width: 2,
-                  height: 50,
-                  displayValue: false
-                });
+                if (window.JsBarcode) {
+                  JsBarcode("#barcode", "${barcode}", {
+                    format: "CODE128",
+                    width: 2,
+                    height: 50,
+                    displayValue: false
+                  });
+                }
                 setTimeout(() => { window.print(); }, 500);
               <\/script>
             </body>
@@ -20697,13 +20763,25 @@ if (!RS_LOCAL_DESIGN_MODE) {
     throw new Error("RS: Firebase no configurado (credenciales de ejemplo detectadas). Detenido a propósito.");
   }
 
+  if (typeof firebase === "undefined") {
+    rsShowFatalScreen(
+      "⚠️ No se pudieron cargar las librerías de Firebase",
+      "El navegador no pudo descargar Firebase desde https://www.gstatic.com.\n\n" +
+      "Posibles causas:\n" +
+      "• Sin conexión a internet o red con filtros/firewall.\n" +
+      "• Una extensión (bloqueador de anuncios/privacidad) bloqueando gstatic.com.\n\n" +
+      "Revisa tu conexión, desactiva el bloqueador para este sitio y recarga la página."
+    );
+    throw new Error("RS: Firebase SDK no disponible (CDN bloqueado o sin red). Detenido a propósito.");
+  }
+
   if (window.location.protocol === "file:") {
     rsShowFatalScreen(
       "⚙️ Este archivo debe abrirse desde un servidor web",
       "Detecté que abriste el archivo directamente desde tu computadora (protocolo file://).\n\n" +
       "Firebase Authentication NO funciona así — necesita http:// o https://.\n\n" +
       "Soluciones:\n" +
-      "• Sube este archivo a Firebase Hosting, Netlify o Vercel (gratis), o\n" +
+      "• Sube este archivo a GitHub Pages, Firebase Hosting, Netlify o Vercel (gratis), o\n" +
       "• Para probar en tu computadora, corre un servidor local, por ejemplo:\n" +
       "    python3 -m http.server 8080\n" +
       "  y abre http://localhost:8080/index.html\n\n" +
@@ -20714,7 +20792,10 @@ if (!RS_LOCAL_DESIGN_MODE) {
 })();
 
 // A partir de aquí, la configuración pasó el preflight check.
-firebase.initializeApp(rsFirebaseConfig);
+// Reutiliza la app ya creada en <head> (evita el error "duplicate-app").
+if (!firebase.apps.length) {
+  firebase.initializeApp(rsFirebaseConfig);
+}
 rsAuth = firebase.auth();
 rsDb = firebase.firestore();
 }
@@ -20729,9 +20810,12 @@ rsDb = firebase.firestore();
 // El código original sigue llamando a localStorage.getItem/setItem exactamente
 // igual que siempre — nunca se entera de este cambio.
 (function () {
-  const _getItem = Storage.prototype.getItem;
-  const _setItem = Storage.prototype.setItem;
-  const _removeItem = Storage.prototype.removeItem;
+  // Si el navegador bloqueó localStorage, el bloque de arranque instaló un
+  // respaldo en memoria: se parchea ese objeto en vez de Storage.prototype.
+  const _objetivo = window.__RS_STORAGE_FALLBACK ? window.localStorage : Storage.prototype;
+  const _getItem = _objetivo.getItem;
+  const _setItem = _objetivo.setItem;
+  const _removeItem = _objetivo.removeItem;
 
   function rsScopedKey(key) {
     if (window.__RS_UID && typeof key === "string" && key.indexOf(RS_STORAGE_PREFIX) === 0) {
@@ -20740,11 +20824,11 @@ rsDb = firebase.firestore();
     return key;
   }
 
-  Storage.prototype.getItem = function (key) {
+  _objetivo.getItem = function (key) {
     return _getItem.call(this, rsScopedKey(key));
   };
 
-  Storage.prototype.setItem = function (key, value) {
+  _objetivo.setItem = function (key, value) {
     const scoped = rsScopedKey(key);
     _setItem.call(this, scoped, value);
     if (window.__RS_UID && typeof key === "string" && key.indexOf(RS_STORAGE_PREFIX) === 0) {
@@ -20752,7 +20836,7 @@ rsDb = firebase.firestore();
     }
   };
 
-  Storage.prototype.removeItem = function (key) {
+  _objetivo.removeItem = function (key) {
     _removeItem.call(this, rsScopedKey(key));
   };
 })();
