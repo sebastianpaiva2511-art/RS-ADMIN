@@ -939,8 +939,11 @@ async function handleAdminLogin(event) {
     const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
     
     if (!userDoc.exists || userDoc.data().role !== 'admin') {
+      // DIAGNÓSTICO TEMPORAL: muestra qué encontró el panel (quitar cuando funcione)
+      const dd = userDoc.exists ? userDoc.data() : null;
+      const info = ' [uid: ' + userCredential.user.uid + ' | documento: ' + (userDoc.exists ? 'existe' : 'NO existe') + ' | role: ' + (dd ? JSON.stringify(dd.role) : 'sin dato') + ']';
       await auth.signOut();
-      showAuthMessage('Acceso denegado: No eres administrador', 'error');
+      showAuthMessage('Acceso denegado: No eres administrador' + info, 'error');
       btn.disabled = false;
       return;
     }
