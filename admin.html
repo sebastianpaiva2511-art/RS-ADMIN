@@ -212,7 +212,7 @@ tbody tr:hover{background:#fafbfd}
       <button data-view="users"><svg class="i"><use href="#i-users"/></svg>Usuarios</button>
       <button data-view="pricing"><svg class="i"><use href="#i-price"/></svg>Precios</button>
       <button data-view="reports"><svg class="i"><use href="#i-reports"/></svg>Reportes</button>
-      <button data-view="activity"><svg class="i"><use href="#i-activity"/></svg>Actividad</button>
+      <button data-view="activity"><svg class="i"><use href="#i-activity"/></svg>Actividades</button>
       <button data-view="settings"><svg class="i"><use href="#i-settings"/></svg>Ajustes</button>
     </nav>
     <div class="side-foot" id="side-foot"></div>
@@ -312,14 +312,15 @@ tbody tr:hover{background:#fafbfd}
       <!-- ACTIVIDAD -->
       <section id="view-activity" class="view">
         <div class="card">
-          <div class="card-head"><div><h2>Historial de actividad</h2><p class="sub">Busca un usuario por nombre o correo para ver sus acciones</p></div></div>
+          <div class="card-head"><div><h2>Actividades / Activity Log</h2><p class="sub">Todo lo que hacen los clientes en index.html: productos agregados, editados o eliminados y ventas. Filtra por nombre o correo.</p></div><button class="btn btn-secondary btn-sm" onclick="refreshActivity()">Actualizar</button></div>
           <div class="toolbar" style="margin-bottom:14px">
             <input class="search" id="act-search" type="search" placeholder="Buscar por nombre o correo (ej: Miguel)" aria-label="Buscar usuario en el historial de actividad" autocomplete="off">
             <select id="act-type" aria-label="Filtrar por tipo de acción">
               <option value="">Todas las acciones</option><option value="product_added">Productos agregados</option><option value="price_change">Cambios de precio</option><option value="stock_change">Cambios de stock</option><option value="product_deleted">Productos eliminados</option><option value="sale">Ventas</option>
             </select>
           </div>
-          <div id="act-results"><p class="empty">Escribe el nombre o correo de un usuario para ver su actividad</p></div>
+          <div id="act-results"></div>
+          <div id="act-feed"></div>
         </div>
         <div id="act-detail" hidden></div>
       </section>
@@ -362,6 +363,7 @@ tbody tr:hover{background:#fafbfd}
           <label class="toggle-row"><div>Nuevos registros<span>Resumen diario de usuarios nuevos</span></div><input type="checkbox"></label>
           <label class="toggle-row"><div>Reporte semanal<span>Ingresos y crecimiento cada lunes</span></div><input type="checkbox" checked></label>
         </div>
+
       </section>
     </main>
   </div>
@@ -385,7 +387,7 @@ tbody tr:hover{background:#fafbfd}
 // true  = sin login ni validación de admin, con datos de demostración
 // false = seguridad real (Firebase Auth + role == 'admin')
 // ============================================================
-const MODO_DESARROLLO = false;
+const MODO_DESARROLLO = true;
 
 // ============================================================
 // CONFIGURACIÓN DE FIREBASE
@@ -408,7 +410,7 @@ let usersLimit = 12, chartMonths = 12;
 const charts = {};
 const STATUS = { paid: 'Pagado', trial: 'Prueba', courtesy: 'Cortesía', overdue: 'Pago pendiente', blocked: 'Bloqueado' };
 const STATUS_COLOR = { paid: '#16a34a', trial: '#2563eb', courtesy: '#8b5cf6', overdue: '#f59e0b', blocked: '#dc2626' };
-const TITLES = { dashboard: 'Dashboard', users: 'Usuarios', pricing: 'Precios', reports: 'Reportes', activity: 'Actividad', settings: 'Ajustes' };
+const TITLES = { dashboard: 'Dashboard', users: 'Usuarios', pricing: 'Precios', reports: 'Reportes', activity: 'Actividades', settings: 'Ajustes' };
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -629,6 +631,7 @@ function switchAdminView(name) {
   $('view-title').textContent = TITLES[name];
   window.scrollTo({ top: 0 });
   if (name === 'dashboard') setTimeout(() => Object.values(charts).forEach(c => c.resize()), 0);
+  if (name === 'activity' && !actSelected) renderActivity();
 }
 $('nav').addEventListener('click', e => { const b = e.target.closest('button'); if (b) switchAdminView(b.dataset.view); });
 $('range-seg').addEventListener('click', e => {
@@ -919,7 +922,7 @@ let actSelected = null, actLimit = 25;
 
 const norm = s => String(s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const fmtDateTime = d => d ? d.toLocaleDateString('es-ES') + ' ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '-';
-const normLog = (x, id) => ({ id, userId: x.userId, type: x.type, product: x.product || '', quantity: +x.quantity || 0, amount: +x.amount || 0,
+const normLog = (x, id) => ({ id, userId: x.userId, userName: x.userName || '', userEmail: x.userEmail || '', items: Array.isArray(x.items) && x.items.length ? x.items.map(i => ({ product: String(i.product || i.name || ''), quantity: +i.quantity || 1, amount: +i.amount || 0 })) : null, type: x.type, product: x.product || '', quantity: +x.quantity || 0, amount: +x.amount || 0,
   cost: x.cost == null ? null : +x.cost, profit: x.profit == null ? null : +x.profit, oldValue: x.oldValue ?? null, newValue: x.newValue ?? null, note: String(x.note || x.reason || ''), createdAt: toDate(x.createdAt) });
 
 // ---- Datos de demostracion (solo MODO_DESARROLLO) ----
@@ -997,7 +1000,10 @@ async function loadActivity(u) {
 const profitOf = l => l.profit != null ? l.profit : l.cost != null ? l.amount - l.cost : l.amount * (PRICING.marginCash || 30) / (100 + (PRICING.marginCash || 30));
 function salesSummary(logs, from, to) {
   const sales = logs.filter(l => l.type === 'sale' && l.createdAt >= from && l.createdAt <= to), by = {};
-  sales.forEach(l => { const p = by[l.product] || (by[l.product] = { name: l.product, units: 0, revenue: 0 }); p.units += l.quantity || 1; p.revenue += l.amount; });
+  sales.forEach(l => {
+    const lines = l.items && l.items.length ? l.items : [{ product: l.product, quantity: l.quantity || 1, amount: l.amount }];
+    lines.forEach(i => { const p = by[i.product] || (by[i.product] = { name: i.product, units: 0, revenue: 0 }); p.units += +i.quantity || 1; p.revenue += +i.amount || 0; });
+  });
   return { count: sales.length, revenue: sales.reduce((t, l) => t + l.amount, 0), profit: sales.reduce((t, l) => t + profitOf(l), 0),
     top: Object.values(by).sort((a, b) => b.units - a.units || b.revenue - a.revenue) };
 }
@@ -1012,33 +1018,83 @@ function weeklyMotivation(cur, prev) {
 // ---- Render ----
 function actDetail(l) {
   const p = '<b style="color:var(--ink)">' + esc(l.product) + '</b>';
-  if (l.type === 'sale') return 'Realizó una venta de ' + money(l.amount) + ' · ' + p + ' × ' + (l.quantity || 1);
+  if (l.type === 'sale') {
+    const lines = l.items && l.items.length ? l.items.map(i => esc(i.product) + ' × ' + i.quantity).join(', ') : p + ' × ' + (l.quantity || 1);
+    return 'Realizó una venta de ' + money(l.amount) + ' · ' + lines;
+  }
   if (l.type === 'price_change') return 'Editó precio de ' + p + ': ' + (l.oldValue != null ? money(l.oldValue) : '-') + ' → ' + (l.newValue != null ? money(l.newValue) : '-');
   if (l.type === 'stock_change') { const d = (l.newValue ?? 0) - (l.oldValue ?? 0); return 'Ajustó stock de ' + p + ': ' + (l.oldValue ?? '-') + ' → ' + (l.newValue ?? '-') + ' uds (' + (d >= 0 ? '+' : '') + d + ')'; }
   if (l.type === 'product_deleted') return 'Eliminó producto' + (norm(l.note) === 'vencido' ? ' vencido' : '') + ': ' + p;
-  return 'Agregó producto ' + p + (l.newValue != null ? ' · precio ' + money(l.newValue) : '') + (l.quantity ? ' · stock inicial ' + l.quantity : '');
+  return 'Agregó ' + p + (l.newValue != null ? ' · precio ' + money(l.newValue) : '') + (l.quantity ? ' · stock inicial ' + l.quantity : '');
+}
+
+let ALL_LOGS = null, feedLimit = 30, feedToken = 0;
+const userOfLog = l => USERS.find(u => u.id === l.userId) || { id: l.userId, displayName: l.userName || '', email: l.userEmail || l.userId || '-' };
+
+// Historial global: demo (Miguel, María y 4 usuarios más) o las últimas 500 acciones de Firestore (activityLogs)
+async function loadAllActivity() {
+  if (ALL_LOGS) return true;
+  if (MODO_DESARROLLO) {
+    const fixed = USERS.filter(u => u.id === 'demo-miguel' || u.id === 'demo-maria');
+    const pick = fixed.concat(USERS.filter(u => u.id !== 'demo-miguel' && u.id !== 'demo-maria').slice(0, 4));
+    pick.forEach(u => { if (!ACT_CACHE[u.id]) ACT_CACHE[u.id] = demoActivity(u); });
+    ALL_LOGS = pick.flatMap(u => ACT_CACHE[u.id].map(l => ({ ...l, userName: u.displayName, userEmail: u.email }))).sort((a, b) => b.createdAt - a.createdAt);
+    return true;
+  }
+  try {
+    const snap = await db.collection('activityLogs').orderBy('createdAt', 'desc').limit(500).get();
+    ALL_LOGS = snap.docs.map(d => normLog(d.data(), d.id)).filter(l => l.createdAt);
+    return true;
+  } catch (e) { console.error('Error cargando historial:', e); showToast('No se pudo cargar el historial de actividades', 'error'); return false; }
+}
+
+async function renderActivityFeed() {
+  const box = $('act-feed'), token = ++feedToken;
+  if (!ALL_LOGS) box.innerHTML = '<p class="empty">Cargando historial...</p>';
+  const ok = await loadAllActivity();
+  if (token !== feedToken) return;
+  if (!ok) { box.innerHTML = '<p class="empty">No se pudo cargar el historial</p>'; return; }
+  const q = norm($('act-search').value.trim()), f = $('act-type').value;
+  const rows = ALL_LOGS.filter(l => { const u = userOfLog(l); return (!f || l.type === f) && (!q || norm((u.displayName || '') + ' ' + (u.email || '')).includes(q)); });
+  box.innerHTML = '<h3 class="sec">' + (q ? 'Historial filtrado' : 'Historial reciente de todos los usuarios') + ' · ' + rows.length + (rows.length === 1 ? ' acción' : ' acciones') + (f ? ' · ' + ACT_TYPES[f] : '') + '</h3>' +
+    '<div class="table-wrap"><table class="rt"><thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead><tbody>' +
+    (rows.length ? rows.slice(0, feedLimit).map(l => '<tr><td class="cell-main" style="white-space:nowrap">' + fmtDateTime(l.createdAt) + '</td><td data-label="Usuario">' + userCell(userOfLog(l)) +
+      '</td><td data-label="Acción"><span class="badge ' + (ACT_BADGE[l.type] || '') + '">' + esc(ACT_TYPES[l.type] || l.type) + '</span></td><td data-label="Detalle">' + actDetail(l) + '</td></tr>').join('')
+      : '<tr><td colspan="4" class="empty">No hay actividad registrada que coincida con el filtro</td></tr>') + '</tbody></table></div>' +
+    (rows.length > feedLimit ? '<div class="more"><button class="btn btn-secondary btn-sm" onclick="feedLimit += 30; renderActivityFeed()">Mostrar más</button></div>' : '');
 }
 
 function renderActivity() {
+  if (!$('view-activity').classList.contains('active')) return;
   const q = norm($('act-search').value.trim()), box = $('act-results');
+  actSelected = null; feedLimit = 30;
+  $('act-detail').hidden = true; $('act-detail').innerHTML = '';
   if (!q) {
-    box.innerHTML = '<p class="empty">Escribe el nombre o correo de un usuario para ver su actividad</p>' + (MODO_DESARROLLO ? '<div class="btn-group" style="justify-content:center"><button class="btn btn-ext btn-sm" onclick="selectActivityUser(\'demo-miguel\')">Probar con Miguel Pérez</button><button class="btn btn-ext btn-sm" onclick="selectActivityUser(\'demo-maria\')">Probar con María Gómez</button></div>' : '');
-    return;
+    box.innerHTML = MODO_DESARROLLO ? '<div class="btn-group" style="margin-bottom:14px"><button class="btn btn-ext btn-sm" onclick="selectActivityUser(\'demo-miguel\')">Probar con Miguel Pérez</button><button class="btn btn-ext btn-sm" onclick="selectActivityUser(\'demo-maria\')">Probar con María Gómez</button></div>' : '';
+  } else {
+    const list = USERS.filter(u => norm(u.email + ' ' + (u.displayName || '')).includes(q));
+    box.innerHTML = list.length
+      ? '<div class="table-wrap" style="margin-bottom:18px"><table class="rt"><thead><tr><th>Usuario</th><th>Estado</th><th class="num">Acciones</th></tr></thead><tbody>' +
+        list.slice(0, 5).map(u => '<tr><td class="cell-main">' + userCell(u) + '</td><td data-label="Estado">' + badge(u.paymentStatus) +
+          '</td><td class="num" data-label="Acciones"><div class="acts"><button class="btn btn-ext btn-sm" onclick="selectActivityUser(\'' + esc(u.id) + '\')">Ver resumen y actividad</button></div></td></tr>').join('') +
+        '</tbody></table></div>' + (list.length > 5 ? '<p class="sub" style="margin:-10px 0 14px">Mostrando 5 de ' + list.length + ' coincidencias. Afina la búsqueda.</p>' : '')
+      : '<p class="empty">No hay usuarios que coincidan con la búsqueda</p>';
   }
-  const list = USERS.filter(u => norm(u.email + ' ' + (u.displayName || '')).includes(q));
-  box.innerHTML = list.length
-    ? '<div class="table-wrap"><table class="rt"><thead><tr><th>Usuario</th><th>Estado</th><th class="num">Acciones</th></tr></thead><tbody>' +
-      list.slice(0, 8).map(u => '<tr><td class="cell-main">' + userCell(u) + '</td><td data-label="Estado">' + badge(u.paymentStatus) +
-        '</td><td class="num" data-label="Acciones"><div class="acts"><button class="btn btn-ext btn-sm" onclick="selectActivityUser(\'' + esc(u.id) + '\')">Ver actividad</button></div></td></tr>').join('') +
-      '</tbody></table></div>' + (list.length > 8 ? '<p class="sub" style="margin-top:8px">Mostrando 8 de ' + list.length + ' coincidencias. Afina la búsqueda.</p>' : '')
-    : '<p class="empty">No hay usuarios que coincidan con la búsqueda</p>';
+  renderActivityFeed();
+}
+
+function clearActivitySearch() { $('act-search').value = ''; renderActivity(); }
+function refreshActivity() {
+  ALL_LOGS = null; Object.keys(ACT_CACHE).forEach(k => delete ACT_CACHE[k]);
+  if (actSelected) selectActivityUser(actSelected); else renderActivity();
 }
 
 async function selectActivityUser(id) {
   const u = USERS.find(x => x.id === id); if (!u) return;
   actSelected = id; actLimit = 25;
   $('act-search').value = u.displayName || u.email;
-  $('act-results').innerHTML = '';
+  feedToken++; $('act-feed').innerHTML = '';
+  $('act-results').innerHTML = '<div class="btn-group" style="margin-bottom:14px"><button class="btn btn-secondary btn-sm" onclick="clearActivitySearch()">← Ver historial de todos los usuarios</button></div>';
   $('act-detail').hidden = false;
   $('act-detail').innerHTML = '<div class="card"><p class="empty">Cargando actividad...</p></div>';
   const ok = await loadActivity(u);
@@ -1073,7 +1129,7 @@ function renderActivityDetail() {
     '<h3 class="sec">Top productos más vendidos de la semana</h3>' +
     '<div class="table-wrap"><table class="rt"><thead><tr><th>Producto</th><th class="num">Unidades</th><th class="num">Ingresos</th></tr></thead><tbody>' +
     (topRows || '<tr><td colspan="3" class="empty">Sin ventas en los últimos 7 días</td></tr>') + '</tbody></table></div>' +
-    '<div class="btn-group" style="margin-top:16px"><button class="btn btn-primary" onclick="shareWeeklyWhatsApp()">Compartir Resumen por WhatsApp</button>' +
+    '<div class="btn-group" style="margin-top:16px"><button class="btn btn-primary" onclick="shareWeeklyWhatsApp()">Enviar Resumen por WhatsApp</button>' +
     '<button class="btn btn-secondary" onclick="copyWeeklyReport()">Copiar Reporte</button></div></div>';
 
   const f = $('act-type').value, rows = logs.filter(l => !f || l.type === f);
@@ -1092,7 +1148,7 @@ function weeklyReportText(u) {
     '📊 *Resumen Semanal de tu Negocio - RS-ADMIN* 📊',
     'Hola ' + (u.displayName || u.email) + '! 👋 Aquí tienes el resumen de tu semana:',
     '',
-    '🛒 *Ventas realizadas:* ' + cur.count + (cur.count === 1 ? ' venta' : ' ventas'),
+    '🛒 *Ventas realizadas:* ' + cur.count + ' ventas',
     '🏆 *Producto más vendido:* ' + (cur.top[0] ? cur.top[0].name : 'Sin ventas esta semana'),
     '💰 *Ingreso total:* ' + money(cur.revenue),
     '📈 *Ganancia estimada:* ' + money(cur.profit),
@@ -1121,7 +1177,7 @@ async function copyWeeklyReport() {
 }
 
 $('act-search').addEventListener('input', renderActivity);
-$('act-type').addEventListener('change', () => { actLimit = 25; renderActivityDetail(); });
+$('act-type').addEventListener('change', () => { actLimit = 25; if (actSelected) renderActivityDetail(); else renderActivity(); });
 
 function generateReport(format) {
   if (format === 'pdf') return window.print();
