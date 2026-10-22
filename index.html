@@ -26137,4 +26137,430 @@ body.modal-open #rs-wa-float{display:none}
 })();
 </script>
 
+
+<!-- ======================================================================
+     RS-ADMIN · CONEXIÓN EN TIEMPO REAL CON EL PANEL (admin.html)
+     Bloque 100% aditivo: no modifica ninguna función existente.
+       1) Escuchador de banners y anuncio global de mantenimiento
+       2) Aviso "Te quedan X días" según la suscripción del usuario
+       3) Registro de actividades y ventas en Firebase (Activity Log)
+     Los nombres de colección/campos se ajustan en RS_CONN_CFG (abajo).
+     ====================================================================== -->
+<style id="rs-conn-style">
+#rs-conn-banners{display:flex;flex-direction:column;gap:8px;margin:0;padding:0}
+#rs-conn-banners:empty{display:none}
+.rs-conn-banner{display:flex;align-items:flex-start;gap:10px;margin:8px 10px 0;padding:10px 12px;border:1px solid;border-radius:10px;font-size:13.5px;line-height:1.45;position:relative}
+.rs-conn-banner .rs-conn-ic{flex:0 0 auto;width:18px;height:18px;margin-top:1px}
+.rs-conn-banner .rs-conn-body{flex:1 1 auto;min-width:0}
+.rs-conn-banner .rs-conn-title{display:block;font-weight:700;margin-bottom:2px}
+.rs-conn-banner .rs-conn-text{display:block;word-wrap:break-word;overflow-wrap:anywhere}
+.rs-conn-banner .rs-conn-action{margin-top:8px;padding:6px 12px;border:0;border-radius:8px;background:#1d4ed8;color:#fff;font-weight:600;font-size:12.5px;cursor:pointer}
+.rs-conn-banner .rs-conn-close{flex:0 0 auto;margin-left:auto;width:26px;height:26px;border:0;border-radius:6px;background:transparent;color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.75}
+.rs-conn-banner .rs-conn-close:hover{opacity:1;background:rgba(0,0,0,.08)}
+.rs-conn-info{background:#eff6ff;border-color:#93c5fd;color:#1e3a8a}
+.rs-conn-warn{background:#fef3c7;border-color:#fbbf24;color:#78350f}
+.rs-conn-danger{background:#fee2e2;border-color:#fca5a5;color:#7f1d1d}
+.rs-conn-maint{background:#fff7ed;border-color:#fdba74;color:#7c2d12}
+html[data-rs-theme="dark"] .rs-conn-info{background:#0f1f3d;border-color:#2b4a8c;color:#bfdbfe}
+html[data-rs-theme="dark"] .rs-conn-warn{background:#3a2a07;border-color:#8a6a12;color:#fde68a}
+html[data-rs-theme="dark"] .rs-conn-danger{background:#3b1212;border-color:#8a2b2b;color:#fecaca}
+html[data-rs-theme="dark"] .rs-conn-maint{background:#3a1f0a;border-color:#8a4a16;color:#fed7aa}
+html[data-rs-theme="dark"] .rs-conn-banner .rs-conn-close:hover{background:rgba(255,255,255,.12)}
+@media print{#rs-conn-banners{display:none!important}}
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  // ------------------------------------------------------------------
+  // CONFIGURACIÓN — debe coincidir con lo que escribe admin.html
+  // ------------------------------------------------------------------
+  var RS_CONN_CFG = {
+    colUsuarios: "users",              // users/{uid}: paymentStatus|estado, subscriptionEndDate|vencimiento
+    colGlobal: "config",               // documento global con anuncios y mantenimiento
+    docGlobal: "global",               // => config/global
+    colActividad: "activityLog",       // colección donde se guarda la actividad (filtrable por nombre/correo)
+    umbralDiasAviso: 7,                // desde cuántos días restantes se muestra el banner
+    graciaInicioMs: 3000,              // ignora escrituras de arranque/hidratación al abrir la app
+    maxEventosPorLote: 30              // si hay más (importación masiva) se guarda un solo resumen
+  };
+
+  var K_PROD = "rs_clothes_products_v2";
+  var K_VENT = "rs_clothes_sales_v2";
+
+  var ICONOS = {
+    reloj: '<svg class="rs-conn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    llave: '<svg class="rs-conn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.6-.6-.6-2.6z"/></svg>',
+    aviso: '<svg class="rs-conn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    cerrar: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>'
+  };
+
+  // ------------------------------------------------------------------
+  // Utilidades
+  // ------------------------------------------------------------------
+  function getAuth() { try { return typeof rsAuth !== "undefined" ? rsAuth : null; } catch (e) { return null; } }
+  function getDb() { try { return typeof rsDb !== "undefined" ? rsDb : null; } catch (e) { return null; } }
+
+  function pick(obj, nombres) {
+    if (!obj) return undefined;
+    for (var i = 0; i < nombres.length; i++) {
+      if (obj[nombres[i]] !== undefined && obj[nombres[i]] !== null) return obj[nombres[i]];
+    }
+    return undefined;
+  }
+
+  function aFecha(v) {
+    if (!v) return null;
+    if (typeof v.toDate === "function") { try { return v.toDate(); } catch (e) { return null; } }
+    if (v instanceof Date) return isNaN(v) ? null : v;
+    var d = new Date(v);
+    return isNaN(d) ? null : d;
+  }
+
+  function esVerdadero(v) { return v === true || v === "true" || v === 1 || v === "1"; }
+
+  var descartados = {};
+  try { descartados = JSON.parse(sessionStorage.getItem("rsconn_descartados") || "{}") || {}; } catch (e) { descartados = {}; }
+  function guardarDescartados() { try { sessionStorage.setItem("rsconn_descartados", JSON.stringify(descartados)); } catch (e) { /* sin almacenamiento */ } }
+
+  // ------------------------------------------------------------------
+  // Contenedor y pintado de banners (siempre con botón de cierre [X])
+  // ------------------------------------------------------------------
+  function asegurarContenedor() {
+    var cont = document.getElementById("rs-conn-banners");
+    if (cont) return cont;
+    cont = document.createElement("div");
+    cont.id = "rs-conn-banners";
+    cont.setAttribute("aria-live", "polite");
+    var pago = document.getElementById("rs-payment-banner");
+    if (pago && pago.parentNode) pago.parentNode.insertBefore(cont, pago);
+    else if (document.body) document.body.insertBefore(cont, document.body.firstChild);
+    return cont;
+  }
+
+  function quitarBanner(id) {
+    var el = document.getElementById("rs-conn-" + id);
+    if (el && el.parentNode) el.parentNode.removeChild(el);
+  }
+
+  function pintarBanner(id, clase, icono, titulo, texto, accion) {
+    var firma = id + "|" + titulo + "|" + texto;
+    if (descartados[id] === firma) { quitarBanner(id); return false; }
+    var cont = asegurarContenedor();
+    var el = document.getElementById("rs-conn-" + id);
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "rs-conn-" + id;
+      el.setAttribute("role", "status");
+      cont.appendChild(el);
+    }
+    el.className = "rs-conn-banner " + clase;
+    el.innerHTML = icono +
+      '<div class="rs-conn-body"><span class="rs-conn-title"></span><span class="rs-conn-text"></span></div>' +
+      '<button type="button" class="rs-conn-close" aria-label="Cerrar aviso" title="Cerrar">' + ICONOS.cerrar + '</button>';
+    el.querySelector(".rs-conn-title").textContent = titulo;
+    el.querySelector(".rs-conn-text").textContent = texto;
+    if (accion) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "rs-conn-action";
+      b.textContent = accion.texto;
+      b.addEventListener("click", accion.fn);
+      el.querySelector(".rs-conn-body").appendChild(b);
+    }
+    el.querySelector(".rs-conn-close").addEventListener("click", function () {
+      descartados[id] = firma;
+      guardarDescartados();
+      quitarBanner(id);
+    });
+    return true;
+  }
+
+  // ------------------------------------------------------------------
+  // 1) y 2) Escuchadores en tiempo real
+  // ------------------------------------------------------------------
+  var datosUsuario = null;
+  var datosGlobal = null;
+  var unsubUsuario = null;
+  var unsubGlobal = null;
+  var temporizadorDias = null;
+
+  function pintarDias() {
+    var d = datosUsuario;
+    if (!d) { quitarBanner("dias"); return; }
+    var estado = String(pick(d, ["estado", "paymentStatus"]) || "").toLowerCase();
+    var fin = aFecha(pick(d, ["vencimiento", "subscriptionEndDate"]));
+    if (!fin || estado === "blocked" || estado === "bloqueado") { quitarBanner("dias"); return; }
+
+    var dias = Math.ceil((fin.getTime() - Date.now()) / 86400000);
+    var esPrueba = estado === "trial" || estado === "prueba";
+    var esCortesia = estado === "courtesy" || estado === "cortesia" || estado === "cortesía";
+    var accion = { texto: "Renovar suscripción", fn: function () { if (typeof window.rsOpenPaymentInfo === "function") window.rsOpenPaymentInfo(); } };
+
+    var mostrado = false;
+    if (dias < 0) {
+      var atras = Math.abs(dias);
+      mostrado = pintarBanner("dias", "rs-conn-danger", ICONOS.aviso, "Suscripción vencida",
+        "Tu suscripción venció hace " + atras + (atras === 1 ? " día." : " días.") + " Renueva para conservar el acceso a tus datos.", accion);
+    } else if (dias <= RS_CONN_CFG.umbralDiasAviso) {
+      var clase = dias <= 3 ? "rs-conn-warn" : "rs-conn-info";
+      var titulo = esPrueba ? "Período de prueba" : (esCortesia ? "Acceso de cortesía" : "Suscripción");
+      var texto = dias === 0 ? "Tu acceso vence hoy."
+        : (dias === 1 ? "Te queda 1 día." : "Te quedan " + dias + " días.");
+      if (!esCortesia) texto += " Renueva para no perder el acceso.";
+      mostrado = pintarBanner("dias", clase, ICONOS.reloj, titulo, texto, esCortesia ? null : accion);
+    } else {
+      quitarBanner("dias");
+    }
+    // Evita duplicar el aviso de pago original: solo se oculta mientras este banner esté visible.
+    if (mostrado) {
+      var viejo = document.getElementById("rs-payment-banner");
+      if (viejo) viejo.style.display = "none";
+    }
+  }
+
+  function pintarGlobal() {
+    var g = datosGlobal;
+    if (!g) { quitarBanner("mantenimiento"); quitarBanner("anuncio"); return; }
+
+    // Mantenimiento
+    var m = pick(g, ["mantenimientoActivo", "maintenanceActive", "mantenimiento", "maintenance"]);
+    var mantActivo = false, mantMsg;
+    if (m && typeof m === "object") {
+      mantActivo = esVerdadero(pick(m, ["activo", "active", "enabled"]));
+      mantMsg = pick(m, ["mensaje", "message", "texto"]);
+    } else {
+      mantActivo = esVerdadero(m);
+    }
+    if (mantMsg === undefined) mantMsg = pick(g, ["mantenimientoMensaje", "mensajeMantenimiento", "maintenanceMessage"]);
+    if (mantActivo) {
+      pintarBanner("mantenimiento", "rs-conn-maint", ICONOS.llave, "Mantenimiento del sistema",
+        String(mantMsg || "El sistema tiene un mantenimiento programado. Guarda tu trabajo y evita operaciones largas."), null);
+    } else {
+      quitarBanner("mantenimiento");
+    }
+
+    // Banner / anuncio global
+    var b = pick(g, ["bannerActivo", "bannerActive"]);
+    var bTexto = pick(g, ["bannerTexto", "bannerText", "bannerMensaje", "bannerMessage"]);
+    var bTipo = String(pick(g, ["bannerTipo", "bannerType"]) || "info").toLowerCase();
+    var bTitulo = pick(g, ["bannerTitulo", "bannerTitle"]);
+    if (esVerdadero(b) && bTexto) {
+      var clase = bTipo === "danger" || bTipo === "error" ? "rs-conn-danger" : (bTipo === "warning" || bTipo === "warn" || bTipo === "aviso" ? "rs-conn-warn" : "rs-conn-info");
+      pintarBanner("anuncio", clase, ICONOS.aviso, String(bTitulo || "Aviso"), String(bTexto), null);
+    } else {
+      quitarBanner("anuncio");
+    }
+  }
+
+  function detenerEscuchas() {
+    if (unsubUsuario) { try { unsubUsuario(); } catch (e) { /* ya detenido */ } unsubUsuario = null; }
+    if (unsubGlobal) { try { unsubGlobal(); } catch (e) { /* ya detenido */ } unsubGlobal = null; }
+    if (temporizadorDias) { clearInterval(temporizadorDias); temporizadorDias = null; }
+    datosUsuario = null;
+    datosGlobal = null;
+  }
+
+  function iniciarEscuchas(user) {
+    detenerEscuchas();
+    var db = getDb();
+    if (!db || !user) return;
+
+    // Suscripción del usuario: cambios hechos en admin.html llegan al instante.
+    unsubUsuario = db.collection(RS_CONN_CFG.colUsuarios).doc(user.uid).onSnapshot(function (snap) {
+      datosUsuario = snap.exists ? snap.data() : null;
+      pintarDias();
+    }, function (err) { console.warn("RS conexión: no se pudo escuchar la suscripción:", err && err.code ? err.code : err); });
+
+    // Mantenimiento y banners globales.
+    unsubGlobal = db.collection(RS_CONN_CFG.colGlobal).doc(RS_CONN_CFG.docGlobal).onSnapshot(function (snap) {
+      datosGlobal = snap.exists ? snap.data() : null;
+      pintarGlobal();
+    }, function (err) { console.warn("RS conexión: no se pudo escuchar el anuncio global:", err && err.code ? err.code : err); });
+
+    // Recalcula los días restantes aunque la app quede abierta toda la noche.
+    temporizadorDias = setInterval(pintarDias, 60 * 1000);
+  }
+
+  // ------------------------------------------------------------------
+  // 3) Registro de actividades y ventas en Firebase
+  // ------------------------------------------------------------------
+  var inicioApp = 0;
+  var pendProductos = [];
+  var pendVentas = [];
+  var temporizadorEnvio = null;
+
+  var vigia = setInterval(function () {
+    if (window.__RS_APP_STARTED && window.__RS_UID) { inicioApp = Date.now(); clearInterval(vigia); }
+  }, 250);
+
+  function appLista() {
+    return !!(window.__RS_APP_STARTED && window.__RS_UID && inicioApp && (Date.now() - inicioApp) > RS_CONN_CFG.graciaInicioMs);
+  }
+
+  function parseLista(s) {
+    if (s === null || s === undefined) return [];
+    try { var a = JSON.parse(s); return Array.isArray(a) ? a : null; } catch (e) { return null; }
+  }
+
+  function num(v) { var n = Number(v); return isFinite(n) ? n : 0; }
+  function usd(v) { return "$" + num(v).toFixed(2); }
+
+  function diffProductos(antes, despues) {
+    var mapaA = {}, mapaB = {};
+    antes.forEach(function (p) { if (p && p.id !== undefined) mapaA[p.id] = p; });
+    despues.forEach(function (p) { if (p && p.id !== undefined) mapaB[p.id] = p; });
+
+    despues.forEach(function (p) {
+      if (!p || p.id === undefined) return;
+      var o = mapaA[p.id];
+      if (!o) {
+        pendProductos.push({ tipo: "producto_agregado", productoId: p.id, producto: p.name || "",
+          detalle: "Precio " + usd(p.price) + " · Stock " + num(p.stock) });
+        return;
+      }
+      if (num(o.price) !== num(p.price) || num(o.priceCredito) !== num(p.priceCredito)) {
+        var txt = num(o.price) !== num(p.price) ? "Precio contado " + usd(o.price) + " a " + usd(p.price) : "";
+        if (num(o.priceCredito) !== num(p.priceCredito)) txt += (txt ? " · " : "") + "Precio crédito " + usd(o.priceCredito) + " a " + usd(p.priceCredito);
+        pendProductos.push({ tipo: "cambio_precio", productoId: p.id, producto: p.name || "", detalle: txt,
+          precioAnterior: num(o.price), precioNuevo: num(p.price) });
+      }
+      if (num(o.stock) !== num(p.stock)) {
+        pendProductos.push({ tipo: "cambio_stock", productoId: p.id, producto: p.name || "",
+          detalle: "Stock " + num(o.stock) + " a " + num(p.stock), stockAnterior: num(o.stock), stockNuevo: num(p.stock),
+          delta: num(p.stock) - num(o.stock) });
+      }
+      var otros = ["name", "category", "cost", "barcode", "sizes", "presentation", "unidadVenta", "unidadesPorCaja"].filter(function (k) {
+        return String(o[k]) !== String(p[k]);
+      });
+      if (otros.length) {
+        pendProductos.push({ tipo: "producto_editado", productoId: p.id, producto: p.name || "",
+          detalle: "Campos modificados: " + otros.join(", ") });
+      }
+    });
+
+    antes.forEach(function (p) {
+      if (!p || p.id === undefined) return;
+      if (!mapaB[p.id]) pendProductos.push({ tipo: "producto_eliminado", productoId: p.id, producto: p.name || "",
+        detalle: "Producto eliminado del inventario" });
+    });
+  }
+
+  function diffVentas(antes, despues) {
+    var vistos = {};
+    antes.forEach(function (v) { if (v && v.id !== undefined) vistos[v.id] = true; });
+    despues.forEach(function (v) {
+      if (!v || v.id === undefined || vistos[v.id]) return;
+      var items = (v.items || []).map(function (it) {
+        return { id: it.id, nombre: it.name || "", cantidad: num(it.quantity), precio: num(it.price) };
+      });
+      var resumen = items.map(function (it) { return it.nombre + " x" + it.cantidad; }).join(", ");
+      pendVentas.push({ tipo: "venta", ventaId: v.id, producto: items.length ? items[0].nombre : "",
+        detalle: (resumen || "Venta") + " · Total " + usd(v.totalUsd),
+        montoUsd: num(v.totalUsd), montoBs: num(v.totalBs), cliente: v.clientName || "",
+        metodoPago: v.paymentMethod || "", items: items, cantidadItems: items.reduce(function (a, it) { return a + it.cantidad; }, 0),
+        fechaVenta: v.date || "" });
+    });
+  }
+
+  function procesarCambio(clave, antes, despues) {
+    var A = parseLista(antes), B = parseLista(despues);
+    if (!A || !B) return;
+    if (clave === K_PROD) diffProductos(A, B); else diffVentas(A, B);
+    clearTimeout(temporizadorEnvio);
+    // Espera breve: saveState() escribe productos y ventas en la misma pasada.
+    temporizadorEnvio = setTimeout(enviarLote, 150);
+  }
+
+  function datosBase() {
+    var a = getAuth();
+    var u = a && a.currentUser;
+    var info = (typeof rsPaymentInfo !== "undefined" && rsPaymentInfo) ? rsPaymentInfo : null;
+    return {
+      userId: u ? u.uid : (window.__RS_UID || ""),
+      email: (u && u.email) || (info && info.email) || (datosUsuario && datosUsuario.email) || "",
+      nombre: (datosUsuario && (datosUsuario.displayName || datosUsuario.nombre)) || (u && u.displayName) || ""
+    };
+  }
+
+  function enviarEventos(eventos) {
+    var db = getDb(), a = getAuth();
+    if (!db || !a || !a.currentUser || !eventos.length) return;
+    if (typeof rsUsuarioValido === "function" && !rsUsuarioValido(a.currentUser.uid)) return;
+    var base = datosBase();
+    var ts = (window.firebase && firebase.firestore && firebase.firestore.FieldValue) ? firebase.firestore.FieldValue.serverTimestamp() : null;
+    var ahora = new Date().toISOString();
+    var lote = db.batch();
+    eventos.forEach(function (ev) {
+      var doc = {};
+      Object.keys(ev).forEach(function (k) { doc[k] = ev[k]; });
+      doc.userId = base.userId;
+      doc.email = base.email;
+      doc.nombre = base.nombre;
+      doc.categoria = ev.tipo === "venta" ? "venta" : "producto";
+      doc.fecha = ahora;
+      if (ts) doc.creadoEn = ts;
+      lote.set(db.collection(RS_CONN_CFG.colActividad).doc(), doc);
+    });
+    lote.commit().catch(function (err) {
+      console.warn("RS conexión: no se pudo guardar la actividad (revisa las reglas de Firestore):", err && err.code ? err.code : err);
+    });
+  }
+
+  function enviarLote() {
+    temporizadorEnvio = null;
+    var productos = pendProductos; pendProductos = [];
+    var ventas = pendVentas; pendVentas = [];
+
+    // El descuento de stock causado por una venta ya queda reflejado en la venta: no se duplica.
+    var vendidos = {};
+    ventas.forEach(function (v) { (v.items || []).forEach(function (it) { vendidos[it.id] = true; }); });
+    productos = productos.filter(function (e) { return !(e.tipo === "cambio_stock" && vendidos[e.productoId] && e.delta < 0); });
+
+    // Importaciones o cambios masivos: un solo resumen en lugar de cientos de registros.
+    if (productos.length > RS_CONN_CFG.maxEventosPorLote) {
+      productos = [{ tipo: "cambio_masivo", producto: "", detalle: productos.length + " cambios en productos (importación o edición masiva)", cantidadCambios: productos.length }];
+    }
+    enviarEventos(productos.concat(ventas));
+  }
+
+  function instalarRastreo() {
+    var objetivo = window.__RS_STORAGE_FALLBACK ? window.localStorage : Storage.prototype;
+    var setPrevio = objetivo.setItem;
+    var getPrevio = objetivo.getItem;
+    objetivo.setItem = function (clave, valor) {
+      var rastrear = (clave === K_PROD || clave === K_VENT) && this === window.localStorage && appLista();
+      var antes = null;
+      if (rastrear) { try { antes = getPrevio.call(this, clave); } catch (e) { rastrear = false; } }
+      var resultado = setPrevio.apply(this, arguments);
+      if (rastrear) { try { procesarCambio(clave, antes, String(valor)); } catch (e) { console.warn("RS conexión: error al registrar actividad:", e); } }
+      return resultado;
+    };
+  }
+
+  // API pública para registrar acciones manuales desde otras partes del sistema.
+  window.RS_CONEXION = {
+    version: "1.0",
+    registrarActividad: function (tipo, detalle, extra) {
+      var ev = { tipo: String(tipo || "actividad"), detalle: String(detalle || ""), producto: "" };
+      if (extra && typeof extra === "object") Object.keys(extra).forEach(function (k) { ev[k] = extra[k]; });
+      enviarEventos([ev]);
+    }
+  };
+
+  // ------------------------------------------------------------------
+  // Arranque
+  // ------------------------------------------------------------------
+  try { instalarRastreo(); } catch (e) { console.warn("RS conexión: no se pudo instalar el registro de actividad:", e); }
+
+  var auth = getAuth();
+  if (auth && typeof auth.onAuthStateChanged === "function") {
+    auth.onAuthStateChanged(function (user) {
+      if (user) iniciarEscuchas(user); else detenerEscuchas();
+    });
+  }
+})();
+</script>
+
 </body></html>
