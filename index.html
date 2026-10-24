@@ -23913,18 +23913,35 @@ rsAuth.onAuthStateChanged(async function (user) {
     $id("rs-eq-cancelar").style.display = "none";
   }
 
+  // Crea la cuenta en Firebase Authentication en segundo plano usando una app secundaria,
+  // para que la sesión del dueño NO se cierre. Devuelve la app secundaria con el empleado
+  // todavía autenticado (permite deshacer si luego falla Firestore).
   async function crearCuentaAuth(email, pass) {
-    var sec = null;
-    try {
-      try { sec = firebase.app("rsStaffCreator"); } catch (e) { sec = firebase.initializeApp(rsFirebaseConfig, "rsStaffCreator"); }
-      await sec.auth().createUserWithEmailAndPassword(email, pass);
-      return "creada";
-    } catch (e) {
-      if (e && e.code === "auth/email-already-in-use") return "existia";
-      throw e;
-    } finally {
-      try { if (sec) await sec.auth().signOut(); } catch (e2) { /* ignorar */ }
-    }
+    var sec;
+    try { sec = firebase.app("rsStaffCreator"); } catch (e) { sec = firebase.initializeApp(rsFirebaseConfig, "rsStaffCreator"); }
+    // Equivale a createUserWithEmailAndPassword(auth, email, password) (SDK compat)
+    await sec.auth().createUserWithEmailAndPassword(email, pass);
+    return sec;
+  }
+
+  async function cerrarSesionSecundaria(sec) {
+    try { if (sec) await sec.auth().signOut(); } catch (e) { /* ignorar */ }
+  }
+
+  function mensajeErrorEmpleado(e) {
+    var c = e && e.code;
+    var mapa = {
+      "rs/ya-en-equipo": "Ese correo ya está en tu equipo. Usa \"Editar permisos\" o \"Activar\" en su ficha.",
+      "auth/email-already-in-use": "Ese correo ya está registrado. Usa otro correo o pídele a esa persona que use \"Olvidé mi contraseña\".",
+      "auth/invalid-email": "El correo no es válido.",
+      "auth/weak-password": "La contraseña es muy débil: usa al menos 6 caracteres.",
+      "auth/operation-not-allowed": "El registro por correo y contraseña no está habilitado en Firebase Authentication.",
+      "auth/network-request-failed": "Sin conexión a internet. Revisa tu red e intenta de nuevo.",
+      "auth/too-many-requests": "Demasiados intentos. Espera unos minutos e intenta de nuevo.",
+      "permission-denied": "No se pudo guardar: ese correo ya pertenece a otro negocio o faltan las reglas de Firestore."
+    };
+    if (c && mapa[c]) return mapa[c];
+    return "No se pudo registrar al empleado: " + (e && e.message ? e.message : "error desconocido");
   }
 
   async function guardarEmpleado() {
@@ -23937,8 +23954,22 @@ rsAuth.onAuthStateChanged(async function (user) {
     if (email === clave(u.email)) return toast("No puedes registrarte como tu propio empleado.", true);
     if (!permisos.length) return toast("Marca al menos una función permitida.", true);
     if (!editando && pass.length < 6) return toast("La contraseña temporal debe tener al menos 6 caracteres.", true);
+    if (btn.disabled) return;
     btn.disabled = true;
+    var sec = null, authCreada = false, readmision = false;
     try {
+      // 1) Alta nueva: primero la cuenta en Firebase Authentication (automática, en segundo plano)
+      if (!editando) {
+        if (EQUIPO.find(function (x) { return x.id === email; })) throw { code: "rs/ya-en-equipo" };
+        try {
+          sec = await crearCuentaAuth(email, pass);
+          authCreada = true;
+        } catch (e0) {
+          // Correo ya existente en Auth (ej. empleado que fue quitado antes): se reincorpora
+          if (e0 && e0.code === "auth/email-already-in-use") readmision = true; else throw e0;
+        }
+      }
+      // 2) Luego permisos y datos en Firestore (igual que antes)
       var ahora = new Date().toISOString();
       var previo = EQUIPO.find(function (x) { return x.id === email; });
       await rsDb.collection("staff").doc(email).set({
@@ -23946,24 +23977,30 @@ rsAuth.onAuthStateChanged(async function (user) {
         permisos: permisos, activo: previo ? previo.activo !== false : true,
         creadoEn: previo && previo.creadoEn ? previo.creadoEn : ahora, actualizadoEn: ahora
       });
-      var nota = "";
-      if (!editando) {
+      await cerrarSesionSecundaria(sec); sec = null;
+      if (readmision) {
+        // Su contraseña anterior ya no sirve: recibe un correo para crear una nueva
         try {
-          var r = await crearCuentaAuth(email, pass);
-          nota = r === "existia" ? " Ese correo ya tenía cuenta en el sistema: si esa persona ya usa el sistema por su cuenta como cliente, no podrá entrar como empleado; en ese caso usa otro correo." : " Entrégale el correo y la contraseña temporal.";
-        } catch (e) {
-          await rsDb.collection("staff").doc(email).delete().catch(function () { /* ignorar */ });
-          throw e;
+          await rsAuth.sendPasswordResetEmail(email);
+          toast("Empleado reincorporado. Se envió un correo a " + email + " para que cree una contraseña nueva.");
+        } catch (e3) {
+          console.warn("RS equipo (reset):", e3);
+          toast("Empleado reincorporado, pero no se pudo enviar el correo. Usa \"Enviar cambio de contraseña\" en su ficha.", true);
         }
+      } else {
+        toast(editando ? "Cambios guardados." : "Empleado registrado. Entrégale el correo y la contraseña temporal.");
       }
-      toast("Empleado guardado." + nota);
       limpiarFormEquipo();
       await cargarEquipo();
       if (!EQUIPO_ACTIVO) { EQUIPO_ACTIVO = true; await tomarSello(u.uid); escucharRespaldo(u.uid); }
     } catch (e) {
       console.warn("RS equipo (guardar):", e);
-      var m = e && e.code === "permission-denied" ? "No se pudo guardar: ese correo ya pertenece a otro negocio o faltan las reglas de Firestore." : "No se pudo guardar: " + (typeof rsTranslateAuthError === "function" ? rsTranslateAuthError(e) : (e && e.message));
-      toast(m, true);
+      // Si la cuenta de Auth se creó pero Firestore falló, se deshace para no dejar cuentas huérfanas
+      if (authCreada && sec) {
+        try { if (sec.auth().currentUser) await sec.auth().currentUser.delete(); } catch (e2) { console.warn("RS equipo (deshacer Auth):", e2); }
+      }
+      await cerrarSesionSecundaria(sec);
+      toast(mensajeErrorEmpleado(e), true);
     }
     btn.disabled = false;
   }
