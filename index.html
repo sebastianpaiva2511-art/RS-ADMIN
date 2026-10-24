@@ -551,9 +551,9 @@
     }
 
     .btn-tasa {
-      background-color: #ecfdf5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
+      background-color: #e0f2fe;
+      color: #075985;
+      border: 1px solid #7dd3fc;
       font-weight: 800;
       font-size: 12px;
     }
@@ -561,7 +561,7 @@
     .tasa-dot {
       width: 7px;
       height: 7px;
-      background-color: #10b981;
+      background-color: #0ea5e9;
       border-radius: 50%;
       display: inline-block;
     }
@@ -691,8 +691,8 @@
       margin: -3px -6px -3px 0;
       padding: 0;
       border-radius: 9999px;
-      border: 1px solid #6ee7b7;
-      background-color: #059669;
+      border: 1px solid #7dd3fc;
+      background-color: #0284c7;
       color: #ffffff;
       font-size: 15px;
       line-height: 1;
@@ -2920,13 +2920,15 @@ document.addEventListener("DOMContentLoaded", function () {
       <ul>
         <li>De tu cuenta: nombre, correo electrónico, contraseña (se guarda cifrada) y estado de tu suscripción.</li>
         <li>De tu negocio: productos y sus fotos, ventas, gastos, cuentas por cobrar y por pagar, y los datos de tus clientes que tú registres (nombre, cédula o RIF, teléfono, correo y dirección).</li>
+        <li>Registro de actividad: un historial de las altas de productos y ventas que haces en el sistema, que el administrador del servicio puede consultar para dar soporte.</li>
+        <li>De tus empleados: si les das acceso, guardamos su correo electrónico y su estado de acceso (activo o inactivo).</li>
       </ul>
       <p><strong>3. Para qué los usamos.</strong> Solo para que el sistema funcione, administrar tu suscripción, darte soporte y mantener la seguridad. No vendemos tus datos ni los usamos para publicidad.</p>
       <p><strong>4. Datos de tus clientes.</strong> La información de las personas que registras en tu negocio es tuya y tú eres responsable de ella. RS Admin solo la guarda para prestarte el servicio.</p>
-      <p><strong>5. Dónde y cómo se guardan.</strong> Los datos se almacenan en servicios en la nube de Google (Firebase) con conexión cifrada. Cada negocio solo puede ver sus propios datos. Ningún sistema es infalible: cuida tu contraseña y exporta copias de seguridad con frecuencia.</p>
+      <p><strong>5. Dónde y cómo se guardan.</strong> Los datos se almacenan en servicios en la nube de Google (Firebase) con conexión cifrada. Cada negocio solo puede ver sus propios datos. Para funcionar, el sistema usa servicios de terceros: Google (Firebase, para tu cuenta y tus datos), redes de distribución de librerías (cdnjs, jsDelivr, unpkg y Google), un servicio de generación de códigos QR (api.qrserver.com, que recibe solo el nombre de tu negocio al imprimir el comprobante) y ve.dolarapi.com (para consultar la tasa de cambio, sin enviar tus datos). Estos servicios pueden ver tu dirección IP al cargarse. Ningún sistema es infalible: cuida tu contraseña y exporta copias de seguridad con frecuencia.</p>
       <p><strong>6. Inteligencia artificial.</strong> Actualmente RS Admin no usa inteligencia artificial para procesar tus datos. Si en el futuro se agregan funciones de IA, lo informaremos aquí y pediremos tu consentimiento antes de enviar datos a un proveedor externo.</p>
-      <p><strong>7. Tus derechos.</strong> Puedes pedir acceso a tus datos, corregirlos, exportarlos o que los eliminemos, escribiendo al correo de contacto.</p>
-      <p><strong>8. Cuánto tiempo los guardamos.</strong> Mientras tu cuenta esté activa. Si pides eliminarla, borraremos tus datos, salvo lo que la ley nos obligue a conservar.</p>
+      <p><strong>7. Tus derechos.</strong> Puedes pedir acceso a tus datos, corregirlos o exportarlos escribiendo al correo de contacto. Para eliminarlos tú mismo, entra al menú de tu perfil y pulsa «Borrar mis datos»: se borran de inmediato tu cuenta y toda la información de tu negocio. Esta acción es permanente, así que exporta antes una copia de seguridad.</p>
+      <p><strong>8. Cuánto tiempo los guardamos.</strong> Mientras tu cuenta esté activa. Si usas «Borrar mis datos» o nos lo pides, los eliminamos, salvo lo que la ley nos obligue a conservar. Las copias de seguridad que tú exportaste a tu dispositivo son tuyas y no se borran desde aquí.</p>
       <p><strong>9. Cambios.</strong> Si actualizamos esta política, publicaremos la nueva versión en esta misma pantalla.</p>
 
       <h3>Cookies y almacenamiento local</h3>
@@ -3029,11 +3031,26 @@ document.addEventListener("DOMContentLoaded", function () {
           <button id="btn-open-profile" class="btn-profile" title="Perfil"
             onclick="document.getElementById('rs-profile-dropdown').classList.toggle('rs-hidden')"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
           <div id="rs-profile-dropdown" class="rs-profile-dropdown rs-hidden">
+            <div class="rs-pd-avatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
             <div class="rs-profile-dropdown-info">
               <span class="rs-user-bar-email" id="rs-user-email-display"></span>
               <span class="rs-user-bar-status" id="rs-user-status-display"></span>
             </div>
-            <button type="button" class="rs-btn-logout" onclick="rsHandleLogout()">Cerrar sesión</button>
+            <div class="rs-pd-sep"></div>
+            <button type="button" class="rs-pd-item" onclick="rsAbrirAjustesDesdePerfil()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Configuración / Ajustes</span>
+            </button>
+            <button type="button" class="rs-pd-item" id="rs-btn-borrar-datos" onclick="rsAbrirBorrarDatos()" style="color:#b91c1c;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              <span>Borrar mis datos</span>
+            </button>
+            <button type="button" class="rs-btn-logout" onclick="rsHandleLogout()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span>Cerrar sesión</span>
+            </button>
           </div>
         </div>
       </div>
@@ -3041,8 +3058,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       <!-- FILA 2: Escáner (código de barras + cámara) y Buscador -->
       <div class="header-row-search" id="header-row-search">
-            <div class="search-box" style="border-color: #a7f3d0; background-color: #ecfdf5;">
-              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="search-box search-box--scan">
+              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="5" width="18" height="14" rx="1"></rect>
                 <line x1="7" y1="5" x2="7" y2="19"></line>
                 <line x1="10" y1="5" x2="10" y2="19"></line>
@@ -5750,7 +5767,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 <li><b>Botón $ / Bs:</b> cambia la moneda en la que se muestra el precio principal del catálogo. No modifica ningún dato.</li>
                 <li><b>Menú lateral:</b> da acceso a Home, Punto de Venta, Inventario, Cuentas por Cobrar / Pagar, Clientes, Historial de Ventas, Gastos, Arqueo de Caja, Configuración, Usuarios y Permisos, Estadísticas y Resumen Financiero.</li>
                 <li><b>Parte baja del menú:</b> la tasa actual con el botón <b>Cambiar Tasa</b> y el interruptor para abrir o cerrar la caja.</li>
-                <li><b>Tu perfil:</b> desde el icono de perfil puedes cerrar sesión.</li>
+                <li><b>Tu perfil:</b> toca el icono de perfil para abrir tu tarjeta, con tu correo, el estado de tu cuenta (Prueba o Activo), el acceso rápido a <b>Configuración / Ajustes</b> y el botón <b>Cerrar sesión</b>. La tarjeta se cierra sola al tocar fuera de ella.</li>
+                <li><b>Avisos en pantalla:</b> el sistema muestra mensajes automáticos de confirmación (o de error si algo falta) al guardar productos, clientes, proveedores y gastos, registrar un abono o un pago, crear un crédito y actualizar datos. En una venta normal, la confirmación es el Ticket de Venta que se abre al finalizar el pedido.</li>
               </ul>
             </div>
           </details>
@@ -5907,8 +5925,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     <li><b>Registrar Nuevo Abono:</b> elige el método de pago, escribe el monto y una nota opcional y toca <b>Abonar</b>. Cada abono guarda fecha y hora exactas.</li>
                     <li><b>Cobrar Completo:</b> rellena el monto con el saldo exacto; luego confirmas con Abonar.</li>
                     <li><b>Historiales plegables:</b> "Historial de Abonos" y "Movimientos / Compras" se despliegan con un toque y muestran un contador.</li>
-                    <li><b>Completar Registro:</b> agrega o corrige los datos del cliente.</li>
-                    <li><b>Compartir WhatsApp</b> y <b>Enviar por Email</b>: mandan el estado de cuenta al cliente.</li>
+                    <li><b>Completar Registro:</b> agrega o corrige los datos del cliente. Ningún campo es obligatorio: puedes guardar solo la información que tengas (por ejemplo, solo el teléfono o solo la cédula) y tocar <b>Guardar Datos</b>. Si dejas el nombre vacío, se conserva el que ya tenía.</li>
+                    <li><b>Compartir WhatsApp</b> y <b>Enviar por Email</b>: al presionarlos, el sistema genera automáticamente un resumen detallado del estado de cuenta (compras con sus montos, historial de abonos y el resumen con Total Compras, Total Abonado y Saldo Pendiente), listo para enviar directamente al cliente. <b>WhatsApp</b> abre el chat del cliente con el mensaje ya escrito; <b>Email</b> abre tu app de correo con el asunto «Estado de Cuenta» y el detalle en el cuerpo. Si el cliente no tiene teléfono o correo guardado, igual se abre WhatsApp o el correo para que elijas el contacto.</li>
                   </ul>
                 </li>
                 <li><b>Recibos y comprobantes de crédito:</b> toca <b>Imprimir Recibo / PDF</b> para abrir el "Recibo / Estado de Cuenta". Elige qué abono mostrar, la moneda (USD o BS) y el formato (Ticket 80 mm, 58 mm o Carta), revisa la vista previa y toca <b>Imprimir / Guardar PDF</b>. Cuando la cuenta queda saldada, el recibo lo indica.</li>
@@ -5959,7 +5977,8 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="rs-acc-body">
               <ul>
                 <li>Se cambian con las pestañas <b>Clientes</b> y <b>Proveedores</b>.</li>
-                <li><b>Nuevo Cliente / Nuevo Proveedor:</b> guarda nombre, cédula o RIF, teléfono, correo y dirección.</li>
+                <li><b>Nuevo Cliente / Nuevo Proveedor:</b> guarda nombre, cédula o RIF, teléfono, correo y dirección. En un cliente nuevo solo el nombre es necesario; la cédula, el teléfono, el correo y la dirección son opcionales y puedes completarlos después.</li>
+                <li><b>Completar los datos de un cliente:</b> en Cuentas por Cobrar, abre <b>Ver &amp; Abonar</b> y toca <b>Completar Registro</b>. Ahí ningún campo es obligatorio, así que puedes guardar rápido solo el dato que tengas, como el teléfono o la cédula.</li>
                 <li>La tabla muestra cuántas compras ha hecho, el total gastado (o comprado), y la última compra. Desde Acciones puedes ver su historial.</li>
                 <li>Los clientes registrados se pueden elegir en el Paso 2 del cobro y en los créditos sin volver a escribir sus datos.</li>
               </ul>
@@ -6933,33 +6952,33 @@ document.addEventListener("DOMContentLoaded", function () {
           </button>
         </div>
 
-        <form id="form-cxc-complete-registro">
+        <form id="form-cxc-complete-registro" novalidate>
           <div class="modal-body">
-            <p style="font-size: 11px; color: #64748b; margin-bottom: 12px;">Completa o actualiza los datos faltantes del cliente. Los campos marcados con <span style="color: #e11d48;">*</span> son obligatorios.</p>
+            <p style="font-size: 11px; color: #64748b; margin-bottom: 12px;">Completa o actualiza los datos del cliente. Todos los campos son opcionales: llena solo el que necesites.</p>
             
             <div class="form-group">
-              <label>Nombre del Cliente: <span style="color: #e11d48;">*</span></label>
-              <input type="text" id="complete-client-name" class="form-input" placeholder="Ej: Carlos Gómez" required>
+              <label>Nombre del Cliente:</label>
+              <input type="text" id="complete-client-name" class="form-input" placeholder="Ej: Carlos Gómez">
             </div>
             
             <div class="form-group">
-              <label>Cédula / RIF: <span style="color: #e11d48;">*</span></label>
-              <input type="text" id="complete-client-cedula" class="form-input" placeholder="Ej: V-12345678" required>
+              <label>Cédula / RIF:</label>
+              <input type="text" id="complete-client-cedula" class="form-input" placeholder="Ej: V-12345678">
             </div>
             
             <div class="form-group">
-              <label>Teléfono: <span style="color: #e11d48;">*</span></label>
-              <input type="text" id="complete-client-phone" class="form-input" placeholder="0412-1234567" required>
+              <label>Teléfono:</label>
+              <input type="text" id="complete-client-phone" class="form-input" placeholder="0412-1234567">
             </div>
             
             <div class="form-group">
-              <label>Correo Electrónico: <span style="color: #e11d48;">*</span></label>
-              <input type="email" id="complete-client-email" class="form-input" placeholder="cliente@email.com" required>
+              <label>Correo Electrónico:</label>
+              <input type="email" id="complete-client-email" class="form-input" placeholder="cliente@email.com">
             </div>
             
             <div class="form-group">
-              <label>Ubicación / Dirección: <span style="color: #e11d48;">*</span></label>
-              <input type="text" id="complete-client-location" class="form-input" placeholder="Calle Principal 123, Apto 4B" required>
+              <label>Ubicación / Dirección:</label>
+              <input type="text" id="complete-client-location" class="form-input" placeholder="Calle Principal 123, Apto 4B">
             </div>
             
             <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; padding: 8px 10px; border-radius: 10px; font-size: 11px; color: #1e3a8a;">
@@ -17494,6 +17513,97 @@ ${state.config.name || 'RS Moda & Estilo'}
           window.location.href = mailtoLink;
           
           showToast(`Se abrió el cliente de correo para ${email}`, "success");
+        },
+
+        // ============================================================
+        // ESTADO DE CUENTA (CxC): mensaje ordenado para WhatsApp / Email
+        // Encabezado, compras/movimientos, historial de abonos y resumen.
+        // ============================================================
+        construirEstadoCuenta: function (cxc, modo) {
+          const wa = modo === "whatsapp";
+          const neg = (state.config && state.config.name) || "RS Moda & Estilo";
+          const negrita = function (t) { return wa ? "*" + t + "*" : t; };
+          const titulo = function (t) { return wa ? ["*" + t + "*"] : [t, "----------------------------------------"]; };
+          const soloFecha = function (f) { return String(f || "").split(",")[0].trim(); };
+          const items = cxc.items || [];
+          const pagos = cxc.payments || [];
+          const total = Number(cxc.totalAmount) || 0;
+          const abonado = Number(cxc.paidAmount) || 0;
+          const pendiente = total - abonado;
+          const tasa = Number(state.tasa) || 0;
+          let L = [];
+
+          L.push(negrita(neg));
+          L.push(negrita("ESTADO DE CUENTA"));
+          L.push("");
+          L.push("Cliente: " + (cxc.clientName || "-"));
+          if (cxc.clientCedula) L.push("Cédula / RIF: " + cxc.clientCedula);
+          L.push("Fecha: " + new Date().toLocaleDateString("es-VE"));
+          L.push("");
+
+          L = L.concat(titulo("COMPRAS / MOVIMIENTOS"));
+          if (items.length) {
+            items.forEach(function (it, i) {
+              const cant = it.quantity ? it.quantity + " x " : "";
+              const f = soloFecha(it.date);
+              L.push((i + 1) + ". " + cant + (it.name || "Artículo") + " - " + formatUSD(it.price) + (f ? " (" + f + ")" : ""));
+            });
+          } else {
+            L.push("Detalle directo registrado.");
+          }
+          L.push("");
+
+          L = L.concat(titulo("HISTORIAL DE ABONOS"));
+          if (pagos.length) {
+            pagos.forEach(function (p, i) {
+              const f = soloFecha(p.date);
+              const nota = (p.note && p.note !== "Abono") ? " - " + p.note : "";
+              L.push((i + 1) + ". " + (f ? f + " - " : "") + formatUSD(p.amount) + (p.method ? " (" + p.method + ")" : "") + nota);
+              if (p.parts && p.parts.length) {
+                L.push("   " + p.parts.map(function (x) {
+                  const monto = x.currency === "Bs" ? formatBS(x.original) : formatUSD(x.usd);
+                  return x.method + (x.reference ? " Ref. " + x.reference : "") + " " + monto;
+                }).join(" / "));
+              }
+            });
+          } else {
+            L.push("Sin abonos registrados.");
+          }
+          L.push("");
+
+          L = L.concat(titulo("RESUMEN DE LA CUENTA"));
+          L.push("Total Compras: " + formatUSD(total));
+          L.push("Total Abonado: " + formatUSD(abonado));
+          L.push(negrita("Saldo Pendiente: " + formatUSD(pendiente)) + (tasa ? " (" + formatBS(pendiente * tasa) + ")" : ""));
+          if (cxc.dueDate) L.push("Vencimiento: " + formatFechaCorta(cxc.dueDate));
+          if (tasa) L.push("Tasa aplicada: " + tasa.toFixed(2) + " Bs/USD");
+          L.push("");
+          L.push("Gracias por su preferencia.");
+          return L.join("\n");
+        },
+
+        compartirEstadoCuentaWhatsApp: function () {
+          if (!state.activeCxCId) return;
+          const cxc = state.cxc.find(function (c) { return c.id === state.activeCxCId; });
+          if (!cxc) return;
+          const texto = window.RS.construirEstadoCuenta(cxc, "whatsapp");
+          let tel = String(cxc.clientPhone || "").replace(/\D/g, "");
+          // Formato local venezolano (0412...) a internacional (58412...), requerido por wa.me
+          if (tel.length === 11 && tel.charAt(0) === "0") tel = "58" + tel.slice(1);
+          const url = "https://wa.me/" + tel + "?text=" + encodeURIComponent(texto);
+          if (!tel) showToast("Este cliente no tiene teléfono registrado: elige el contacto en WhatsApp.", "error");
+          window.open(url, "_blank");
+        },
+
+        enviarEstadoCuentaEmail: function () {
+          if (!state.activeCxCId) return;
+          const cxc = state.cxc.find(function (c) { return c.id === state.activeCxCId; });
+          if (!cxc) return;
+          const email = String(cxc.clientEmail || "").trim();
+          const cuerpo = window.RS.construirEstadoCuenta(cxc, "email").replace(/\n/g, "\r\n");
+          const url = "mailto:" + email + "?subject=" + encodeURIComponent("Estado de Cuenta") + "&body=" + encodeURIComponent(cuerpo);
+          if (!email) showToast("Este cliente no tiene correo registrado: escríbelo en tu app de correo.", "error");
+          window.location.href = url;
         }
       };
 
@@ -19046,6 +19156,9 @@ ${state.config.name || 'RS Moda & Estilo'}
           if (posView) {
             posView.addEventListener("click", function (e) {
               if (e.target.closest("input, select, textarea, button, .product-card")) return;
+              // Solo en equipos con mouse (PC + pistola lectora). En pantallas
+              // táctiles, tocar zonas vacías NO enfoca el lector ni abre nada.
+              if (!(window.matchMedia && window.matchMedia("(pointer: fine)").matches)) return;
               barcodeInput.focus();
             });
           }
@@ -19056,6 +19169,10 @@ ${state.config.name || 'RS Moda & Estilo'}
         if (btnCamScan) {
           btnCamScan.addEventListener("click", function (e) {
             e.preventDefault();
+            // La cámara SOLO se abre con un toque real sobre este botón:
+            // se ignoran clics simulados o que no provengan del propio botón.
+            if (!e.isTrusted) return;
+            if (!e.target || !e.target.closest || !e.target.closest("#btn-camera-scan")) return;
             window.RS.abrirCamaraEscaner();
           });
         }
@@ -20424,40 +20541,11 @@ ${state.config.name || 'RS Moda & Estilo'}
           };
         }
 
-        // WhatsApp Share CxC
-        document.getElementById("btn-cxc-whatsapp").onclick = function () {
-          if (!state.activeCxCId) return;
-          const cxc = state.cxc.find(c => c.id === state.activeCxCId);
-          if (!cxc) return;
-
-          const pending = cxc.totalAmount - cxc.paidAmount;
-          const msg = `*${state.config.name}* 👗✨%0A` +
-                      `*ESTADO DE CUENTA DE CRÉDITO*%0A` +
-                      `👤 *Cliente:* ${cxc.clientName}%0A` +
-                      `🪪 *Cédula:* ${cxc.clientCedula || 'No registrada'}%0A` +
-                      `📅 *Fecha de Registro:* ${cxc.date}%0A` +
-                      `⏰ *Fecha de Vencimiento:* ${formatFechaCorta(cxc.dueDate)}%0A` +
-                      `💵 *Total Deuda:* ${formatUSD(cxc.totalAmount)} (${formatBS(cxc.totalAmount * state.tasa)})%0A` +
-                      `🟢 *Abonado a la fecha:* ${formatUSD(cxc.paidAmount)}%0A` +
-                      `🔴 *SALDO PENDIENTE:* ${formatUSD(pending)} (${formatBS(pending * state.tasa)})%0A` +
-                      `📊 *Tasa aplicada:* ${state.tasa.toFixed(2)} Bs/USD%0A%0A` +
-                      `Gracias por su preferencia.`;
-
-          const cleanPhone = (cxc.clientPhone || "").replace(/\D/g, "");
-          const url = cleanPhone ? `https://wa.me/${cleanPhone}?text=${msg}` : `https://wa.me/?text=${msg}`;
-          window.open(url, "_blank");
-        };
-
-        // MEJORA 4: Email Share CxC
+        // Compartir estado de cuenta: WhatsApp (wa.me) y Email (mailto:)
+        const btnCxcWhatsapp = document.getElementById("btn-cxc-whatsapp");
+        if (btnCxcWhatsapp) btnCxcWhatsapp.onclick = function () { window.RS.compartirEstadoCuentaWhatsApp(); };
         const btnCxcEmail = document.getElementById("btn-cxc-email");
-        if (btnCxcEmail) {
-          btnCxcEmail.onclick = function () {
-            if (!state.activeCxCId) return;
-            const cxc = state.cxc.find(c => c.id === state.activeCxCId);
-            if (!cxc) return;
-            window.RS.enviarPorEmail('cxc', cxc.clientEmail);
-          };
-        }
+        if (btnCxcEmail) btnCxcEmail.onclick = function () { window.RS.enviarEstadoCuentaEmail(); };
 
         document.getElementById("btn-close-modal-cxc-history").onclick = () => document.getElementById("modal-history-cxc").style.display = "none";
         document.getElementById("btn-close-cxc-modal").onclick = () => document.getElementById("modal-history-cxc").style.display = "none";
@@ -20498,8 +20586,11 @@ ${state.config.name || 'RS Moda & Estilo'}
             return;
           }
 
-          // Actualizar datos del cliente
-          cxc.clientName = document.getElementById("complete-client-name").value.trim();
+          // Actualizar datos del cliente (todos los campos son opcionales).
+          // Si el nombre se deja vacío se conserva el actual, para que la cuenta
+          // nunca quede sin nombre en las listas.
+          const nuevoNombre = document.getElementById("complete-client-name").value.trim();
+          if (nuevoNombre) cxc.clientName = nuevoNombre;
           cxc.clientCedula = document.getElementById("complete-client-cedula").value.trim();
           cxc.clientPhone = document.getElementById("complete-client-phone").value.trim();
           cxc.clientEmail = document.getElementById("complete-client-email").value.trim();
@@ -22825,7 +22916,11 @@ let rsDb = null;
 // en vez de fallar en silencio.
 // ----------------------------------------------------------------------------
 // FIREBASE_DISABLED_START: preflight check y conexión real a Firebase, desactivados para modo de diseño local
-const RS_LOCAL_DESIGN_MODE = false; // false = Firebase y login ACTIVOS (producción). true = modo diseño local sin login.
+// ===== MODO_DESARROLLO (TEMPORAL) =====
+// true  = bypass de inicio de sesión: abre directo el sistema, sin correo ni contraseña (solo para pruebas).
+// false = PRODUCCIÓN: Firebase y login obligatorio. CAMBIAR A false ANTES DE PUBLICAR.
+const MODO_DESARROLLO = false;
+const RS_LOCAL_DESIGN_MODE = MODO_DESARROLLO;
 
 if (!RS_LOCAL_DESIGN_MODE) {
 (function rsPreflightCheck() {
@@ -22953,11 +23048,13 @@ function rsSesionPerdida() {
 // 3) SINCRONIZACIÓN CON FIRESTORE (respaldo en la nube del sandbox local)
 // ----------------------------------------------------------------------------
 function rsScheduleCloudSync() {
+  if (window.__rsBorrando) return; // borrado de cuenta en curso: no volver a subir datos
   clearTimeout(rsSyncTimer);
   rsSyncTimer = setTimeout(rsSyncToCloud, 1500); // debounce: agrupa escrituras rápidas
 }
 
 async function rsSyncToCloud() {
+  if (window.__rsBorrando) return;
   if (!window.__RS_UID) return;
   if (!rsUsuarioValido(window.__RS_UID)) { rsSesionPerdida(); return; }
   const uid = rsAuth.currentUser.uid;
@@ -23164,11 +23261,108 @@ async function rsHandleRegister(event) {
 }
 
 function rsHandleLogout() {
+  if (MODO_DESARROLLO || !rsAuth) { location.reload(); return; } // sin sesión real en modo desarrollo
   if (confirm("¿Deseas cerrar sesión?")) {
     rsAuth.signOut().then(function () {
       location.reload(); // recarga limpia: evita mezclar el estado de dos sesiones distintas
     });
   }
+}
+
+
+// ----------------------------------------------------------------------------
+// BORRAR MIS DATOS (derecho de eliminación): borra respaldo en la nube, empleados,
+// ficha de la cuenta, datos locales y la cuenta de acceso. Pide contraseña y la
+// palabra BORRAR. Función aditiva: no toca ninguna otra parte del sistema.
+// ----------------------------------------------------------------------------
+function rsAbrirBorrarDatos() {
+  var dd = document.getElementById("rs-profile-dropdown");
+  if (dd) dd.classList.add("rs-hidden");
+  if (MODO_DESARROLLO || !rsAuth || !rsAuth.currentUser) {
+    alert("Esta opción solo está disponible con una sesión iniciada.");
+    return;
+  }
+  var viejo = document.getElementById("rs-borrar-modal");
+  if (viejo) viejo.remove();
+  var m = document.createElement("div");
+  m.id = "rs-borrar-modal";
+  m.className = "rs-legal-overlay rs-open";
+  m.innerHTML =
+    '<div class="rs-legal-box" role="dialog" aria-modal="true" style="max-width:440px;">' +
+    '<div class="rs-legal-head"><h2 style="color:#b91c1c;">Borrar mis datos</h2>' +
+    '<button type="button" class="rs-legal-close" onclick="rsCerrarBorrarDatos()" aria-label="Cerrar">&times;</button></div>' +
+    '<div class="rs-legal-body">' +
+    '<p><strong>Esta acción es permanente y no se puede deshacer.</strong> Se borrarán tu cuenta, tus productos y fotos, ventas, gastos, cuentas por cobrar y por pagar, clientes y el acceso de tus empleados.</p>' +
+    '<p>Antes de continuar, te recomendamos <strong>exportar una copia de seguridad</strong> desde Configuración.</p>' +
+    '<div class="rs-form-group"><label>Tu contraseña</label><input type="password" id="rs-borrar-pass" autocomplete="current-password" style="width:100%;"></div>' +
+    '<div class="rs-form-group"><label>Escribe BORRAR para confirmar</label><input type="text" id="rs-borrar-texto" autocomplete="off" style="width:100%;"></div>' +
+    '<p id="rs-borrar-msg" style="color:#b91c1c;font-weight:600;min-height:18px;"></p>' +
+    '<button type="button" id="rs-borrar-ok" onclick="rsEjecutarBorrarDatos()" style="width:100%;background:#b91c1c;color:#fff;border:0;border-radius:10px;padding:12px;font-weight:800;cursor:pointer;">Borrar todo definitivamente</button>' +
+    '</div></div>';
+  document.body.appendChild(m);
+}
+function rsCerrarBorrarDatos() {
+  var m = document.getElementById("rs-borrar-modal");
+  if (m) m.remove();
+}
+async function rsEjecutarBorrarDatos() {
+  var msg = document.getElementById("rs-borrar-msg");
+  var btn = document.getElementById("rs-borrar-ok");
+  function err(t) { if (msg) msg.textContent = t; if (btn) btn.disabled = false; }
+  var user = rsAuth && rsAuth.currentUser;
+  if (!user) { err("No hay sesión iniciada."); return; }
+  var pass = (document.getElementById("rs-borrar-pass") || {}).value || "";
+  var txt = ((document.getElementById("rs-borrar-texto") || {}).value || "").trim();
+  if (!pass) { err("Escribe tu contraseña."); return; }
+  if (txt.toUpperCase() !== "BORRAR") { err("Escribe la palabra BORRAR para confirmar."); return; }
+  btn.disabled = true;
+  msg.style.color = "#475569";
+  msg.textContent = "Verificando...";
+  var uid = user.uid;
+  try {
+    var cred = firebase.auth.EmailAuthProvider.credential(user.email, pass);
+    await user.reauthenticateWithCredential(cred);
+  } catch (e) {
+    msg.style.color = "#b91c1c";
+    err("Contraseña incorrecta.");
+    return;
+  }
+  // A partir de aquí no se vuelve a sincronizar nada con la nube.
+  window.__rsBorrando = true;
+  clearTimeout(rsSyncTimer);
+  msg.textContent = "Borrando tus datos...";
+  try {
+    // Un empleado (no dueño) no tiene ficha propia ni empleados a su cargo.
+    // Primero el registro de actividad (si falla aquí, aún no se ha borrado nada).
+    var actSnap = await rsDb.collection("activityLog").where("userId", "==", uid).get();
+    for (var a = 0; a < actSnap.docs.length; a += 400) {
+      var lote = rsDb.batch();
+      actSnap.docs.slice(a, a + 400).forEach(function (d) { lote.delete(d.ref); });
+      await lote.commit();
+    }
+    var staffSnap = await rsDb.collection("staff").where("ownerUid", "==", uid).get();
+    for (var i = 0; i < staffSnap.docs.length; i++) await staffSnap.docs[i].ref.delete();
+    await rsDb.collection("users").doc(uid).collection("appData").doc("backup").delete();
+    await rsDb.collection("users").doc(uid).delete();
+  } catch (e) {
+    window.__rsBorrando = false;
+    msg.style.color = "#b91c1c";
+    err("No se pudo borrar todo (" + (e && e.code ? e.code : "error") + "). Tu cuenta sigue activa. Escribe a soporte.");
+    return;
+  }
+  try {
+    var pref = "u_" + uid + "__", borrar = [];
+    for (var k = 0; k < localStorage.length; k++) {
+      var key = localStorage.key(k);
+      if (key && key.indexOf(pref) === 0) borrar.push(key);
+    }
+    var rm = Storage.prototype.removeItem;
+    borrar.forEach(function (key) { try { rm.call(localStorage, key); } catch (e) {} });
+  } catch (e) { /* ignorar */ }
+  try { await user.delete(); } catch (e) { /* los datos ya se borraron; se cierra sesión igual */ }
+  try { await rsAuth.signOut(); } catch (e) {}
+  alert("Tus datos fueron borrados. Gracias por haber usado RS Admin.");
+  location.reload();
 }
 
 function rsTranslateAuthError(error) {
@@ -23232,11 +23426,11 @@ function rsUpdateUserBarDisplay() {
   document.getElementById("rs-user-email-display").textContent = rsPaymentInfo.email;
   const statusEl = document.getElementById("rs-user-status-display");
   const labels = {
-    paid: ["✓ Pagado", "rs-status-paid"],
-    trial: ["★ Prueba", "rs-status-trial"],
-    courtesy: ["♥ Cortesía", "rs-status-courtesy"],
-    overdue: ["⚠ Pendiente", "rs-status-overdue"],
-    blocked: ["✗ Bloqueado", "rs-status-blocked"]
+    paid: ["Activo", "rs-status-paid"],
+    trial: ["Prueba", "rs-status-trial"],
+    courtesy: ["Cortesía", "rs-status-courtesy"],
+    overdue: ["Pendiente", "rs-status-overdue"],
+    blocked: ["Bloqueado", "rs-status-blocked"]
   };
   const pair = labels[rsPaymentInfo.status] || ["", ""];
   statusEl.textContent = pair[0];
@@ -23260,6 +23454,13 @@ function rsOpenPaymentInfo() {
 if (RS_LOCAL_DESIGN_MODE) {
   document.getElementById("rs-auth-modal").classList.add("rs-hidden");
   document.getElementById("rs-app-wrapper").classList.remove("rs-hidden");
+  // MODO_DESARROLLO: datos de ejemplo en el menú de perfil (sin sesión real)
+  (function () {
+    var em = document.getElementById("rs-user-email-display");
+    var st = document.getElementById("rs-user-status-display");
+    if (em) em.textContent = "modo.desarrollo@local";
+    if (st) { st.textContent = "Prueba"; st.className = "rs-user-bar-status rs-status-trial"; }
+  })();
   rsStartOriginalApp();
 } else {
 rsAuth.onAuthStateChanged(async function (user) {
@@ -23303,6 +23504,702 @@ rsAuth.onAuthStateChanged(async function (user) {
 });
 }
 // FIREBASE_DISABLED_END
+
+// ============================================================================
+// RS · ACCESO POR VENCIMIENTO, AVISOS Y EMPLEADOS POR CORREO  (bloque aditivo)
+// No modifica ninguna función existente: solo "envuelve" rsCheckPaymentStatus,
+// rsUsuarioValido, rsHydrateFromCloud, rsSyncToCloud, rsShowAuthMessage y
+// rsUpdateUserBarDisplay, y solo cambia su comportamiento para (a) cuentas
+// vencidas/bloqueadas y (b) empleados registrados por correo.
+// Para un dueño sin empleados y con suscripción vigente todo funciona igual.
+// ============================================================================
+(function rsAccesoEquipoAvisos() {
+  "use strict";
+  if (typeof RS_LOCAL_DESIGN_MODE !== "undefined" && RS_LOCAL_DESIGN_MODE) return; // modo diseño: sin Firebase
+  if (typeof rsAuth === "undefined" || !rsAuth || typeof rsDb === "undefined" || !rsDb) return;
+
+  // ---------------------------------------------------------------------------
+  // Lógica pura (se prueba aparte). Debe coincidir con membership() de admin.html
+  // ---------------------------------------------------------------------------
+  /*PURE_START*/
+  var DIA = 864e5, GRACIA_DIAS = 7, AVISO_DIAS = 7;   // GRACIA_DIAS: igual que GRACE_DAYS de admin.html (0 = bloqueo el mismo día del vencimiento)
+  var PRUEBA_DIAS = (typeof RS_TRIAL_DAYS !== "undefined" ? RS_TRIAL_DAYS : 30);
+
+  function aFecha(v) {
+    if (!v) return null;
+    var d = typeof v.toDate === "function" ? v.toDate() : new Date(v);
+    return isNaN(d) ? null : d;
+  }
+
+  // Estado real de la membresía. bloqueado = true cuando el panel lo bloqueó o
+  // cuando venció y ya pasó el periodo de gracia.
+  function membresia(d, ahora) {
+    var st = String((d && (d.paymentStatus || d.estado)) || "").toLowerCase();
+    if (st === "bloqueado") st = "blocked";
+    var fin = aFecha(d && (d.subscriptionEndDate || d.vencimiento));
+    if (!fin && st === "trial") {
+      var cre = aFecha(d && d.createdAt);
+      if (cre) fin = new Date(cre.getTime() + PRUEBA_DIAS * DIA);
+    }
+    var r = { estado: st, fin: fin, dias: null, graciaRestante: null, bloqueado: false, aviso: null };
+    if (st === "blocked") { r.bloqueado = true; return r; }
+    if (st !== "paid" && st !== "trial" && st !== "overdue") return r;   // cortesía: sin vencimiento automático
+    if (!fin) { if (st === "overdue") r.aviso = "gracia"; return r; }
+    var diff = fin.getTime() - ahora;
+    if (st !== "overdue" && diff >= 0) {
+      r.dias = Math.ceil(diff / DIA);
+      if (r.dias <= AVISO_DIAS) r.aviso = "por_vencer";
+      return r;
+    }
+    var left = diff >= 0 ? GRACIA_DIAS : GRACIA_DIAS - Math.floor(-diff / DIA);
+    if (left > 0) { r.estado = "overdue"; r.aviso = "gracia"; r.graciaRestante = left; }
+    else { r.estado = "blocked"; r.bloqueado = true; }
+    return r;
+  }
+
+  function tieneId(x) { return !!x && typeof x === "object" && x.id !== undefined && x.id !== null; }
+
+  // Fusión de dos respaldos cuando dos personas guardaron a la vez: en listas con
+  // "id" se conservan los registros de ambos lados (gana la versión local si el
+  // mismo id existe en los dos); en cualquier otro dato gana la versión local.
+  function mezclarSnapshots(nube, local) {
+    var out = {}, claves = {};
+    Object.keys(nube || {}).forEach(function (k) { claves[k] = 1; });
+    Object.keys(local || {}).forEach(function (k) { claves[k] = 1; });
+    Object.keys(claves).forEach(function (k) {
+      var a = nube ? nube[k] : undefined, b = local ? local[k] : undefined;
+      if (a === undefined) { out[k] = b; return; }
+      if (b === undefined || a === b) { out[k] = b === undefined ? a : b; return; }
+      var A, B;
+      try { A = JSON.parse(a); B = JSON.parse(b); } catch (e) { out[k] = b; return; }
+      if (Array.isArray(A) && Array.isArray(B) && A.every(tieneId) && B.every(tieneId)) {
+        var ids = {};
+        B.forEach(function (x) { ids[String(x.id)] = 1; });
+        out[k] = JSON.stringify(B.concat(A.filter(function (x) { return !ids[String(x.id)]; })));
+      } else out[k] = b;
+    });
+    return out;
+  }
+
+  function avisoVencido(av, ahora) { var e = aFecha(av && av.expiraEn); return !!e && e.getTime() < ahora; }
+
+  // ¿Este aviso le corresponde a esta sesión? ctx = { uid, pendiente }
+  function avisoAplica(av, ctx) {
+    if (!av || av.activo === false) return false;
+    if (av.destino === "todos") return true;
+    if (av.destino === "pendientes") return !!ctx.pendiente;
+    return av.destino === "uid:" + ctx.uid;
+  }
+  /*PURE_END*/
+
+  // ---------------------------------------------------------------------------
+  // Estado del módulo y utilidades
+  // ---------------------------------------------------------------------------
+  var STAFF = null;                // { ownerUid, ownerEmail, nombre, permisos:Set } cuando entra un empleado
+  var EQUIPO_ACTIVO = false;       // dueño con al menos un empleado activo → respaldo compartido con fusión
+  var DATOS_DUENO = null;          // documento users/{dueño} (suscripción vigente)
+  var sello = null;                // última marca updatedAt del respaldo en la nube conocida por esta sesión
+  var SESION = Math.random().toString(36).slice(2, 10);
+  var bloqueando = false;
+  var unsubs = [], timerVigilancia = null, unsubBackup = null;
+
+  function $id(id) { return document.getElementById(id); }
+  function clave(e) { return String(e || "").trim().toLowerCase(); }
+  function esc(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]; }); }
+  function miId() { var u = rsAuth.currentUser; return ((u && (u.email || u.uid)) || "?") + "|" + SESION; }
+  function refBackup(uid) { return rsDb.collection("users").doc(uid).collection("appData").doc("backup"); }
+  function fmtFecha(d) { return d ? d.toLocaleDateString("es-VE") : "-"; }
+
+  function toast(msg, error) {
+    var t = document.createElement("div");
+    t.textContent = msg;
+    t.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:90vw;padding:10px 16px;border-radius:10px;font:600 13px system-ui,sans-serif;color:#fff;z-index:2147483000;box-shadow:0 6px 20px rgba(0,0,0,.25);background:" + (error ? "#dc2626" : "#16a34a");
+    document.body.appendChild(t);
+    setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 4000);
+  }
+
+  function porDefecto(fn) { try { return fn(); } catch (e) { console.warn("RS acceso:", e); } }
+
+  // Funciones del sistema (módulos) que se pueden asignar a un empleado
+  var PERMISOS = [
+    { key: "dashboard", label: "Inicio (Home)", vistas: ["dashboard"] },
+    { key: "pos", label: "Punto de Venta (POS)", vistas: ["pos"] },
+    { key: "inventory", label: "Inventario", vistas: ["inventory"] },
+    { key: "cuentas", label: "Cuentas por Cobrar / Pagar", vistas: ["cxc", "cxp"] },
+    { key: "clientes", label: "Clientes y Proveedores", vistas: ["clientes", "proveedores"] },
+    { key: "history", label: "Historial de Ventas", vistas: ["history"] },
+    { key: "gastos", label: "Gastos", vistas: ["gastos", "gasto-simple"] },
+    { key: "arqueo", label: "Arqueo de Caja", vistas: ["arqueo"] },
+    { key: "finanzas", label: "Resumen Financiero y Estadísticas", vistas: ["fin-utilidad", "fin-reportes", "estadisticas", "estadistica-simple"] },
+    { key: "config", label: "Configuración", vistas: ["config"] }
+  ];
+  var TODAS_VISTAS = ["dashboard", "pos", "inventory", "cxc", "cxp", "clientes", "proveedores", "history", "gasto-simple", "gastos", "estadistica-simple", "estadisticas", "arqueo", "config", "usuarios", "fin-utilidad", "fin-reportes"];
+
+  // ---------------------------------------------------------------------------
+  // Estilos propios (reutiliza las clases de banner que ya existen)
+  // ---------------------------------------------------------------------------
+  (function inyectarCss() {
+    var s = document.createElement("style");
+    s.id = "rs-acc-css";
+    s.textContent =
+      "#rs-acc-bloqueo{position:fixed;inset:0;z-index:2147483600;background:rgba(15,23,42,.94);display:flex;align-items:center;justify-content:center;padding:20px}" +
+      "#rs-acc-bloqueo .rs-acc-box{background:#fff;color:#0f172a;max-width:420px;width:100%;border-radius:18px;padding:26px 22px;text-align:center;font-family:system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.4)}" +
+      "#rs-acc-bloqueo h2{font-size:19px;font-weight:800;margin:6px 0 10px}" +
+      "#rs-acc-bloqueo p{font-size:14px;line-height:1.5;color:#334155;margin:0 0 18px}" +
+      "#rs-acc-bloqueo button{background:#0052ff;color:#fff;border:0;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer}" +
+      ".rs-acc-chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;margin:2px 4px 2px 0}" +
+      ".rs-acc-on{background:#ecfdf5;color:#059669}.rs-acc-off{background:#f1f5f9;color:#94a3b8}" +
+      "#rs-equipo-card .rs-eq-perms{display:grid;grid-template-columns:1fr 1fr;gap:6px;border:1px solid #e2e8f0;border-radius:10px;padding:10px}" +
+      "#rs-equipo-card .rs-eq-perms label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#334155}" +
+      "@media(max-width:480px){#rs-equipo-card .rs-eq-perms{grid-template-columns:1fr}}" +
+      ".rs-eq-item{border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-top:10px}" +
+      ".rs-eq-item .rs-eq-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}";
+    document.head.appendChild(s);
+  })();
+
+  // ---------------------------------------------------------------------------
+  // 1) BLOQUEO POR VENCIMIENTO / BLOQUEO MANUAL
+  // ---------------------------------------------------------------------------
+  function textoBloqueo(d, m, paraEmpleado) {
+    var vencio = m.fin && m.fin.getTime() < Date.now();
+    var base = paraEmpleado ? "La suscripción del negocio" : "Tu suscripción";
+    if (vencio && String(d.paymentStatus || d.estado || "").toLowerCase() !== "blocked") {
+      return base + " venció el " + fmtFecha(m.fin) + " y no se registró el pago. El acceso queda suspendido hasta que el administrador confirme el pago y lo reactive.";
+    }
+    return (paraEmpleado ? "El acceso del negocio" : "Tu acceso") + " fue suspendido por el administrador. Comunícate con soporte para reactivarlo.";
+  }
+
+  function pantallaBloqueo(msg) {
+    if ($id("rs-acc-bloqueo")) return;
+    var o = document.createElement("div");
+    o.id = "rs-acc-bloqueo";
+    o.innerHTML = '<div class="rs-acc-box"><div style="font-size:40px">🔒</div><h2>Acceso suspendido</h2><p></p><button type="button">Cerrar sesión</button></div>';
+    o.querySelector("p").textContent = msg;
+    o.querySelector("button").addEventListener("click", function () { location.reload(); });
+    document.body.appendChild(o);
+  }
+
+  async function bloquearSesion(msg) {
+    if (bloqueando) return;
+    bloqueando = true;
+    try { sessionStorage.setItem("rs_msg_bloqueo", msg); } catch (e) { /* sin almacenamiento */ }
+    pantallaBloqueo(msg);
+    // Intenta guardar lo pendiente (si el servidor ya lo bloqueó, simplemente falla) y cierra la sesión.
+    try {
+      await Promise.race([Promise.resolve().then(function () { return rsSyncToCloud(); }), new Promise(function (r) { setTimeout(r, 2500); })]);
+    } catch (e) { /* sin conexión o sin permiso */ }
+    try { await rsAuth.signOut(); } catch (e) { /* el overlay sigue bloqueando */ }
+  }
+
+  function evaluarSuscripcion() {
+    if (!DATOS_DUENO || bloqueando) return;
+    var m = membresia(DATOS_DUENO, Date.now());
+    if (m.bloqueado) bloquearSesion(textoBloqueo(DATOS_DUENO, m, !!STAFF));
+    else pintarAvisos();   // el recordatorio "pendientes" depende del estado
+  }
+
+  function iniciarVigilancia(duenoUid) {
+    if (timerVigilancia) clearInterval(timerVigilancia);
+    unsubs.push(rsDb.collection("users").doc(duenoUid).onSnapshot(function (snap) {
+      if (snap.exists) { DATOS_DUENO = snap.data(); evaluarSuscripcion(); }
+    }, function (err) { console.warn("RS acceso: no se pudo vigilar la suscripción:", err && err.code ? err.code : err); }));
+    timerVigilancia = setInterval(evaluarSuscripcion, 60 * 1000);   // revisa cada minuto aunque la app quede abierta
+  }
+
+  // Mensaje de bloqueo mostrado en la pantalla de inicio de sesión tras el cierre automático
+  (function mensajePrevio() {
+    var m = null;
+    try { m = sessionStorage.getItem("rs_msg_bloqueo"); sessionStorage.removeItem("rs_msg_bloqueo"); } catch (e) { m = null; }
+    if (!m) return;
+    var f = function () { rsShowAuthMessage(m, "error"); };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", f); else f();
+  })();
+
+  // ---------------------------------------------------------------------------
+  // 2) ANUNCIOS Y AVISOS DEL PANEL MASTER (banners con botón de cierre)
+  // ---------------------------------------------------------------------------
+  var GLOBAL = null, AVISOS = {}, cerrados = {};
+  try { cerrados = JSON.parse(localStorage.getItem("rs_av_cerrados") || "{}") || {}; } catch (e) { cerrados = {}; }
+  function guardarCerrados() { try { localStorage.setItem("rs_av_cerrados", JSON.stringify(cerrados)); } catch (e) { /* ignorar */ } }
+
+  function contenedorBanners() {
+    var c = $id("rs-conn-banners");
+    if (c) return c;
+    c = document.createElement("div");
+    c.id = "rs-conn-banners";
+    c.setAttribute("aria-live", "polite");
+    var pago = $id("rs-payment-banner");
+    if (pago && pago.parentNode) pago.parentNode.insertBefore(c, pago);
+    else document.body.insertBefore(c, document.body.firstChild);
+    return c;
+  }
+
+  var ICONOS_TIPO = { mantenimiento: "🔧", mejora: "✨", pago: "💳", general: "📢" };
+  function claseNivel(av) {
+    if (av.tipo === "mantenimiento") return "rs-conn-maint";
+    return av.nivel === "danger" ? "rs-conn-danger" : av.nivel === "warning" ? "rs-conn-warn" : "rs-conn-info";
+  }
+
+  function pintarUno(id, firma, clase, titulo, texto) {
+    var cont = contenedorBanners(), el = $id(id);
+    if (cerrados[id] === firma) { if (el && el.parentNode) el.parentNode.removeChild(el); return; }
+    if (!el) { el = document.createElement("div"); el.id = id; el.setAttribute("role", "status"); cont.appendChild(el); }
+    el.className = "rs-conn-banner " + clase;
+    el.innerHTML = '<div class="rs-conn-body"><span class="rs-conn-title"></span><span class="rs-conn-text"></span></div>' +
+      '<button type="button" class="rs-conn-close" aria-label="Cerrar aviso" title="Cerrar" style="font-size:18px;line-height:1">×</button>';
+    el.querySelector(".rs-conn-title").textContent = titulo;
+    el.querySelector(".rs-conn-text").textContent = texto;
+    el.querySelector(".rs-conn-close").addEventListener("click", function () {
+      cerrados[id] = firma; guardarCerrados();
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+  }
+
+  function quitarUno(id) { var el = $id(id); if (el && el.parentNode) el.parentNode.removeChild(el); }
+
+  function pintarAvisos() {
+    var ahora = Date.now(), hoy = new Date().toISOString().slice(0, 10);
+    var m = DATOS_DUENO ? membresia(DATOS_DUENO, ahora) : null;
+    var uid = STAFF ? STAFF.ownerUid : (rsAuth.currentUser && rsAuth.currentUser.uid);
+    var ctx = { uid: uid, pendiente: !!(m && (m.aviso || m.estado === "overdue")) };
+    var vistos = {};
+    Object.keys(AVISOS).forEach(function (dest) {
+      (AVISOS[dest] || []).forEach(function (av) {
+        if (vistos[av.id] || !avisoAplica(av, ctx) || avisoVencido(av, ahora)) return;
+        vistos[av.id] = 1;
+        var firma = av.tipo === "pago" ? av.id + "|" + hoy : av.id;   // los recordatorios de pago reaparecen cada día
+        pintarUno("rs-av-" + av.id, firma, claseNivel(av), (ICONOS_TIPO[av.tipo] || "📢") + " " + (av.titulo || "Aviso"), av.mensaje || "");
+      });
+    });
+    document.querySelectorAll('[id^="rs-av-"]').forEach(function (el) {
+      if (el.id !== "rs-av-global" && el.id !== "rs-av-cambios" && !vistos[el.id.slice(6)] && el.parentNode) el.parentNode.removeChild(el);
+    });
+    // Anuncio global del panel (Ajustes → Anuncio global)
+    var g = GLOBAL;
+    if (g && (g.announcementActive === true || g.announcementActive === "true") && g.announcement) {
+      pintarUno("rs-av-global", "g|" + g.announcement, "rs-conn-info", "📢 Aviso", String(g.announcement));
+    } else quitarUno("rs-av-global");
+  }
+
+  function iniciarAvisos(duenoUid, esEmpleado) {
+    unsubs.push(rsDb.collection("config").doc("global").onSnapshot(function (s) {
+      GLOBAL = s.exists ? s.data() : null; pintarAvisos();
+    }, function (e) { console.warn("RS avisos (global):", e && e.code ? e.code : e); }));
+    var destinos = esEmpleado ? ["todos"] : ["todos", "pendientes", "uid:" + duenoUid];
+    destinos.forEach(function (dest) {
+      unsubs.push(rsDb.collection("avisos").where("destino", "==", dest).where("activo", "==", true).onSnapshot(function (s) {
+        AVISOS[dest] = s.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+        pintarAvisos();
+      }, function (e) { console.warn("RS avisos (" + dest + "):", e && e.code ? e.code : e); }));
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 3) EMPLEADOS: ingreso por correo con permisos por función
+  // ---------------------------------------------------------------------------
+  function permitida(vista) {
+    if (!STAFF) return true;
+    if (vista === "usuarios") return false;   // el panel de usuarios es solo del dueño
+    for (var i = 0; i < PERMISOS.length; i++) {
+      if (PERMISOS[i].vistas.indexOf(vista) !== -1) return STAFF.permisos.has(PERMISOS[i].key);
+    }
+    return false;
+  }
+
+  var ultimoAvisoPermiso = 0;
+  function sinPermiso() {
+    if (Date.now() - ultimoAvisoPermiso < 2500) return;
+    ultimoAvisoPermiso = Date.now();
+    toast("No tienes permiso para usar esta función.", true);
+  }
+
+  function irAPrimeraPermitida() {
+    for (var i = 0; i < TODAS_VISTAS.length; i++) {
+      if (!permitida(TODAS_VISTAS[i])) continue;
+      var l = document.querySelector('.nav-link[data-target="' + TODAS_VISTAS[i] + '"]');
+      if (l && l.style.display !== "none") { l.click(); return; }
+    }
+  }
+
+  var observadas = {};
+  function aplicarPermisos() {
+    if (!STAFF) return;
+    TODAS_VISTAS.forEach(function (v) {
+      if (permitida(v)) return;
+      document.querySelectorAll('.nav-link[data-target="' + v + '"]').forEach(function (l) { if (l.style.display !== "none") l.style.display = "none"; });
+      var sec = $id("view-" + v);
+      if (sec && !observadas[v]) {
+        observadas[v] = true;
+        // Barrera: si cualquier parte del sistema intenta mostrar una vista prohibida, se vuelve a ocultar.
+        new MutationObserver(function () {
+          if (sec.style.display !== "none") { sec.style.display = "none"; sinPermiso(); irAPrimeraPermitida(); }
+        }).observe(sec, { attributes: true, attributeFilter: ["style"] });
+        if (sec.style.display !== "none") { sec.style.display = "none"; irAPrimeraPermitida(); }
+      }
+    });
+    var tg = document.querySelector('.nav-group-toggle[data-group="finanzas"]');
+    if (tg && tg.parentElement && !permitida("fin-utilidad") && !permitida("fin-reportes")) tg.parentElement.style.display = "none";
+    if (!permitida("pos")) {
+      var fila = $id("header-row-search"); if (fila) fila.style.display = "none";
+      var badge = $id("cart-counter-badge"); var bc = badge && badge.closest("button"); if (bc) bc.style.display = "none";
+    }
+    if (!permitida("config")) {
+      document.querySelectorAll(".rs-pd-item").forEach(function (b) {
+        if (String(b.getAttribute("onclick") || "").indexOf("rsAbrirAjustesDesdePerfil") !== -1) b.style.display = "none";
+      });
+    }
+  }
+
+  function iniciarModoEmpleado() {
+    var intentos = 0;
+    var espera = setInterval(function () {
+      intentos++;
+      if (window.__RS_APP_STARTED || intentos > 100) {
+        clearInterval(espera);
+        setTimeout(function () { aplicarPermisos(); irAPrimeraPermitida(); setInterval(aplicarPermisos, 1000); }, 500);
+      }
+    }, 200);
+  }
+
+  // ---- Panel del dueño: Equipo (se agrega debajo de "Usuarios y Permisos") ----
+  var EQUIPO = [], editando = null;
+
+  function chipsPermisos(lista) {
+    return PERMISOS.map(function (p) {
+      var on = (lista || []).indexOf(p.key) !== -1;
+      return '<span class="rs-acc-chip ' + (on ? "rs-acc-on" : "rs-acc-off") + '">' + (on ? "✅ " : "— ") + esc(p.label) + "</span>";
+    }).join("");
+  }
+
+  function pintarEquipo() {
+    var cont = $id("rs-eq-lista");
+    if (!cont) return;
+    if (!EQUIPO.length) { cont.innerHTML = '<div style="text-align:center;color:#64748b;padding:14px;font-size:12px">Aún no has registrado empleados con acceso por correo.</div>'; return; }
+    cont.innerHTML = EQUIPO.map(function (e) {
+      var activo = e.activo !== false;
+      return '<div class="rs-eq-item" data-id="' + esc(e.id) + '">' +
+        '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><div><strong style="font-size:13px">' + esc(e.nombre || e.email) + '</strong>' +
+        '<div style="font-size:11px;color:#64748b">' + esc(e.email) + '</div></div>' +
+        '<span class="rs-acc-chip ' + (activo ? "rs-acc-on" : "rs-acc-off") + '">' + (activo ? "🟢 Acceso activo" : "⚪ Acceso desactivado") + "</span></div>" +
+        '<div style="margin-top:6px">' + chipsPermisos(e.permisos) + "</div>" +
+        '<div class="rs-eq-btns">' +
+        '<button type="button" class="btn btn-help" style="padding:4px 10px;font-size:11px" data-act="editar">Editar permisos</button>' +
+        '<button type="button" class="btn btn-help" style="padding:4px 10px;font-size:11px" data-act="toggle">' + (activo ? "Desactivar" : "Activar") + "</button>" +
+        '<button type="button" class="btn btn-help" style="padding:4px 10px;font-size:11px" data-act="reset">Enviar cambio de contraseña</button>' +
+        '<button type="button" class="btn btn-help" style="padding:4px 10px;font-size:11px;color:#e11d48" data-act="borrar">Quitar</button>' +
+        "</div></div>";
+    }).join("");
+  }
+
+  async function cargarEquipo() {
+    var cont = $id("rs-eq-lista");
+    if (!cont || !rsAuth.currentUser) return;
+    try {
+      var snap = await rsDb.collection("staff").where("ownerUid", "==", rsAuth.currentUser.uid).get();
+      EQUIPO = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); }).sort(function (a, b) { return a.id < b.id ? -1 : 1; });
+      pintarEquipo();
+    } catch (e) {
+      console.warn("RS equipo:", e);
+      cont.innerHTML = '<div style="color:#b45309;font-size:12px;padding:10px">No se pudo cargar el equipo. Verifica que las reglas de Firestore incluyan la colección "staff".</div>';
+    }
+  }
+
+  function limpiarFormEquipo() {
+    editando = null;
+    $id("rs-eq-email").value = ""; $id("rs-eq-email").readOnly = false;
+    $id("rs-eq-nombre").value = ""; $id("rs-eq-pass").value = ""; $id("rs-eq-passwrap").style.display = "";
+    document.querySelectorAll(".rs-eq-perm").forEach(function (c) { c.checked = c.value === "pos"; });
+    $id("rs-eq-guardar").textContent = "Registrar empleado";
+    $id("rs-eq-cancelar").style.display = "none";
+  }
+
+  async function crearCuentaAuth(email, pass) {
+    var sec = null;
+    try {
+      try { sec = firebase.app("rsStaffCreator"); } catch (e) { sec = firebase.initializeApp(rsFirebaseConfig, "rsStaffCreator"); }
+      await sec.auth().createUserWithEmailAndPassword(email, pass);
+      return "creada";
+    } catch (e) {
+      if (e && e.code === "auth/email-already-in-use") return "existia";
+      throw e;
+    } finally {
+      try { if (sec) await sec.auth().signOut(); } catch (e2) { /* ignorar */ }
+    }
+  }
+
+  async function guardarEmpleado() {
+    var btn = $id("rs-eq-guardar");
+    var email = clave($id("rs-eq-email").value), nombre = $id("rs-eq-nombre").value.trim(), pass = $id("rs-eq-pass").value;
+    var permisos = Array.prototype.slice.call(document.querySelectorAll(".rs-eq-perm:checked")).map(function (c) { return c.value; });
+    var u = rsAuth.currentUser;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast("Escribe un correo válido.", true);
+    if (!nombre) return toast("Escribe el nombre del empleado.", true);
+    if (email === clave(u.email)) return toast("No puedes registrarte como tu propio empleado.", true);
+    if (!permisos.length) return toast("Marca al menos una función permitida.", true);
+    if (!editando && pass.length < 6) return toast("La contraseña temporal debe tener al menos 6 caracteres.", true);
+    btn.disabled = true;
+    try {
+      var ahora = new Date().toISOString();
+      var previo = EQUIPO.find(function (x) { return x.id === email; });
+      await rsDb.collection("staff").doc(email).set({
+        email: email, nombre: nombre, ownerUid: u.uid, ownerEmail: u.email || "",
+        permisos: permisos, activo: previo ? previo.activo !== false : true,
+        creadoEn: previo && previo.creadoEn ? previo.creadoEn : ahora, actualizadoEn: ahora
+      });
+      var nota = "";
+      if (!editando) {
+        try {
+          var r = await crearCuentaAuth(email, pass);
+          nota = r === "existia" ? " Ese correo ya tenía cuenta en el sistema: si esa persona ya usa el sistema por su cuenta como cliente, no podrá entrar como empleado; en ese caso usa otro correo." : " Entrégale el correo y la contraseña temporal.";
+        } catch (e) {
+          await rsDb.collection("staff").doc(email).delete().catch(function () { /* ignorar */ });
+          throw e;
+        }
+      }
+      toast("Empleado guardado." + nota);
+      limpiarFormEquipo();
+      await cargarEquipo();
+      if (!EQUIPO_ACTIVO) { EQUIPO_ACTIVO = true; await tomarSello(u.uid); escucharRespaldo(u.uid); }
+    } catch (e) {
+      console.warn("RS equipo (guardar):", e);
+      var m = e && e.code === "permission-denied" ? "No se pudo guardar: ese correo ya pertenece a otro negocio o faltan las reglas de Firestore." : "No se pudo guardar: " + (typeof rsTranslateAuthError === "function" ? rsTranslateAuthError(e) : (e && e.message));
+      toast(m, true);
+    }
+    btn.disabled = false;
+  }
+
+  async function accionEquipo(id, act) {
+    var e = EQUIPO.find(function (x) { return x.id === id; });
+    if (!e) return;
+    try {
+      if (act === "editar") {
+        editando = id;
+        $id("rs-eq-email").value = e.email; $id("rs-eq-email").readOnly = true;
+        $id("rs-eq-nombre").value = e.nombre || ""; $id("rs-eq-passwrap").style.display = "none";
+        document.querySelectorAll(".rs-eq-perm").forEach(function (c) { c.checked = (e.permisos || []).indexOf(c.value) !== -1; });
+        $id("rs-eq-guardar").textContent = "Guardar cambios";
+        $id("rs-eq-cancelar").style.display = "";
+        $id("rs-eq-email").scrollIntoView({ behavior: "smooth", block: "center" });
+      } else if (act === "toggle") {
+        await rsDb.collection("staff").doc(id).update({ activo: e.activo === false, actualizadoEn: new Date().toISOString() });
+        toast(e.activo === false ? "Acceso activado." : "Acceso desactivado.");
+        await cargarEquipo();
+      } else if (act === "reset") {
+        await rsAuth.sendPasswordResetEmail(e.email);
+        toast("Se envió un correo para cambiar la contraseña a " + e.email + ".");
+      } else if (act === "borrar") {
+        if (!confirm("¿Quitar a " + (e.nombre || e.email) + "? Dejará de poder entrar al sistema.")) return;
+        await rsDb.collection("staff").doc(id).delete();
+        toast("Empleado quitado.");
+        await cargarEquipo();
+      }
+    } catch (err) {
+      console.warn("RS equipo (acción):", err);
+      toast("No se pudo completar la acción.", true);
+    }
+  }
+
+  function montarPanelEquipo() {
+    if (STAFF || $id("rs-equipo-card")) return;
+    var vista = $id("view-usuarios");
+    if (!vista) return;
+    var card = document.createElement("div");
+    card.className = "card"; card.id = "rs-equipo-card"; card.style.marginTop = "14px";
+    card.innerHTML =
+      '<h2 style="font-size:16px;font-weight:800">👥 Equipo: acceso por correo</h2>' +
+      '<p style="font-size:11px;color:#64748b;margin:2px 0 12px">Registra el correo de cada empleado y marca qué funciones puede usar. Al iniciar sesión solo verá lo autorizado y trabajará con los datos de tu negocio.</p>' +
+      '<div class="form-group"><label>Correo del empleado:</label><input type="email" id="rs-eq-email" class="form-input" placeholder="empleado@correo.com" autocomplete="off"></div>' +
+      '<div class="form-group"><label>Nombre:</label><input type="text" id="rs-eq-nombre" class="form-input" placeholder="Ej: María Pérez" autocomplete="off"></div>' +
+      '<div class="form-group" id="rs-eq-passwrap"><label>Contraseña temporal (mín. 6 caracteres):</label><input type="text" id="rs-eq-pass" class="form-input" placeholder="Se la entregas al empleado" autocomplete="off"></div>' +
+      '<div class="form-group"><label>Funciones permitidas: <a href="#" id="rs-eq-todos" style="font-size:11px;margin-left:8px">marcar todas</a></label>' +
+      '<div class="rs-eq-perms">' + PERMISOS.map(function (p) { return '<label><input type="checkbox" class="rs-eq-perm" value="' + p.key + '"' + (p.key === "pos" ? " checked" : "") + "> " + esc(p.label) + "</label>"; }).join("") + "</div></div>" +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="rs-eq-guardar" class="btn btn-primary">Registrar empleado</button>' +
+      '<button type="button" id="rs-eq-cancelar" class="btn btn-help" style="display:none">Cancelar edición</button></div>' +
+      '<div id="rs-eq-lista" style="margin-top:6px"></div>';
+    vista.appendChild(card);
+    $id("rs-eq-guardar").addEventListener("click", guardarEmpleado);
+    $id("rs-eq-cancelar").addEventListener("click", limpiarFormEquipo);
+    $id("rs-eq-todos").addEventListener("click", function (ev) { ev.preventDefault(); document.querySelectorAll(".rs-eq-perm").forEach(function (c) { c.checked = true; }); });
+    $id("rs-eq-lista").addEventListener("click", function (ev) {
+      var b = ev.target.closest("button[data-act]"); if (!b) return;
+      accionEquipo(b.closest(".rs-eq-item").getAttribute("data-id"), b.getAttribute("data-act"));
+    });
+    cargarEquipo();
+  }
+
+  // ---------------------------------------------------------------------------
+  // 4) RESPALDO COMPARTIDO (dueño + empleados) con fusión si se guarda a la vez
+  // ---------------------------------------------------------------------------
+  async function tomarSello(uid) {
+    try { var d = await refBackup(uid).get(); sello = d.exists ? (d.data().updatedAt || null) : null; } catch (e) { sello = null; }
+  }
+
+  function avisoCambiosAjenos() {
+    pintarUno("rs-av-cambios", "cambios|" + Date.now(), "rs-conn-warn", "👥 Hay cambios nuevos de otro usuario",
+      "Toca aquí para actualizar y ver los datos más recientes.");
+    var el = $id("rs-av-cambios");
+    if (el) {
+      el.style.cursor = "pointer";
+      el.querySelector(".rs-conn-body").addEventListener("click", async function () {
+        try { await Promise.race([Promise.resolve().then(function () { return rsSyncToCloud(); }), new Promise(function (r) { setTimeout(r, 3000); })]); } catch (e) { /* ignorar */ }
+        location.reload();
+      });
+    }
+  }
+
+  function escucharRespaldo(uid) {
+    if (unsubBackup) { try { unsubBackup(); } catch (e) { /* ya detenido */ } }
+    unsubBackup = refBackup(uid).onSnapshot(function (snap) {
+      if (!snap.exists || snap.metadata.hasPendingWrites) return;
+      var d = snap.data();
+      if (d.updatedBy && d.updatedBy !== miId() && d.updatedAt !== sello) avisoCambiosAjenos();
+    }, function () { /* sin permiso o sin conexión */ });
+  }
+
+  var _usuarioValido = rsUsuarioValido;
+  rsUsuarioValido = function (uid) {
+    if (!STAFF) return _usuarioValido(uid);
+    var u = rsAuth && rsAuth.currentUser;
+    if (!u) return false;
+    if (uid && uid !== u.uid && uid !== STAFF.ownerUid) return false;
+    return window.__RS_UID === STAFF.ownerUid;
+  };
+
+  var _hidratar = rsHydrateFromCloud;
+  rsHydrateFromCloud = async function (uid) {
+    if (!STAFF) return _hidratar(uid);
+    if (!rsUsuarioValido(STAFF.ownerUid)) return;
+    try {
+      var doc = await refBackup(STAFF.ownerUid).get();
+      if (doc.exists) {
+        var data = doc.data();
+        if (data.userId && data.userId !== STAFF.ownerUid) { console.error("Respaldo ignorado: pertenece a otro usuario."); return; }
+        sello = data.updatedAt || null;
+        var snapshot = data.snapshot || {};
+        Object.keys(snapshot).forEach(function (k) { localStorage.setItem("u_" + STAFF.ownerUid + "__" + k, snapshot[k]); });
+      }
+    } catch (err) { console.error("Error al recuperar respaldo del negocio:", err); }
+  };
+
+  var _sincronizar = rsSyncToCloud;
+  rsSyncToCloud = async function () {
+    if (!STAFF && !EQUIPO_ACTIVO) return _sincronizar();   // dueño sin empleados: lógica original
+    var u = rsAuth.currentUser;
+    var dueno = STAFF ? STAFF.ownerUid : (u && u.uid);
+    if (!dueno || !window.__RS_UID) return;
+    if (window.__RS_UID !== dueno || !rsUsuarioValido(dueno)) { rsSesionPerdida(); return; }
+    var pref = "u_" + dueno + "__", snapshot = {};
+    for (var i = 0; i < localStorage.length; i++) {
+      var raw = localStorage.key(i);
+      if (raw && raw.indexOf(pref + RS_STORAGE_PREFIX) === 0) snapshot[raw.substring(pref.length)] = localStorage.getItem(raw);
+    }
+    try {
+      var tam = new Blob([JSON.stringify(snapshot)]).size;
+      if (tam > 1000000) { console.error("Respaldo en la nube omitido: " + tam + " bytes superan el límite de 1 MB de Firestore."); return; }
+    } catch (e) { /* se intenta igual */ }
+    var ref = refBackup(dueno), nuevo = new Date().toISOString(), conflicto = false, final = snapshot;
+    try {
+      await rsDb.runTransaction(async function (tx) {
+        conflicto = false; final = snapshot;
+        var cur = await tx.get(ref);
+        if (cur.exists) {
+          var c = cur.data();
+          if (c.updatedAt && c.updatedAt !== sello) { final = mezclarSnapshots(c.snapshot || {}, snapshot); conflicto = true; }
+        }
+        tx.set(ref, { userId: dueno, snapshot: final, updatedAt: nuevo, updatedBy: miId() });
+      });
+      sello = nuevo;
+      if (conflicto) {
+        Object.keys(final).forEach(function (k) { if (final[k] !== snapshot[k]) localStorage.setItem(pref + k, final[k]); });
+        avisoCambiosAjenos();
+      }
+    } catch (err) { console.error("Error al sincronizar con Firestore:", err); }
+  };
+
+  async function detectarEquipoDelDueno(uid) {
+    try {
+      var snap = await rsDb.collection("staff").where("ownerUid", "==", uid).get();
+      if (snap.docs.some(function (d) { return d.data().activo !== false; })) {
+        EQUIPO_ACTIVO = true;
+        await tomarSello(uid);
+        escucharRespaldo(uid);
+      }
+    } catch (e) { /* sin reglas de staff aún: se mantiene la sincronización original */ }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 5) Conexión con el flujo de inicio de sesión existente
+  // ---------------------------------------------------------------------------
+  var _mensaje = rsShowAuthMessage;
+  rsShowAuthMessage = function (message, type) {
+    if (window.__rsMsgBloqueo && String(message).indexOf("Tu acceso está bloqueado") === 0) {
+      message = window.__rsMsgBloqueo; window.__rsMsgBloqueo = null;
+    }
+    return _mensaje(message, type);
+  };
+
+  var _barra = rsUpdateUserBarDisplay;
+  rsUpdateUserBarDisplay = function () {
+    _barra();
+    if (STAFF) {
+      var st = $id("rs-user-status-display");
+      if (st) { st.textContent = "Empleado"; st.className = "rs-user-bar-status rs-status-trial"; }
+    }
+  };
+
+  function rechazar(msg) { window.__rsMsgBloqueo = msg; return false; }
+
+  function iniciarSesionExtras(uid) {
+    var dueno = STAFF ? STAFF.ownerUid : uid;
+    setTimeout(function () {
+      iniciarVigilancia(dueno);
+      iniciarAvisos(dueno, !!STAFF);
+      if (STAFF) { iniciarModoEmpleado(); escucharRespaldo(dueno); }
+      else { montarPanelEquipo(); detectarEquipoDelDueno(uid); }
+    }, 0);
+  }
+
+  var _revisarPago = rsCheckPaymentStatus;
+  rsCheckPaymentStatus = async function (uid) {
+    var u = rsAuth && rsAuth.currentUser;
+    if (!u || u.uid !== uid) return false;
+    STAFF = null; EQUIPO_ACTIVO = false; DATOS_DUENO = null; bloqueando = false;
+
+    // 1) ¿Tiene negocio propio? (cliente o dueño). Si lo tiene, nunca entra como empleado de otro.
+    var d = null;
+    try { var doc = await rsDb.collection("users").doc(uid).get(); d = doc.exists ? doc.data() : null; } catch (e) { d = null; }
+
+    if (d && d.role !== "staff") {
+      var mm = membresia(d, Date.now());
+      if (mm.bloqueado) return rechazar(textoBloqueo(d, mm, false));   // venció sin pagar o lo bloqueó el panel master
+      var ok = await _revisarPago(uid);                                  // lógica original intacta (banner de pago, rsPaymentInfo)
+      if (ok) { DATOS_DUENO = d; iniciarSesionExtras(uid); }
+      return ok;
+    }
+
+    // 2) Sin negocio propio: ¿su correo está registrado como empleado de algún negocio?
+    var s = null;
+    try { var sd = await rsDb.collection("staff").doc(clave(u.email)).get(); if (sd.exists) s = sd.data(); }
+    catch (e) { console.warn("RS acceso: no se pudo consultar el equipo:", e && e.code ? e.code : e); }
+    if (!s || !s.ownerUid || s.ownerUid === uid) {
+      return rechazar("Tu correo no está autorizado. Si eres empleado, pide al dueño del negocio que te registre.");
+    }
+    if (s.activo === false) return rechazar("Tu acceso fue desactivado por el dueño del negocio.");
+    var od = null;
+    try { od = await rsDb.collection("users").doc(s.ownerUid).get(); } catch (e) { od = null; }
+    if (!od || !od.exists) return rechazar("No se pudo validar el negocio al que perteneces. Intenta de nuevo.");
+    var dd = od.data(), m = membresia(dd, Date.now());
+    if (m.bloqueado) return rechazar(textoBloqueo(dd, m, true));
+    STAFF = { ownerUid: s.ownerUid, ownerEmail: s.ownerEmail || "", nombre: s.nombre || "", permisos: new Set(s.permisos || []) };
+    DATOS_DUENO = dd;
+    window.__RS_UID = s.ownerUid;   // trabaja con los datos del negocio
+    rsPaymentInfo = { status: "staff", endDate: m.fin, price: dd.subscriptionPrice || RS_DEFAULT_SUB_PRICE, role: "staff", email: u.email };
+    var banner = $id("rs-payment-banner"); if (banner) banner.style.display = "none";
+    iniciarSesionExtras(uid);
+    return true;
+  };
+})();
+
 </script>
 
 <!-- ============================================================ -->
@@ -24330,142 +25227,6 @@ input[type="password"], input[type="date"], input[type="search"], input[type="te
 }
 </style>
 
-<div id="rs-onb" role="dialog" aria-modal="true" aria-labelledby="rs-onb-title">
-  <div class="rs-onb-card">
-    <div class="rs-onb-top">
-      <div class="rs-onb-logo">RS</div>
-      <h1 id="rs-onb-title">¡Bienvenido a RS Admin!</h1>
-      <p class="rs-onb-sub">Tu sistema comercial para vender, controlar inventario y cobrar con total claridad.</p>
-    </div>
-    <div class="rs-onb-body">
-      <p class="rs-onb-q">¿Para qué tipo de negocio vas a utilizar RS Admin?</p>
-      <div class="rs-onb-grid" id="rs-onb-grid" role="radiogroup" aria-labelledby="rs-onb-title"></div>
-      <button type="button" class="rs-onb-go" id="rs-onb-go" disabled>Continuar</button>
-      <p class="rs-onb-note">Podrás usar todas las funciones sin importar tu elección.</p>
-    </div>
-  </div>
-</div>
-
-<script>
-/* Módulo de Bienvenida / Onboarding — independiente del resto del sistema. */
-(function () {
-  "use strict";
-  // Clave con el prefijo del sistema: queda aislada por usuario, entra en los
-  // respaldos y desaparece junto con los datos al reiniciarlos.
-  var KEY = "rs_clothes_negocio_tipo_v1";
-  var SVG = function (p) {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
-  };
-  var OPCIONES = [
-    { id: "bodega", label: "Bodega / Abasto / Minimarket",
-      icon: '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>' },
-    { id: "ropa", label: "Tienda de Ropa y Calzado",
-      icon: '<path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/>' },
-    { id: "ferreteria", label: "Ferretería y Materiales",
-      icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>' },
-    { id: "repuestos", label: "Repuestos y Autoaccesorios",
-      icon: '<path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M3 12h18"/>' },
-    { id: "farmacia", label: "Farmacia / Cuidado Personal",
-      icon: '<path d="M10.5 20.5L3.5 13.5a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7z"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/>' },
-    { id: "otro", label: "OTRO / Comercio General", wide: true,
-      icon: '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' }
-  ];
-  var CHECK = SVG('<polyline points="20 6 9 17 4 12"/>');
-
-  var overlay = null, grid = null, goBtn = null, elegido = null;
-
-  function leer() {
-    try {
-      var raw = window.localStorage.getItem(KEY);
-      if (!raw) return null;
-      var o = JSON.parse(raw);
-      return (o && o.tipo) ? o : null;
-    } catch (e) { return null; }
-  }
-  function guardar(op) {
-    var data = { tipo: op.id, etiqueta: op.label, fecha: new Date().toISOString() };
-    try { window.localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* sin espacio / bloqueado */ }
-    return data;
-  }
-  function construir() {
-    grid.innerHTML = "";
-    OPCIONES.forEach(function (op) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "rs-onb-opt" + (op.wide ? " rs-onb-wide" : "");
-      b.setAttribute("role", "radio");
-      b.setAttribute("aria-checked", "false");
-      b.setAttribute("data-tipo", op.id);
-      b.innerHTML = '<span class="rs-onb-ico">' + SVG(op.icon) + '</span><span>' + op.label +
-                    '</span><span class="rs-onb-check">' + CHECK + '</span>';
-      b.addEventListener("click", function () { seleccionar(op, b); });
-      grid.appendChild(b);
-    });
-  }
-  function seleccionar(op, btn) {
-    elegido = op;
-    var items = grid.querySelectorAll(".rs-onb-opt");
-    for (var i = 0; i < items.length; i++) items[i].setAttribute("aria-checked", items[i] === btn ? "true" : "false");
-    goBtn.disabled = false;
-  }
-  function abrir(preseleccion) {
-    if (!overlay) return;
-    elegido = null; goBtn.disabled = true;
-    var items = grid.querySelectorAll(".rs-onb-opt");
-    for (var i = 0; i < items.length; i++) items[i].setAttribute("aria-checked", "false");
-    if (preseleccion) {
-      for (var j = 0; j < items.length; j++) {
-        if (items[j].getAttribute("data-tipo") === preseleccion) items[j].click();
-      }
-    }
-    overlay.classList.add("rs-onb-open");
-    document.documentElement.style.overflow = "hidden";
-    try { overlay.scrollTop = 0; } catch (e) {}
-  }
-  function cerrar() {
-    overlay.classList.remove("rs-onb-open");
-    document.documentElement.style.overflow = "";
-  }
-  function continuar() {
-    if (!elegido) return;
-    var data = guardar(elegido);
-    cerrar();
-    try { document.dispatchEvent(new CustomEvent("rs:negocio-elegido", { detail: data })); } catch (e) {}
-  }
-  function revisar() {
-    // Solo se muestra cuando la app ya está visible y aún no hay preferencia guardada.
-    var wrap = document.getElementById("rs-app-wrapper");
-    if (wrap && wrap.classList.contains("rs-hidden")) return;
-    if (!leer()) abrir();
-  }
-  function init() {
-    overlay = document.getElementById("rs-onb");
-    grid = document.getElementById("rs-onb-grid");
-    goBtn = document.getElementById("rs-onb-go");
-    if (!overlay || !grid || !goBtn) return;
-    construir();
-    goBtn.addEventListener("click", continuar);
-    // En modo Firebase la app aparece después del login: se vigila su visibilidad.
-    var wrap = document.getElementById("rs-app-wrapper");
-    if (wrap && window.MutationObserver) {
-      new MutationObserver(function () {
-        if (!overlay.classList.contains("rs-onb-open")) revisar();
-      }).observe(wrap, { attributes: true, attributeFilter: ["class"] });
-    }
-    revisar();
-  }
-  // API pública mínima (por si luego se quiere cambiar el tipo desde Configuración).
-  window.RSOnboarding = {
-    tipo: function () { var o = leer(); return o ? o.tipo : null; },
-    datos: leer,
-    abrir: function () { var o = leer(); abrir(o ? o.tipo : null); }
-  };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
-  else init();
-})();
-</script>
-
-
 <style id="rsx-ext">
 /* ===== NUEVO: selector de categorías (Nuevo Producto) ===== */
 .rsx-cat-trigger{display:flex;align-items:center;gap:8px;text-align:left;cursor:pointer;color:#94a3b8;min-height:36px}
@@ -24524,9 +25285,9 @@ html[data-rs-theme="dark"] option{background:#17223a;color:#e6edf8}
 :where(html[data-rs-theme="dark"]) .btn-icon-box{background-color:#17223a}
 :where(html[data-rs-theme="dark"]) .btn-icon-box{color:#e6edf8}
 :where(html[data-rs-theme="dark"]) .btn-icon-box{border-color:#26344f}
-:where(html[data-rs-theme="dark"]) .btn-tasa{background-color:#0f2a1f}
-:where(html[data-rs-theme="dark"]) .btn-tasa{color:#6ee7b7}
-:where(html[data-rs-theme="dark"]) .btn-tasa{border-color:#1c5a40}
+:where(html[data-rs-theme="dark"]) .btn-tasa{background-color:#0c2a44}
+:where(html[data-rs-theme="dark"]) .btn-tasa{color:#7dd3fc}
+:where(html[data-rs-theme="dark"]) .btn-tasa{border-color:#1e4f7a}
 :where(html[data-rs-theme="dark"]) .caja-status-badge.caja-status-abierta{background-color:#0f2a1f}
 :where(html[data-rs-theme="dark"]) .caja-status-badge.caja-status-abierta{color:#6ee7b7}
 :where(html[data-rs-theme="dark"]) .caja-status-badge.caja-status-abierta{border-color-color:#1c5a40}
@@ -26560,6 +27321,76 @@ html[data-rs-theme="dark"] .rs-conn-banner .rs-conn-close:hover{background:rgba(
       if (user) iniciarEscuchas(user); else detenerEscuchas();
     });
   }
+})();
+</script>
+
+<!-- ============================================================ -->
+<!-- MEJORAS DE INTERFAZ: celeste en la barra superior, menú de    -->
+<!-- perfil rediseñado y cierre automático al tocar fuera.         -->
+<!-- ============================================================ -->
+<style id="rs-ui-mejoras-css">
+.header-row-search .search-box.search-box--scan { border: 1.5px solid #7dd3fc; background-color: #f0f9ff; }
+html[data-rs-theme="dark"] .header-row-search .search-box.search-box--scan { border-color: #1e4f7a; background-color: #0c2a44; }
+html[data-rs-theme="dark"] .header-row-search .search-box.search-box--scan svg { stroke: #7dd3fc; }
+
+.rs-profile-dropdown { min-width: 250px; padding: 16px 14px 14px; gap: 10px; align-items: stretch; border-radius: 14px; }
+.rs-profile-dropdown .rs-pd-avatar {
+  width: 56px; height: 56px; border-radius: 50%; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  background: #e0ecff; color: #0052ff; border: 2px solid #bfd4ff;
+}
+.rs-profile-dropdown .rs-pd-avatar svg { width: 28px; height: 28px; }
+.rs-profile-dropdown .rs-profile-dropdown-info { align-items: center; text-align: center; gap: 6px; }
+.rs-profile-dropdown .rs-user-bar-email { font-size: 13px; }
+.rs-profile-dropdown .rs-user-bar-status { align-self: center; letter-spacing: 0.4px; }
+.rs-profile-dropdown .rs-pd-sep { height: 1px; background: #e2e8f0; margin: 2px 0; }
+.rs-profile-dropdown .rs-pd-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;
+  font-size: 13px; font-weight: 700; text-align: left;
+}
+.rs-profile-dropdown .rs-pd-item svg { width: 18px; height: 18px; flex-shrink: 0; color: #0052ff; }
+.rs-profile-dropdown .rs-pd-item:hover { background: #eef4ff; border-color: #bfd4ff; }
+.rs-profile-dropdown .rs-btn-logout {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 800;
+}
+.rs-profile-dropdown .rs-btn-logout svg { width: 17px; height: 17px; flex-shrink: 0; }
+html[data-rs-theme="dark"] .rs-profile-dropdown .rs-pd-avatar { background: #17223a; color: #93b4ff; border-color: #26344f; }
+html[data-rs-theme="dark"] .rs-profile-dropdown .rs-pd-sep { background: #26344f; }
+html[data-rs-theme="dark"] .rs-profile-dropdown .rs-pd-item { background: #17223a; border-color: #26344f; color: #e6edf8; }
+html[data-rs-theme="dark"] .rs-profile-dropdown .rs-pd-item svg { color: #93b4ff; }
+html[data-rs-theme="dark"] .rs-profile-dropdown .rs-pd-item:hover { background: #1c2a47; }
+</style>
+<script id="rs-ui-mejoras-js">
+(function () {
+  function menuPerfil() { return document.getElementById("rs-profile-dropdown"); }
+  function cerrarMenuPerfil() {
+    var dd = menuPerfil();
+    if (dd && !dd.classList.contains("rs-hidden")) dd.classList.add("rs-hidden");
+  }
+
+  // Cierre automático: un toque/clic fuera de la tarjeta (o del botón de perfil) la oculta.
+  // Se usa pointerdown en fase de captura para que funcione también en iOS y aunque
+  // otro elemento detenga la propagación del clic.
+  document.addEventListener("pointerdown", function (e) {
+    var dd = menuPerfil();
+    if (!dd || dd.classList.contains("rs-hidden")) return;
+    var t = e.target;
+    if (t && t.closest && t.closest(".rs-profile-wrap")) return;
+    cerrarMenuPerfil();
+  }, true);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") cerrarMenuPerfil();
+  });
+
+  // Acceso rápido a Configuración / Ajustes
+  window.rsAbrirAjustesDesdePerfil = function () {
+    cerrarMenuPerfil();
+    var link = document.querySelector('.nav-link[data-target="config"]');
+    if (link) link.click();
+  };
 })();
 </script>
 
