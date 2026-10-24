@@ -199,6 +199,7 @@ tbody tr:hover{background:#fafbfd}
       <div class="field"><label for="admin-password">Contraseña</label><input type="password" id="admin-password" required placeholder="••••••••"></div>
       <button type="submit" class="btn-auth" id="btn-admin-login">Ingresar</button>
     </form>
+    <button type="button" class="rs-legal-link" onclick="rsAbrirLegal()">Aviso legal y Política de Privacidad</button>
   </div>
 </div>
 
@@ -909,20 +910,29 @@ async function extendUser(id) {
 //     oldValue, newValue, createdAt }
 // Ganancia neta estimada: amount - cost; si no hay costo, se usa el margen de contado de Precios.
 // ============================================================
-const ACT_TYPES = { product_added: 'Producto agregado', price_change: 'Cambio de precio', stock_change: 'Cambio de stock', sale: 'Venta', product_deleted: 'Producto eliminado' };
+const ACT_TYPES = { product_added: 'Producto agregado', price_change: 'Cambio de precio', stock_change: 'Cambio de stock', sale: 'Venta', product_deleted: 'Producto eliminado', producto_editado: 'Producto editado', cambio_masivo: 'Cambio masivo', actividad: 'Actividad' };
 const ACT_BADGE = { product_added: 'st-trial', price_change: 'st-overdue', stock_change: 'st-courtesy', sale: 'st-paid', product_deleted: 'st-blocked' };
 const ACT_CACHE = {};
 let actSelected = null, actLimit = 25;
 
 const norm = s => String(s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const fmtDateTime = d => d ? d.toLocaleDateString('es-ES') + ' ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '-';
-const normLog = (x, id) => ({ id, userId: x.userId, userName: x.userName || '', userEmail: x.userEmail || '', items: Array.isArray(x.items) && x.items.length ? x.items.map(i => ({ product: String(i.product || i.name || ''), quantity: +i.quantity || 1, amount: +i.amount || 0 })) : null, type: x.type, product: x.product || '', quantity: +x.quantity || 0, amount: +x.amount || 0,
-  cost: x.cost == null ? null : +x.cost, profit: x.profit == null ? null : +x.profit, oldValue: x.oldValue ?? null, newValue: x.newValue ?? null, note: String(x.note || x.reason || ''), createdAt: toDate(x.createdAt) });
+// La app cliente escribe en español (colección activityLog); aquí se traduce al formato interno del panel.
+const ACT_TIPO_ES = { producto_agregado: 'product_added', cambio_precio: 'price_change', cambio_stock: 'stock_change', producto_eliminado: 'product_deleted', venta: 'sale' };
+const normLog = (x, id) => {
+  const items = Array.isArray(x.items) && x.items.length ? x.items.map(i => ({ product: String(i.product || i.name || i.nombre || ''), quantity: +(i.quantity || i.cantidad) || 1, amount: +i.amount || ((+i.precio || 0) * (+(i.quantity || i.cantidad) || 1)) })) : null;
+  const tipo = x.type || x.tipo;
+  return { id, userId: x.userId, userName: x.userName || x.nombre || '', userEmail: x.userEmail || x.email || '', items, type: ACT_TIPO_ES[tipo] || tipo, product: x.product || x.producto || '', detail: String(x.detalle || ''),
+    quantity: +(x.quantity || x.cantidadItems) || 0, amount: +(x.amount ?? x.montoUsd) || 0,
+    cost: x.cost == null ? null : +x.cost, profit: x.profit == null ? null : +x.profit,
+    oldValue: x.oldValue ?? x.precioAnterior ?? x.stockAnterior ?? null, newValue: x.newValue ?? x.precioNuevo ?? x.stockNuevo ?? null,
+    note: String(x.note || x.reason || ''), createdAt: toDate(x.createdAt || x.creadoEn || x.fecha) };
+};
 
 async function loadActivity(u) {
   if (ACT_CACHE[u.id]) return true;
   try {
-    const snap = await db.collection('activityLogs').where('userId', '==', u.id).get();
+    const snap = await db.collection('activityLog').where('userId', '==', u.id).get();
     ACT_CACHE[u.id] = snap.docs.map(d => normLog(d.data(), d.id)).filter(l => l.createdAt).sort((a, b) => b.createdAt - a.createdAt).slice(0, 1000);
     return true;
   } catch (e) { console.error('Error cargando actividad:', e); showToast('No se pudo cargar la actividad del usuario', 'error'); return false; }
@@ -957,6 +967,7 @@ function actDetail(l) {
   if (l.type === 'price_change') return 'Editó precio de ' + p + ': ' + (l.oldValue != null ? money(l.oldValue) : '-') + ' → ' + (l.newValue != null ? money(l.newValue) : '-');
   if (l.type === 'stock_change') { const d = (l.newValue ?? 0) - (l.oldValue ?? 0); return 'Ajustó stock de ' + p + ': ' + (l.oldValue ?? '-') + ' → ' + (l.newValue ?? '-') + ' uds (' + (d >= 0 ? '+' : '') + d + ')'; }
   if (l.type === 'product_deleted') return 'Eliminó producto' + (norm(l.note) === 'vencido' ? ' vencido' : '') + ': ' + p;
+  if (l.type !== 'product_added') return (l.product ? p + ' · ' : '') + esc(l.detail || ACT_TYPES[l.type] || l.type);
   return 'Agregó ' + p + (l.newValue != null ? ' · precio ' + money(l.newValue) : '') + (l.quantity ? ' · stock inicial ' + l.quantity : '');
 }
 
@@ -967,7 +978,7 @@ const userOfLog = l => USERS.find(u => u.id === l.userId) || { id: l.userId, dis
 async function loadAllActivity() {
   if (ALL_LOGS) return true;
   try {
-    const snap = await db.collection('activityLogs').orderBy('createdAt', 'desc').limit(500).get();
+    const snap = await db.collection('activityLog').orderBy('creadoEn', 'desc').limit(500).get();
     ALL_LOGS = snap.docs.map(d => normLog(d.data(), d.id)).filter(l => l.createdAt);
     return true;
   } catch (e) { console.error('Error cargando historial:', e); showToast('No se pudo cargar el historial de actividades', 'error'); return false; }
@@ -1124,6 +1135,301 @@ function showToast(msg, type) {
 // INICIO
 // ============================================================
 iniciarSeguridadReal();
+</script>
+<!-- ============================================================ -->
+<!-- RS ADMIN · AVISOS A CLIENTES Y CONTROL DE VENCIMIENTO        -->
+<!-- Bloque aditivo: agrega la sección "Avisos" al menú. No       -->
+<!-- cambia ninguna función ni diseño existente.                  -->
+<!-- ============================================================ -->
+<style id="rs-avisos-css">
+.av-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.av-chip{padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;background:#f1f5f9;color:#334155}
+.av-chip.warn{background:#fef3c7;color:#92400e}.av-chip.bad{background:#fee2e2;color:#991b1b}
+.av-tpl{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.av-acts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.av-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.av-pill.on{background:#dcfce7;color:#166534}.av-pill.off{background:#f1f5f9;color:#64748b}.av-pill.exp{background:#fef3c7;color:#92400e}
+</style>
+<script id="rs-avisos-js">
+(function () {
+  "use strict";
+  var TIPOS = {
+    mantenimiento: { icono: "🔧", nombre: "Mantenimiento", nivel: "warning" },
+    mejora: { icono: "✨", nombre: "Mejora del sistema", nivel: "info" },
+    pago: { icono: "💳", nombre: "Recordatorio de pago", nivel: "warning" },
+    general: { icono: "📢", nombre: "Aviso general", nivel: "info" }
+  };
+  var LISTA = [];
+
+  TITLES.avisos = "Avisos";
+
+  // ---------- Menú lateral + sección ----------
+  var nav = document.getElementById("nav");
+  var btn = document.createElement("button");
+  btn.setAttribute("data-view", "avisos");
+  btn.innerHTML = '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Avisos';
+  nav.insertBefore(btn, nav.querySelector('[data-view="settings"]'));
+
+  var sec = document.createElement("section");
+  sec.id = "view-avisos";
+  sec.className = "view";
+  sec.innerHTML =
+    '<div class="card">' +
+      '<div class="card-head"><div><h2>Control de vencimiento</h2><p class="sub">Clientes por vencer, en periodo de gracia o bloqueados. Al vencer y pasar la gracia, el sistema del cliente se bloquea solo y cierra su sesión hasta que lo reactives aquí.</p></div>' +
+      '<button class="btn btn-secondary btn-sm" onclick="RSAV.sincronizar()">Revisar vencimientos ahora</button></div>' +
+      '<div class="av-chips" id="av-resumen"></div>' +
+      '<div class="table-wrap"><table class="rt"><thead><tr><th>Cliente</th><th>Estado</th><th>Vencimiento</th><th class="num">Acciones</th></tr></thead><tbody id="av-venc-body"><tr><td colspan="4" class="empty">Sin clientes por vencer ni bloqueados.</td></tr></tbody></table></div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-head"><div><h2>Enviar aviso a clientes</h2><p class="sub">Aparece como banner dentro del sistema del cliente (mantenimiento, mejoras o recordatorio de pago).</p></div></div>' +
+      '<div class="av-tpl"><button class="btn btn-secondary btn-sm" onclick="RSAV.plantilla(\'pago\')">💳 Recordatorio de pago</button>' +
+      '<button class="btn btn-secondary btn-sm" onclick="RSAV.plantilla(\'mantenimiento\')">🔧 Mantenimiento</button>' +
+      '<button class="btn btn-secondary btn-sm" onclick="RSAV.plantilla(\'mejora\')">✨ Mejora del sistema</button></div>' +
+      '<div class="form-row"><div class="field"><label for="av-tipo">Tipo de aviso</label><select id="av-tipo">' +
+        Object.keys(TIPOS).map(function (k) { return '<option value="' + k + '">' + TIPOS[k].icono + " " + TIPOS[k].nombre + "</option>"; }).join("") + '</select></div>' +
+      '<div class="field"><label for="av-destino">Enviar a</label><select id="av-destino"><option value="todos">Todos los clientes</option><option value="pendientes">Solo clientes por vencer o con pago pendiente</option><option value="cliente">Un cliente específico</option></select></div></div>' +
+      '<div class="form-row full" id="av-cliente-wrap" style="display:none"><div class="field"><label for="av-cliente">Correo del cliente</label><input id="av-cliente" list="av-clientes-dl" placeholder="cliente@correo.com" autocomplete="off"><datalist id="av-clientes-dl"></datalist></div></div>' +
+      '<div class="form-row full"><div class="field"><label for="av-titulo">Título</label><input id="av-titulo" maxlength="60" placeholder="Ej: Mantenimiento programado"></div></div>' +
+      '<div class="form-row full"><div class="field"><label for="av-mensaje">Mensaje</label><textarea id="av-mensaje" maxlength="300" placeholder="Escribe el mensaje que verá el cliente"></textarea><span class="hint"><span id="av-count">0</span>/300 caracteres</span></div></div>' +
+      '<div class="form-row"><div class="field"><label for="av-expira">Mostrar hasta (opcional)</label><input type="date" id="av-expira"><span class="hint">Después de esa fecha el aviso deja de mostrarse solo.</span></div></div>' +
+      '<button class="btn btn-primary" id="av-enviar" onclick="RSAV.enviar()">Enviar aviso</button>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-head"><div><h2>Avisos enviados</h2><p class="sub">Los últimos 50. Puedes desactivarlos o eliminarlos en cualquier momento.</p></div></div>' +
+      '<div class="table-wrap"><table class="rt"><thead><tr><th>Aviso</th><th>Para</th><th>Estado</th><th class="num">Acciones</th></tr></thead><tbody id="av-lista-body"><tr><td colspan="4" class="empty">Cargando avisos...</td></tr></tbody></table></div>' +
+    '</div>';
+  document.querySelector("main.content").appendChild(sec);
+
+  document.getElementById("av-destino").addEventListener("change", function () {
+    document.getElementById("av-cliente-wrap").style.display = this.value === "cliente" ? "" : "none";
+  });
+  document.getElementById("av-mensaje").addEventListener("input", function () { document.getElementById("av-count").textContent = this.value.length; });
+
+  // ---------- Utilidades ----------
+  function clientePorCorreo(correo) {
+    var c = String(correo || "").trim().toLowerCase();
+    return USERS.find(function (u) { return String(u.email || "").toLowerCase() === c; }) || null;
+  }
+  function destinoTexto(a) {
+    if (a.destino === "todos") return "Todos los clientes";
+    if (a.destino === "pendientes") return "Por vencer / pago pendiente";
+    return a.destinoEmail || String(a.destino || "").replace("uid:", "");
+  }
+  function estadoAviso(a) {
+    var e = a.expiraEn ? new Date(a.expiraEn) : null;
+    if (e && !isNaN(e) && e.getTime() < Date.now()) return '<span class="av-pill exp">Vencido</span>';
+    return a.activo === false ? '<span class="av-pill off">Desactivado</span>' : '<span class="av-pill on">Activo</span>';
+  }
+
+  // ---------- Control de vencimiento ----------
+  function pintarVencimientos() {
+    var body = document.getElementById("av-venc-body");
+    if (!body) return;
+    var por = 0, gracia = 0, bloq = 0, filas = [];
+    USERS.forEach(function (u) {
+      var m = membership(u);
+      var esBloq = m.state === "blocked" || u.paymentStatus === "blocked";
+      if (esBloq) bloq++; else if (m.alert === "grace") gracia++; else if (m.alert === "expiring") por++;
+      if (esBloq || m.alert) filas.push({ u: u, m: m, bloq: esBloq });
+    });
+    document.getElementById("av-resumen").innerHTML =
+      '<span class="av-chip warn">Por vencer (7 días o menos): ' + por + '</span>' +
+      '<span class="av-chip warn">En periodo de gracia: ' + gracia + '</span>' +
+      '<span class="av-chip bad">Bloqueados: ' + bloq + '</span>';
+    filas.sort(function (a, b) { return (b.bloq ? 1 : 0) - (a.bloq ? 1 : 0); });
+    body.innerHTML = filas.length ? filas.map(function (f) {
+      var id = esc(f.u.id);
+      return '<tr><td class="cell-main">' + userCell(f.u) + '</td><td data-label="Estado">' + badge(f.bloq ? "blocked" : f.m.state) + '</td><td data-label="Vencimiento">' + dueInfo(f.u) + '</td>' +
+        '<td data-label="Acciones"><div class="av-acts"><button class="btn btn-secondary btn-sm" onclick="RSAV.avisar(\'' + id + '\')">Avisar</button>' +
+        '<button class="btn btn-primary btn-sm" onclick="RSAV.reactivar(\'' + id + '\')">' + (f.bloq ? "Reactivar" : "Registrar pago") + '</button></div></td></tr>';
+    }).join("") : '<tr><td colspan="4" class="empty">Sin clientes por vencer ni bloqueados.</td></tr>';
+    var dl = document.getElementById("av-clientes-dl");
+    if (dl) dl.innerHTML = USERS.map(function (u) { return '<option value="' + esc(u.email) + '"></option>'; }).join("");
+  }
+
+  // ---------- Avisos enviados ----------
+  async function cargarAvisos() {
+    var body = document.getElementById("av-lista-body");
+    try {
+      var snap = await db.collection("avisos").orderBy("creadoEn", "desc").limit(50).get();
+      LISTA = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+    } catch (e) {
+      console.error("Error cargando avisos:", e);
+      body.innerHTML = '<tr><td colspan="4" class="empty">No se pudieron cargar los avisos. Revisa que las reglas de Firestore incluyan la colección "avisos".</td></tr>';
+      return;
+    }
+    body.innerHTML = LISTA.length ? LISTA.map(function (a) {
+      var t = TIPOS[a.tipo] || TIPOS.general, id = esc(a.id);
+      return '<tr><td class="cell-main"><b>' + t.icono + " " + esc(a.titulo) + '</b><div style="font-size:12px;color:var(--muted);margin-top:2px">' + esc(a.mensaje) + '</div><div style="font-size:11px;color:var(--muted)">' + esc(fmtDate(a.creadoEn)) + '</div></td>' +
+        '<td data-label="Para">' + esc(destinoTexto(a)) + '</td><td data-label="Estado">' + estadoAviso(a) + '</td>' +
+        '<td data-label="Acciones"><div class="av-acts"><button class="btn btn-secondary btn-sm" onclick="RSAV.alternar(\'' + id + '\')">' + (a.activo === false ? "Activar" : "Desactivar") + '</button>' +
+        '<button class="btn btn-secondary btn-sm" onclick="RSAV.borrar(\'' + id + '\')">Eliminar</button></div></td></tr>';
+    }).join("") : '<tr><td colspan="4" class="empty">Aún no has enviado avisos.</td></tr>';
+  }
+
+  window.RSAV = {
+    plantilla: function (tipo, cliente) {
+      var T = {
+        pago: ["Recordatorio de pago", "Tu mensualidad está por vencer. Realiza tu pago a tiempo para evitar la suspensión de tu acceso."],
+        mantenimiento: ["Mantenimiento programado", "Haremos mantenimiento del sistema. Podrías notar lentitud o interrupciones breves. Guarda tu trabajo con anticipación."],
+        mejora: ["Nuevas mejoras disponibles", "Mejoramos el sistema con nuevas funciones. Recarga la página para verlas."]
+      }[tipo];
+      if (!T) return;
+      var msg = T[1];
+      if (tipo === "pago" && cliente) {
+        var fin = membership(cliente).end;
+        if (fin) msg = "Tu mensualidad vence el " + fmtDate(fin) + ". Realiza tu pago antes de esa fecha para evitar la suspensión de tu acceso.";
+      }
+      document.getElementById("av-tipo").value = tipo;
+      document.getElementById("av-titulo").value = T[0];
+      document.getElementById("av-mensaje").value = msg;
+      document.getElementById("av-count").textContent = msg.length;
+    },
+
+    avisar: function (id) {
+      var u = USERS.find(function (x) { return x.id === id; });
+      if (!u) return;
+      document.getElementById("av-destino").value = "cliente";
+      document.getElementById("av-cliente-wrap").style.display = "";
+      document.getElementById("av-cliente").value = u.email;
+      RSAV.plantilla("pago", u);
+      document.getElementById("av-titulo").scrollIntoView({ behavior: "smooth", block: "center" });
+    },
+
+    reactivar: function (id) {
+      openUserStatusModal(id);                                   // modal existente de "Cambiar estado"
+      var sel = document.getElementById("modal-user-new-status");
+      if (sel) sel.value = "paid";                               // Pagado = +1 mes desde hoy y acceso reactivado
+    },
+
+    sincronizar: async function () {
+      var n = await syncMembershipStates();                      // función existente: guarda estados por vencimiento
+      renderAll();
+      showToast(n ? n + (n === 1 ? " cliente pasó" : " clientes pasaron") + " a pago pendiente/bloqueado" : "Vencimientos al día", "success");
+    },
+
+    enviar: async function () {
+      var tipo = document.getElementById("av-tipo").value, dest = document.getElementById("av-destino").value;
+      var titulo = document.getElementById("av-titulo").value.trim(), mensaje = document.getElementById("av-mensaje").value.trim();
+      var expira = document.getElementById("av-expira").value, destino = dest, destinoEmail = "";
+      if (!titulo) return showToast("Escribe un título", "error");
+      if (!mensaje) return showToast("Escribe el mensaje", "error");
+      if (dest === "cliente") {
+        var c = clientePorCorreo(document.getElementById("av-cliente").value);
+        if (!c) return showToast("Elige un cliente de la lista (correo exacto)", "error");
+        destino = "uid:" + c.id; destinoEmail = c.email;
+      }
+      var b = document.getElementById("av-enviar"); b.disabled = true;
+      try {
+        await db.collection("avisos").add({
+          titulo: titulo, mensaje: mensaje, tipo: tipo, nivel: TIPOS[tipo].nivel,
+          destino: destino, destinoEmail: destinoEmail, activo: true,
+          creadoEn: new Date().toISOString(),
+          expiraEn: expira ? new Date(expira + "T23:59:59").toISOString() : null,
+          creadoPor: currentAdmin ? currentAdmin.email : ""
+        });
+        showToast("Aviso enviado", "success");
+        ["av-titulo", "av-mensaje", "av-expira", "av-cliente"].forEach(function (i) { document.getElementById(i).value = ""; });
+        document.getElementById("av-count").textContent = "0";
+        await cargarAvisos();
+      } catch (e) { showToast("Error al enviar: " + e.message, "error"); }
+      b.disabled = false;
+    },
+
+    alternar: async function (id) {
+      var a = LISTA.find(function (x) { return x.id === id; });
+      if (!a) return;
+      try { await db.collection("avisos").doc(id).update({ activo: a.activo === false }); await cargarAvisos(); }
+      catch (e) { showToast("Error: " + e.message, "error"); }
+    },
+
+    borrar: async function (id) {
+      if (!confirm("¿Eliminar este aviso?")) return;
+      try { await db.collection("avisos").doc(id).delete(); await cargarAvisos(); showToast("Aviso eliminado", "success"); }
+      catch (e) { showToast("Error: " + e.message, "error"); }
+    }
+  };
+
+  // ---------- Conexión con funciones existentes (sin modificarlas) ----------
+  var _switch = switchAdminView;
+  switchAdminView = function (name) {
+    _switch(name);
+    if (name === "avisos") { pintarVencimientos(); cargarAvisos(); }
+  };
+  var _renderAll = renderAll;
+  renderAll = function () {
+    _renderAll();
+    try { pintarVencimientos(); } catch (e) { /* la sección aún no se ha abierto */ }
+  };
+})();
+</script>
+
+<style>
+.rs-legal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;z-index:100000;padding:16px}
+.rs-legal-overlay.rs-open{display:flex}
+.rs-legal-box{background:#fff;color:#0f172a;border-radius:14px;width:100%;max-width:640px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.rs-legal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e2e8f0}
+.rs-legal-head h2{font-size:16px;font-weight:800;margin:0}
+.rs-legal-close{background:none;border:0;font-size:22px;line-height:1;cursor:pointer;color:#475569;padding:4px 8px}
+.rs-legal-body{padding:16px 20px 24px;overflow-y:auto;font-size:13px;line-height:1.6;color:#334155}
+.rs-legal-body h3{font-size:14px;font-weight:800;color:#0f172a;margin:18px 0 6px}
+.rs-legal-body p{margin:0 0 8px}.rs-legal-body ul{margin:0 0 8px 18px;padding:0}
+.rs-legal-link{background:none;border:0;color:#4f46e5;font-weight:600;cursor:pointer;font-size:12px;text-decoration:underline;margin-top:10px;width:100%}
+</style>
+<div id="rs-legal-modal" class="rs-legal-overlay" onclick="if(event.target===this)rsCerrarLegal();">
+  <div class="rs-legal-box" role="dialog" aria-modal="true" aria-labelledby="rs-legal-title">
+    <div class="rs-legal-head"><h2 id="rs-legal-title">Aviso Legal, Privacidad y Términos</h2><button type="button" class="rs-legal-close" onclick="rsCerrarLegal()" aria-label="Cerrar">&times;</button></div>
+    <div class="rs-legal-body">
+      <!-- BORRADOR: revisar con un abogado venezolano antes de comercializar. -->
+      <p>Última actualización: octubre de 2026.</p>
+
+      <h3>Aviso Legal</h3>
+      <p><strong>Titular.</strong> RS Admin es un sistema de administración para comercios desarrollado y operado por la empresa Richard Paiva y Sebastián Paiva. Contacto: <span class="rs-legal-correo"></span>.</p>
+      <p><strong>Naturaleza del servicio.</strong> RS Admin es una herramienta de gestión interna. No es una máquina fiscal ni un sistema de facturación autorizado por el SENIAT, y sus comprobantes no sustituyen documentos fiscales.</p>
+      <p><strong>Propiedad intelectual.</strong> El software, su diseño, nombre y logotipos pertenecen a sus titulares. No se permite copiarlos, revenderlos ni distribuirlos sin autorización por escrito.</p>
+      <p><strong>Responsabilidad sobre los datos.</strong> La veracidad y exactitud de la información que registras en tu negocio es tu responsabilidad.</p>
+      <p><strong>Enlaces a terceros.</strong> El sistema puede abrir servicios externos (por ejemplo WhatsApp o Google). Esos servicios tienen sus propias condiciones y políticas de privacidad.</p>
+      <p><strong>Ley aplicable.</strong> Este aviso se rige por las leyes de la República Bolivariana de Venezuela.</p>
+
+      <h3>Política de Privacidad</h3>
+      <p><strong>1. Quiénes somos.</strong> RS Admin es un sistema de administración para comercios. Para cualquier consulta sobre tus datos escribe a <span class="rs-legal-correo"></span>.</p>
+      <p><strong>2. Qué datos guardamos.</strong></p>
+      <ul>
+        <li>De tu cuenta: nombre, correo electrónico, contraseña (se guarda cifrada) y estado de tu suscripción.</li>
+        <li>De tu negocio: productos y sus fotos, ventas, gastos, cuentas por cobrar y por pagar, y los datos de tus clientes que tú registres (nombre, cédula o RIF, teléfono, correo y dirección).</li>
+        <li>Registro de actividad: un historial de las altas de productos y ventas que haces en el sistema, que el administrador del servicio puede consultar para dar soporte.</li>
+        <li>De tus empleados: si les das acceso, guardamos su correo electrónico y su estado de acceso (activo o inactivo).</li>
+      </ul>
+      <p><strong>3. Para qué los usamos.</strong> Solo para que el sistema funcione, administrar tu suscripción, darte soporte y mantener la seguridad. No vendemos tus datos ni los usamos para publicidad.</p>
+      <p><strong>4. Datos de tus clientes.</strong> La información de las personas que registras en tu negocio es tuya y tú eres responsable de ella. RS Admin solo la guarda para prestarte el servicio.</p>
+      <p><strong>5. Dónde y cómo se guardan.</strong> Los datos se almacenan en servicios en la nube de Google (Firebase) con conexión cifrada. Cada negocio solo puede ver sus propios datos. Para funcionar, el sistema usa servicios de terceros: Google (Firebase, para tu cuenta y tus datos), redes de distribución de librerías (cdnjs, jsDelivr, unpkg y Google), un servicio de generación de códigos QR (api.qrserver.com, que recibe solo el nombre de tu negocio al imprimir el comprobante) y ve.dolarapi.com (para consultar la tasa de cambio, sin enviar tus datos). Estos servicios pueden ver tu dirección IP al cargarse. Ningún sistema es infalible: cuida tu contraseña y exporta copias de seguridad con frecuencia.</p>
+      <p><strong>6. Inteligencia artificial.</strong> Actualmente RS Admin no usa inteligencia artificial para procesar tus datos. Si en el futuro se agregan funciones de IA, lo informaremos aquí y pediremos tu consentimiento antes de enviar datos a un proveedor externo.</p>
+      <p><strong>7. Tus derechos.</strong> Puedes pedir acceso a tus datos, corregirlos o exportarlos escribiendo al correo de contacto. Para eliminarlos tú mismo, entra al menú de tu perfil y pulsa «Borrar mis datos»: se borran de inmediato tu cuenta y toda la información de tu negocio. Esta acción es permanente, así que exporta antes una copia de seguridad.</p>
+      <p><strong>8. Cuánto tiempo los guardamos.</strong> Mientras tu cuenta esté activa. Si usas «Borrar mis datos» o nos lo pides, los eliminamos, salvo lo que la ley nos obligue a conservar. Las copias de seguridad que tú exportaste a tu dispositivo son tuyas y no se borran desde aquí.</p>
+      <p><strong>9. Cambios.</strong> Si actualizamos esta política, publicaremos la nueva versión en esta misma pantalla.</p>
+
+      <h3>Cookies y almacenamiento local</h3>
+      <p><strong>Necesario para funcionar.</strong> RS Admin guarda en tu navegador (localStorage e IndexedDB) tu sesión de inicio, preferencias como el tema oscuro o el bloqueo de la app, y datos del negocio para que el sistema funcione. Sin esto la aplicación no puede operar y no requiere consentimiento.</p>
+      <p><strong>Opcional.</strong> No usamos cookies publicitarias. Si se activa la analítica del sitio, solo se carga cuando pulsas «Aceptar» en el aviso de cookies de la aplicación; si pulsas «Rechazar opcionales» no se carga.</p>
+      <p><strong>Cambiar tu elección.</strong> Configurar cookies. También puedes borrar los datos del sitio desde los ajustes de tu navegador (esto cerrará tu sesión).</p>
+
+      <h3>Términos de Servicio</h3>
+      <p><strong>1. El servicio.</strong> RS Admin ofrece herramientas de inventario, ventas, cobranzas, gastos y reportes para tu negocio.</p>
+      <p><strong>2. Tu cuenta.</strong> Eres responsable de la información que registras y de lo que ocurra con tu cuenta. No puedes usar el sistema para actividades ilegales.</p>
+      <p><strong>3. Prueba y suscripción.</strong> Tu cuenta nueva incluye un período de prueba de 30 días. Después, el acceso requiere pagar la suscripción al precio vigente que se muestra en la aplicación. Si el pago no se realiza, el acceso puede suspenderse; tus datos se conservarán un tiempo razonable para que puedas exportarlos.</p>
+      <p><strong>4. Comprobantes.</strong> Los comprobantes y reportes de RS Admin son de control interno. No sustituyen la factura fiscal ni los libros exigidos por el SENIAT. Cada negocio es responsable de cumplir sus obligaciones tributarias.</p>
+      <p><strong>5. Copias de seguridad.</strong> Te recomendamos usar la opción de exportar copia de seguridad con regularidad.</p>
+      <p><strong>6. Disponibilidad y responsabilidad.</strong> Hacemos esfuerzos razonables para que el servicio funcione sin interrupciones, pero se ofrece tal como está. En la medida que permita la ley, no respondemos por pérdidas indirectas derivadas de su uso.</p>
+      <p><strong>7. Ley aplicable.</strong> Estos términos se rigen por las leyes de la República Bolivariana de Venezuela.</p>
+      <p><strong>8. Contacto.</strong> <span class="rs-legal-correo"></span></p>
+    </div>
+  </div>
+</div>
+<script>
+// Cambia el correo de contacto aquí (el mismo que en index.html).
+var RS_LEGAL_CORREO = "TU_CORREO@AQUI.COM";
+function rsAbrirLegal(){var m=document.getElementById("rs-legal-modal");if(!m)return;var e=m.querySelectorAll(".rs-legal-correo");for(var i=0;i<e.length;i++)e[i].textContent=RS_LEGAL_CORREO;m.classList.add("rs-open");}
+function rsCerrarLegal(){var m=document.getElementById("rs-legal-modal");if(m)m.classList.remove("rs-open");}
 </script>
 </body>
 </html>
