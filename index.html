@@ -2903,7 +2903,6 @@ document.addEventListener("DOMContentLoaded", function () {
       <button type="button" class="rs-legal-close" onclick="rsCerrarLegal()" aria-label="Cerrar">&times;</button>
     </div>
     <div class="rs-legal-body">
-      <!-- BORRADOR: revisar con un abogado venezolano antes de comercializar. -->
       <p>Última actualización: octubre de 2026.</p>
 
       <h3>Aviso Legal</h3>
@@ -2920,15 +2919,15 @@ document.addEventListener("DOMContentLoaded", function () {
       <ul>
         <li>De tu cuenta: nombre, correo electrónico, contraseña (se guarda cifrada) y estado de tu suscripción.</li>
         <li>De tu negocio: productos y sus fotos, ventas, gastos, cuentas por cobrar y por pagar, y los datos de tus clientes que tú registres (nombre, cédula o RIF, teléfono, correo y dirección).</li>
-        <li>Registro de actividad: un historial de las altas de productos y ventas que haces en el sistema, que el administrador del servicio puede consultar para dar soporte.</li>
-        <li>De tus empleados: si les das acceso, guardamos su correo electrónico y su estado de acceso (activo o inactivo).</li>
+        <li>Registro de actividad: un historial de lo que haces en el sistema (altas y cambios de productos, cambios de stock y ventas), asociado a tu nombre y correo, que el administrador del servicio puede consultar para dar soporte.</li>
+        <li>De tus empleados: si les das acceso, guardamos su nombre, su correo electrónico, las funciones que les permites usar y su estado de acceso (activo o inactivo). Si quitas a un empleado o borras tus datos, se elimina su ficha en el sistema; su cuenta de acceso puede permanecer en nuestro proveedor de autenticación hasta que nos pidas eliminarla.</li>
       </ul>
       <p><strong>3. Para qué los usamos.</strong> Solo para que el sistema funcione, administrar tu suscripción, darte soporte y mantener la seguridad. No vendemos tus datos ni los usamos para publicidad.</p>
-      <p><strong>4. Datos de tus clientes.</strong> La información de las personas que registras en tu negocio es tuya y tú eres responsable de ella. RS Admin solo la guarda para prestarte el servicio.</p>
+      <p><strong>4. Datos de tus clientes.</strong> La información de las personas que registras en tu negocio es tuya y tú eres responsable de ella. RS Admin solo la guarda para prestarte el servicio. Tú eres responsable de contar con el permiso de tus clientes para registrar sus datos. Cuando compartes un comprobante o estado de cuenta por WhatsApp o correo electrónico, esa información sale del sistema hacia ese servicio por decisión tuya y se rige por las políticas de ese servicio.</p>
       <p><strong>5. Dónde y cómo se guardan.</strong> Los datos se almacenan en servicios en la nube de Google (Firebase) con conexión cifrada. Cada negocio solo puede ver sus propios datos. Para funcionar, el sistema usa servicios de terceros: Google (Firebase, para tu cuenta y tus datos), redes de distribución de librerías (cdnjs, jsDelivr, unpkg y Google), un servicio de generación de códigos QR (api.qrserver.com, que recibe solo el nombre de tu negocio al imprimir el comprobante) y ve.dolarapi.com (para consultar la tasa de cambio, sin enviar tus datos). Estos servicios pueden ver tu dirección IP al cargarse. Ningún sistema es infalible: cuida tu contraseña y exporta copias de seguridad con frecuencia.</p>
       <p><strong>6. Inteligencia artificial.</strong> Actualmente RS Admin no usa inteligencia artificial para procesar tus datos. Si en el futuro se agregan funciones de IA, lo informaremos aquí y pediremos tu consentimiento antes de enviar datos a un proveedor externo.</p>
-      <p><strong>7. Tus derechos.</strong> Puedes pedir acceso a tus datos, corregirlos o exportarlos escribiendo al correo de contacto. Para eliminarlos tú mismo, entra al menú de tu perfil y pulsa «Borrar mis datos»: se borran de inmediato tu cuenta y toda la información de tu negocio. Esta acción es permanente, así que exporta antes una copia de seguridad.</p>
-      <p><strong>8. Cuánto tiempo los guardamos.</strong> Mientras tu cuenta esté activa. Si usas «Borrar mis datos» o nos lo pides, los eliminamos, salvo lo que la ley nos obligue a conservar. Las copias de seguridad que tú exportaste a tu dispositivo son tuyas y no se borran desde aquí.</p>
+      <p><strong>7. Tus derechos.</strong> Puedes pedir acceso a tus datos, corregirlos o exportarlos escribiendo al correo de contacto. Para eliminarlos tú mismo, el dueño de la cuenta entra al menú de su perfil y pulsa «Borrar mis datos» (esta opción no está disponible para los empleados): se borran de inmediato tu cuenta y toda la información de tu negocio. Esta acción es permanente, así que exporta antes una copia de seguridad.</p>
+      <p><strong>8. Cuánto tiempo los guardamos.</strong> Mientras tu cuenta esté activa. Si usas «Borrar mis datos» o nos lo pides, los eliminamos, salvo lo que la ley nos obligue a conservar. El respaldo guardado en la nube se elimina junto con tus datos, aunque puede tardar un tiempo breve en desaparecer por completo de los sistemas de nuestro proveedor. Las copias de seguridad que tú exportaste a tu dispositivo son tuyas y no se borran desde aquí.</p>
       <p><strong>9. Cambios.</strong> Si actualizamos esta política, publicaremos la nueva versión en esta misma pantalla.</p>
 
       <h3>Cookies y almacenamiento local</h3>
@@ -5520,6 +5519,7 @@ document.addEventListener("DOMContentLoaded", function () {
               <button type="button" class="cv2-pay-card" data-method="Punto de Venta"><span class="cv2-pay-ico"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span><span>Punto de Venta</span></button>
               <button type="button" class="cv2-pay-card" data-method="Zelle"><span class="cv2-pay-ico"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span>Zelle</span></button>
               <button type="button" class="cv2-pay-card" data-method="Efectivo Bs"><span class="cv2-pay-ico"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg></span><span>Efectivo Bs.</span></button>
+              <button type="button" class="cv2-pay-card" data-method="Bio Pago"><span class="cv2-pay-ico"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 11a3 3 0 0 0-3 3c0 2.2-.5 4-1.5 5.5"/><path d="M12 7a7 7 0 0 0-7 7c0 1.4-.2 2.7-.6 4"/><path d="M12 3a11 11 0 0 1 11 11c0 1.2-.1 2.3-.4 3.4"/><path d="M15 14c0 2-.3 3.9-1 5.6"/><path d="M19 14a7 7 0 0 0-1.5-4.3"/></svg></span><span>Bio Pago</span></button>
               <button type="button" class="cv2-pay-card" data-method="__combined__"><span class="cv2-pay-ico"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg></span><span>Pago Combinado</span></button>
             </div>
 
@@ -5531,6 +5531,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <option value="Pago Móvil (VES)">Pago Móvil (VES)</option>
                 <option value="Zelle">Zelle / Transferencias</option>
                 <option value="Punto de Venta">Punto de Venta</option>
+                <option value="Bio Pago">Bio Pago</option>
               </select>
               <div id="cv2-ref-wrap" style="display: none;">
                 <label class="cv2-label" for="cart-pay-reference"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Número de referencia (opcional)</label>
@@ -5832,7 +5833,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <li><b>Observaciones:</b> nota del pedido; se guarda con la venta y sale en el ticket.</li>
                 <li><b>Método de pago:</b> toca una tarjeta (Efectivo USD, Pago Móvil, Punto de Venta, Zelle, Efectivo Bs. o <b>Pago Combinado</b>: varios métodos con su monto y referencia; la suma debe coincidir con el total). En un solo pago puedes anotar el <b>número de referencia</b> (opcional) para Pago Móvil, Zelle o Punto de Venta.</li>
                 <li><b>Finalizar Pedido e Imprimir:</b> descuenta el stock, registra la venta y abre el Ticket de Venta listo para imprimir.</li>
-                <li><b>Registrar como Crédito (CxC):</b> en vez de cobrar, deja la venta como cuenta por cobrar del cliente (ver Cuentas por Cobrar).</li>
+                <li><b>Registrar como Crédito (CxC):</b> en vez de cobrar, deja la venta como cuenta por cobrar del cliente (ver Cuentas por Cobrar). Si el cliente paga una parte ahora, toca <b>Pago mixto</b>, registra su abono con uno o varios métodos (incluido <b>Bio Pago</b>) y el resto queda a crédito.</li>
                 <li><b>Enviar por Email:</b> escribe el correo del cliente y envía el comprobante.</li>
                 <li><b>Volver al pedido:</b> regresa al Paso 1 sin perder los productos seleccionados.</li>
               </ul>
@@ -7482,6 +7483,15 @@ document.addEventListener("DOMContentLoaded", function () {
               <label>Fecha de Vencimiento:</label>
               <input type="date" id="cc-due-date" required="" class="form-input">
             </div>
+            <!-- NUEVO: Pago mixto — abono inicial con uno o varios métodos; el resto queda como crédito (CxC) -->
+            <div id="cc-abono-box" style="border-top: 1px solid #e2e8f0; padding-top: 8px; margin-top: 4px;">
+              <button type="button" id="cc-abono-toggle" class="btn btn-help" style="width: 100%; padding: 8px; font-size: 12px;">＋ Pago mixto: abonar una parte ahora (opcional)</button>
+              <div id="cc-abono-panel" style="display: none; margin-top: 8px;">
+                <div id="cc-abono-rows"></div>
+                <button type="button" id="cc-abono-add" class="btn btn-help rs-comb-add">+ Agregar método de pago</button>
+                <div id="cc-abono-summary" class="rs-comb-summary"></div>
+              </div>
+            </div>
             <p style="font-size: 10px; color: #94a3b8;">Si el cliente ya tiene una cuenta abierta, el monto se sumará a su deuda y se actualizará su fecha de vencimiento — no se crea una fila nueva.</p>
           </div>
 
@@ -8395,14 +8405,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const abonosDia = [];
         state.cxc.forEach(c => {
           (c.payments || []).forEach(p => {
-            if (parseFechaArqueoYMD(p.date) === fechaYMD) {
+            if (!p.inicial && parseFechaArqueoYMD(p.date) === fechaYMD) {
               abonosDia.push({ clientName: c.clientName, amount: p.amount, date: p.date });
             }
           });
           // NUEVO: abonos de ciclos archivados con "Cuenta Nueva"
           (c.ciclosCerrados || []).forEach(ciclo => {
             (ciclo.payments || []).forEach(p => {
-              if (parseFechaArqueoYMD(p.date) === fechaYMD) {
+              if (!p.inicial && parseFechaArqueoYMD(p.date) === fechaYMD) {
                 abonosDia.push({ clientName: c.clientName, amount: p.amount, date: p.date });
               }
             });
@@ -12215,6 +12225,7 @@ const msgCosto = (infoProm.hayCosto && Math.abs((Number(product.cost) || 0) - co
         document.getElementById("cc-location").value = "";
         document.getElementById("cc-due-date").value = sumarDiasISO(30);
 
+        rsCcAbonoReset();
         document.getElementById("modal-cart-credit").style.display = "flex";
       }
 
@@ -13329,7 +13340,7 @@ const msgCosto = (infoProm.hayCosto && Math.abs((Number(product.cost) || 0) - co
       // No reemplaza el flujo de pago de un solo método: solo se activa
       // cuando el usuario elige la pestaña "Pago Combinado".
       // ============================================================
-      const METODOS_PAGO_DISPONIBLES = ["Efectivo USD", "Efectivo Bs", "Pago Móvil (VES)", "Zelle", "Punto de Venta"];
+      const METODOS_PAGO_DISPONIBLES = ["Efectivo USD", "Efectivo Bs", "Pago Móvil (VES)", "Zelle", "Punto de Venta", "Bio Pago"];
 
       // ============================================================
       // NUEVO: PAGOS COMBINADOS en Cuentas por Cobrar y Cuentas por Pagar.
@@ -13577,6 +13588,207 @@ const msgCosto = (infoProm.hayCosto && Math.abs((Number(product.cost) || 0) - co
           amount: parseFloat(r.amount) || 0,
           reference: (r.reference || "").trim()
         }));
+      }
+
+      // ============================================================
+      // NUEVO: PAGO MIXTO CON CRÉDITO (abono inicial + saldo en CxC)
+      // En "Registrar como Crédito (CxC)" el cliente puede pagar una parte
+      // ahora con uno o varios métodos (incluido Bio Pago) y el resto
+      // queda como deuda en Cuentas por Cobrar. El abono se guarda como
+      // un abono normal de la cuenta (con su detalle en "parts").
+      // ============================================================
+      const ccAbonoState = { activo: false, rows: [] };
+      const CC_ABONO_METODOS_BS = ["Efectivo Bs", "Pago Móvil (VES)", "Punto de Venta", "Bio Pago"];
+
+      function rsCcRound2(n) { return Math.round((n + 1e-9) * 100) / 100; }
+      function rsCcEsc(v) {
+        return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+      function rsCcTotalCreditoUsd() {
+        const subtotal = state.cart.reduce((sum, i) => sum + ((i.priceCredito != null ? i.priceCredito : i.price) * i.quantity), 0);
+        return subtotal - calcularMontoDescuentoParaSubtotal(subtotal);
+      }
+      function rsCcNuevaFila(metodo) {
+        metodo = metodo || "Efectivo USD";
+        return {
+          id: "ccab-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
+          method: metodo,
+          currency: CC_ABONO_METODOS_BS.indexOf(metodo) !== -1 ? "Bs" : "USD",
+          amount: "",
+          reference: ""
+        };
+      }
+      function rsCcUsdDeFila(r) {
+        const a = parseFloat(r.amount);
+        if (!(a > 0)) return 0;
+        if (r.currency === "Bs") return state.tasa > 0 ? rsCcRound2(a / state.tasa) : 0;
+        return rsCcRound2(a);
+      }
+      function rsCcTotalAbonoUsd() {
+        return rsCcRound2(ccAbonoState.rows.reduce((t, r) => t + rsCcUsdDeFila(r), 0));
+      }
+      function rsCcTextoEq(r) {
+        const a = parseFloat(r.amount);
+        if (!(a > 0)) return "Ingresa el monto de este método de pago.";
+        if (r.currency === "Bs") return "≈ " + formatUSD(rsCcUsdDeFila(r)) + " (a " + Number(state.tasa || 0).toFixed(2) + " Bs/$)";
+        return "≈ " + formatBS(a * state.tasa);
+      }
+
+      function rsCcActualizarResumen() {
+        const box = document.getElementById("cc-abono-summary");
+        if (!box) return;
+        const totalCred = rsCcRound2(rsCcTotalCreditoUsd());
+        const abono = rsCcTotalAbonoUsd();
+        const resta = rsCcRound2(totalCred - abono);
+        let color = "#475569", bg = "#f1f5f9", estado = "Ingresa el monto que paga el cliente ahora.";
+        if (abono > 0) {
+          if (resta <= 0.005) {
+            color = "#e11d48"; bg = "#fef2f2";
+            estado = "⚠️ El abono cubre todo el pedido. Para cobrarlo completo usa «Finalizar Pedido», o reduce el abono.";
+          } else {
+            color = "#b45309"; bg = "#fffbeb";
+            estado = "Quedará a crédito (CxC): <b>" + formatUSD(resta) + "</b>";
+          }
+        }
+        box.style.color = color;
+        box.style.backgroundColor = bg;
+        box.style.borderColor = color;
+        box.innerHTML = '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:12px;"><span>Abono ahora:</span><span>' + formatUSD(abono) + "</span></div>" +
+          '<div style="display:flex;justify-content:space-between;font-size:11px;"><span>Total del pedido:</span><span>' + formatUSD(totalCred) + "</span></div>" +
+          '<div style="margin-top:2px;">' + estado + "</div>";
+      }
+
+      function rsCcRenderFilas() {
+        const box = document.getElementById("cc-abono-rows");
+        if (!box) return;
+        if (ccAbonoState.rows.length === 0) ccAbonoState.rows.push(rsCcNuevaFila("Efectivo USD"));
+        box.innerHTML = ccAbonoState.rows.map(function (r, i) {
+          const opts = METODOS_PAGO_DISPONIBLES.map(function (m) {
+            return '<option value="' + m + '"' + (m === r.method ? " selected" : "") + ">" + m + "</option>";
+          }).join("");
+          return '<div class="rs-comb-row">' +
+            '<div class="rs-comb-head"><span>Forma de pago ' + (i + 1) + "</span>" +
+              (ccAbonoState.rows.length > 1 ? '<button type="button" class="rs-comb-del" data-cc-del="' + r.id + '" aria-label="Quitar">✕</button>' : "") +
+            "</div>" +
+            '<select class="form-select" data-cc-field="method" data-cc-id="' + r.id + '">' + opts + "</select>" +
+            '<div class="rs-comb-amt">' +
+              '<input type="number" step="0.01" min="0" inputmode="decimal" class="form-input" placeholder="Monto" value="' + rsCcEsc(r.amount) + '" data-cc-field="amount" data-cc-id="' + r.id + '">' +
+              '<select class="form-select" data-cc-field="currency" data-cc-id="' + r.id + '">' +
+                '<option value="USD"' + (r.currency === "USD" ? " selected" : "") + ">$ USD</option>" +
+                '<option value="Bs"' + (r.currency === "Bs" ? " selected" : "") + ">Bs</option>" +
+              "</select>" +
+            "</div>" +
+            '<input type="text" class="form-input" placeholder="Referencia (opcional)" value="' + rsCcEsc(r.reference) + '" data-cc-field="reference" data-cc-id="' + r.id + '">' +
+            '<div class="rs-comb-eq" id="cc-abono-eq-' + r.id + '">' + rsCcTextoEq(r) + "</div>" +
+          "</div>";
+        }).join("");
+        rsCcActualizarResumen();
+      }
+
+      function rsCcAplicarVisibilidad() {
+        const panel = document.getElementById("cc-abono-panel");
+        const tg = document.getElementById("cc-abono-toggle");
+        if (panel) panel.style.display = ccAbonoState.activo ? "block" : "none";
+        if (tg) tg.textContent = ccAbonoState.activo
+          ? "✕ Quitar abono (todo el pedido a crédito)"
+          : "＋ Pago mixto: abonar una parte ahora (opcional)";
+      }
+
+      function rsCcAbonoReset() {
+        ccAbonoState.activo = false;
+        ccAbonoState.rows = [];
+        rsCcAplicarVisibilidad();
+        const box = document.getElementById("cc-abono-rows");
+        if (box) box.innerHTML = "";
+      }
+
+      function rsCcAbonoInit() {
+        const tg = document.getElementById("cc-abono-toggle");
+        const add = document.getElementById("cc-abono-add");
+        const rowsBox = document.getElementById("cc-abono-rows");
+        if (!tg || !add || !rowsBox || tg.dataset.ccInit === "1") return;
+        tg.dataset.ccInit = "1";
+
+        tg.addEventListener("click", function () {
+          ccAbonoState.activo = !ccAbonoState.activo;
+          if (ccAbonoState.activo) {
+            if (ccAbonoState.rows.length === 0) ccAbonoState.rows.push(rsCcNuevaFila("Efectivo USD"));
+            rsCcRenderFilas();
+          }
+          rsCcAplicarVisibilidad();
+        });
+        add.addEventListener("click", function () {
+          if (ccAbonoState.rows.length >= 6) { showToast("Máximo 6 formas de pago por abono.", "error"); return; }
+          ccAbonoState.rows.push(rsCcNuevaFila("Efectivo USD"));
+          rsCcRenderFilas();
+        });
+        rowsBox.addEventListener("click", function (e) {
+          const del = e.target.closest("[data-cc-del]");
+          if (!del) return;
+          if (ccAbonoState.rows.length <= 1) return;
+          const id = del.getAttribute("data-cc-del");
+          ccAbonoState.rows = ccAbonoState.rows.filter(r => r.id !== id);
+          rsCcRenderFilas();
+        });
+        rowsBox.addEventListener("input", function (e) {
+          const el = e.target.closest("[data-cc-field]");
+          if (!el) return;
+          const field = el.getAttribute("data-cc-field");
+          if (field !== "amount" && field !== "reference") return;
+          const row = ccAbonoState.rows.find(r => r.id === el.getAttribute("data-cc-id"));
+          if (!row) return;
+          row[field] = el.value;
+          if (field === "amount") {
+            const eq = document.getElementById("cc-abono-eq-" + row.id);
+            if (eq) eq.textContent = rsCcTextoEq(row);
+            rsCcActualizarResumen();
+          }
+        });
+        rowsBox.addEventListener("change", function (e) {
+          const el = e.target.closest("select[data-cc-field]");
+          if (!el) return;
+          const field = el.getAttribute("data-cc-field");
+          const row = ccAbonoState.rows.find(r => r.id === el.getAttribute("data-cc-id"));
+          if (!row) return;
+          row[field] = el.value;
+          if (field === "method") row.currency = CC_ABONO_METODOS_BS.indexOf(row.method) !== -1 ? "Bs" : "USD";
+          rsCcRenderFilas();
+        });
+      }
+
+      // Devuelve null (sin abono), false (error ya avisado) o { total, partes }.
+      function rsCcAbonoLeer(totalCreditoUsd) {
+        if (!ccAbonoState.activo) return null;
+        const rows = ccAbonoState.rows;
+        if (rows.length === 0 || rows.every(r => !(parseFloat(r.amount) > 0))) {
+          showToast("Ingresa el monto del abono o toca «Quitar abono» para registrar todo a crédito.", "error");
+          return false;
+        }
+        if (rows.some(r => !(parseFloat(r.amount) > 0))) {
+          showToast("Cada forma de pago debe tener un monto mayor a 0. Completa o quita las filas vacías.", "error");
+          return false;
+        }
+        if (!(state.tasa > 0) && rows.some(r => r.currency === "Bs")) {
+          showToast("Define la tasa del dólar antes de registrar montos en bolívares.", "error");
+          return false;
+        }
+        const total = rsCcTotalAbonoUsd();
+        if (!(total > 0)) { showToast("Ingresa un monto de abono válido.", "error"); return false; }
+        if (total >= rsCcRound2(totalCreditoUsd) - 0.005) {
+          showToast("El abono cubre todo el pedido. Usa «Finalizar Pedido» para cobrarlo completo o reduce el abono.", "error");
+          return false;
+        }
+        const partes = rows.map(function (r) {
+          return {
+            method: r.method,
+            currency: r.currency,
+            original: Math.round(parseFloat(r.amount) * 100) / 100,
+            usd: rsCcUsdDeFila(r),
+            rate: state.tasa,
+            reference: (r.reference || "").trim()
+          };
+        });
+        return { total: total, partes: partes };
       }
 
       // 6. CARRITO Y CONTROL DE COMPRA
@@ -21087,6 +21299,7 @@ ${state.config.name || 'RS Moda & Estilo'}
         document.getElementById("cc-name").addEventListener("input", verificarPosibleDuplicadoCC);
         document.getElementById("cc-cedula").addEventListener("input", verificarPosibleDuplicadoCC);
 
+        rsCcAbonoInit();
         document.getElementById("form-cart-credit").onsubmit = function (e) {
           e.preventDefault();
           if (state.cart.length === 0) {
@@ -21142,6 +21355,10 @@ ${state.config.name || 'RS Moda & Estilo'}
           const descuentoCredito = calcularMontoDescuentoParaSubtotal(subtotalCredito);
           const totalUsd = subtotalCredito - descuentoCredito;
 
+          // NUEVO: pago mixto — se valida el abono inicial antes de tocar stock o cuentas
+          const abonoCc = rsCcAbonoLeer(totalUsd);
+          if (abonoCc === false) return;
+
           // Descontar stock
           state.cart.forEach(item => {
             const p = state.products.find(prod => prod.id === item.id);
@@ -21173,6 +21390,20 @@ ${state.config.name || 'RS Moda & Estilo'}
             items: itemsConPrecioCredito,
             existingId: existingId
           });
+
+          // NUEVO: pago mixto — el abono inicial queda como abono normal de la cuenta
+          if (abonoCc) {
+            cxcGuardado.paidAmount = (cxcGuardado.paidAmount || 0) + abonoCc.total;
+            if (!cxcGuardado.payments) cxcGuardado.payments = [];
+            cxcGuardado.payments.unshift({
+              amount: abonoCc.total,
+              date: getNowFormatted(),
+              method: abonoCc.partes.length > 1 ? METODO_PAGOS_COMBINADOS : abonoCc.partes[0].method,
+              note: "Abono inicial de la venta (pago mixto)",
+              parts: abonoCc.partes,
+              inicial: true
+            });
+          }
 
           // NUEVO: construir un comprobante/factura de la venta a crédito,
           // igual que se hace en la venta al contado, para que quede una
@@ -21212,6 +21443,22 @@ ${state.config.name || 'RS Moda & Estilo'}
             totalBs: totalUsd * state.tasa
           };
           saleCredito.note = rsNotaPedido();
+          // NUEVO: pago mixto — desglose del abono + saldo a crédito en ticket y venta
+          if (abonoCc) {
+            const restanteCc = rsCcRound2(totalUsd - abonoCc.total);
+            const pagosMixtos = abonoCc.partes.map(p => ({ method: p.method, amount: p.usd, reference: p.reference || "" }))
+              .concat([{ method: "Crédito (CxC)", amount: restanteCc, reference: "" }]);
+            const metodoMixto = "Pago Mixto (" + abonoCc.partes.map(p => p.method).join(" + ") + ") + Crédito (CxC) — Vence " + formatFechaCorta(dueDate);
+            [ticketCredito, saleCredito].forEach(function (o) {
+              o.payments = pagosMixtos.map(p => Object.assign({}, p));
+              o.paymentMethod = metodoMixto;
+              o.conIgtf = false;
+              o.igtfBaseUsd = 0;
+              o.igtfUsd = 0;
+            });
+            saleCredito.abonoInicialUsd = abonoCc.total;
+            saleCredito.creditoUsd = restanteCc;
+          }
           state.sales.unshift(saleCredito);
 
           state.cart = [];
@@ -21237,10 +21484,13 @@ ${state.config.name || 'RS Moda & Estilo'}
           document.getElementById("modal-cart-credit").style.display = "none";
           document.getElementById("cart-overlay").style.display = "none";
           this.reset();
+          rsCcAbonoReset();
           switchCcTab("existing");
 
           // MEJORA 1: Mostrar mensaje visual de éxito con badge distintivo
-          showToastWithBadge(`✅ ¡Se cobró correctamente! Crédito registrado a ${name}`, "success");
+          showToastWithBadge(abonoCc
+            ? `✅ ¡Se cobró correctamente! Abono de ${formatUSD(abonoCc.total)} y crédito de ${formatUSD(totalUsd - abonoCc.total)} a ${name}`
+            : `✅ ¡Se cobró correctamente! Crédito registrado a ${name}`, "success");
 
           // Se cambia la vista de fondo a "Cuentas por Cobrar" (sin modal
           // encima) para que, al cerrar la factura, el usuario ya esté ahí
@@ -23201,7 +23451,7 @@ async function rsHandleLogin(event) {
 // ----------------------------------------------------------------------------
 // POLÍTICA DE PRIVACIDAD Y TÉRMINOS — CAMBIA EL CORREO DE CONTACTO AQUÍ
 // ----------------------------------------------------------------------------
-const RS_LEGAL_CORREO = "TU_CORREO@AQUI.COM";
+const RS_LEGAL_CORREO = "rsadmin.oficial@gmail.com";
 const RS_LEGAL_VERSION = "2026-10";
 
 function rsAbrirLegal() {
@@ -23276,6 +23526,7 @@ function rsHandleLogout() {
 // palabra BORRAR. Función aditiva: no toca ninguna otra parte del sistema.
 // ----------------------------------------------------------------------------
 function rsAbrirBorrarDatos() {
+  if (window.__RS_ES_EMPLEADO) return; // solo el dueño de la cuenta puede borrar datos
   var dd = document.getElementById("rs-profile-dropdown");
   if (dd) dd.classList.add("rs-hidden");
   if (MODO_DESARROLLO || !rsAuth || !rsAuth.currentUser) {
@@ -23306,6 +23557,7 @@ function rsCerrarBorrarDatos() {
   if (m) m.remove();
 }
 async function rsEjecutarBorrarDatos() {
+  if (window.__RS_ES_EMPLEADO) return; // solo el dueño de la cuenta puede borrar datos
   var msg = document.getElementById("rs-borrar-msg");
   var btn = document.getElementById("rs-borrar-ok");
   function err(t) { if (msg) msg.textContent = t; if (btn) btn.disabled = false; }
@@ -24230,6 +24482,9 @@ rsAuth.onAuthStateChanged(async function (user) {
     STAFF = { ownerUid: s.ownerUid, ownerEmail: s.ownerEmail || "", nombre: s.nombre || "", permisos: new Set(s.permisos || []) };
     DATOS_DUENO = dd;
     window.__RS_UID = s.ownerUid;   // trabaja con los datos del negocio
+    // Los empleados NO pueden borrar datos: esa opción es solo del dueño de la cuenta.
+    window.__RS_ES_EMPLEADO = true;
+    var rsBtnBorrar = $id("rs-btn-borrar-datos"); if (rsBtnBorrar) rsBtnBorrar.style.display = "none";
     rsPaymentInfo = { status: "staff", endDate: m.fin, price: dd.subscriptionPrice || RS_DEFAULT_SUB_PRICE, role: "staff", email: u.email };
     var banner = $id("rs-payment-banner"); if (banner) banner.style.display = "none";
     iniciarSesionExtras(uid);
