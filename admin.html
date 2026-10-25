@@ -1380,7 +1380,6 @@ iniciarSeguridadReal();
   <div class="rs-legal-box" role="dialog" aria-modal="true" aria-labelledby="rs-legal-title">
     <div class="rs-legal-head"><h2 id="rs-legal-title">Aviso Legal, Privacidad y Términos</h2><button type="button" class="rs-legal-close" onclick="rsCerrarLegal()" aria-label="Cerrar">&times;</button></div>
     <div class="rs-legal-body">
-      <!-- BORRADOR: revisar con un abogado venezolano antes de comercializar. -->
       <p>Última actualización: octubre de 2026.</p>
 
       <h3>Aviso Legal</h3>
@@ -1397,21 +1396,21 @@ iniciarSeguridadReal();
       <ul>
         <li>De tu cuenta: nombre, correo electrónico, contraseña (se guarda cifrada) y estado de tu suscripción.</li>
         <li>De tu negocio: productos y sus fotos, ventas, gastos, cuentas por cobrar y por pagar, y los datos de tus clientes que tú registres (nombre, cédula o RIF, teléfono, correo y dirección).</li>
-        <li>Registro de actividad: un historial de las altas de productos y ventas que haces en el sistema, que el administrador del servicio puede consultar para dar soporte.</li>
-        <li>De tus empleados: si les das acceso, guardamos su correo electrónico y su estado de acceso (activo o inactivo).</li>
+        <li>Registro de actividad: un historial de lo que haces en el sistema (altas y cambios de productos, cambios de stock y ventas), asociado a tu nombre y correo, que el administrador del servicio puede consultar para dar soporte.</li>
+        <li>De tus empleados: si les das acceso, guardamos su nombre, su correo electrónico, las funciones que les permites usar y su estado de acceso (activo o inactivo). Si quitas a un empleado o borras tus datos, se elimina su ficha en el sistema; su cuenta de acceso puede permanecer en nuestro proveedor de autenticación hasta que nos pidas eliminarla.</li>
       </ul>
       <p><strong>3. Para qué los usamos.</strong> Solo para que el sistema funcione, administrar tu suscripción, darte soporte y mantener la seguridad. No vendemos tus datos ni los usamos para publicidad.</p>
-      <p><strong>4. Datos de tus clientes.</strong> La información de las personas que registras en tu negocio es tuya y tú eres responsable de ella. RS Admin solo la guarda para prestarte el servicio.</p>
+      <p><strong>4. Datos de tus clientes.</strong> La información de las personas que registras en tu negocio es tuya y tú eres responsable de ella. RS Admin solo la guarda para prestarte el servicio. Tú eres responsable de contar con el permiso de tus clientes para registrar sus datos. Cuando compartes un comprobante o estado de cuenta por WhatsApp o correo electrónico, esa información sale del sistema hacia ese servicio por decisión tuya y se rige por las políticas de ese servicio.</p>
       <p><strong>5. Dónde y cómo se guardan.</strong> Los datos se almacenan en servicios en la nube de Google (Firebase) con conexión cifrada. Cada negocio solo puede ver sus propios datos. Para funcionar, el sistema usa servicios de terceros: Google (Firebase, para tu cuenta y tus datos), redes de distribución de librerías (cdnjs, jsDelivr, unpkg y Google), un servicio de generación de códigos QR (api.qrserver.com, que recibe solo el nombre de tu negocio al imprimir el comprobante) y ve.dolarapi.com (para consultar la tasa de cambio, sin enviar tus datos). Estos servicios pueden ver tu dirección IP al cargarse. Ningún sistema es infalible: cuida tu contraseña y exporta copias de seguridad con frecuencia.</p>
       <p><strong>6. Inteligencia artificial.</strong> Actualmente RS Admin no usa inteligencia artificial para procesar tus datos. Si en el futuro se agregan funciones de IA, lo informaremos aquí y pediremos tu consentimiento antes de enviar datos a un proveedor externo.</p>
-      <p><strong>7. Tus derechos.</strong> Puedes pedir acceso a tus datos, corregirlos o exportarlos escribiendo al correo de contacto. Para eliminarlos tú mismo, entra al menú de tu perfil y pulsa «Borrar mis datos»: se borran de inmediato tu cuenta y toda la información de tu negocio. Esta acción es permanente, así que exporta antes una copia de seguridad.</p>
-      <p><strong>8. Cuánto tiempo los guardamos.</strong> Mientras tu cuenta esté activa. Si usas «Borrar mis datos» o nos lo pides, los eliminamos, salvo lo que la ley nos obligue a conservar. Las copias de seguridad que tú exportaste a tu dispositivo son tuyas y no se borran desde aquí.</p>
+      <p><strong>7. Tus derechos.</strong> Puedes pedir acceso a tus datos, corregirlos o exportarlos escribiendo al correo de contacto. Para eliminarlos tú mismo, el dueño de la cuenta entra al menú de su perfil y pulsa «Borrar mis datos» (esta opción no está disponible para los empleados): se borran de inmediato tu cuenta y toda la información de tu negocio. Esta acción es permanente, así que exporta antes una copia de seguridad.</p>
+      <p><strong>8. Cuánto tiempo los guardamos.</strong> Mientras tu cuenta esté activa. Si usas «Borrar mis datos» o nos lo pides, los eliminamos, salvo lo que la ley nos obligue a conservar. El respaldo guardado en la nube se elimina junto con tus datos, aunque puede tardar un tiempo breve en desaparecer por completo de los sistemas de nuestro proveedor. Las copias de seguridad que tú exportaste a tu dispositivo son tuyas y no se borran desde aquí.</p>
       <p><strong>9. Cambios.</strong> Si actualizamos esta política, publicaremos la nueva versión en esta misma pantalla.</p>
 
       <h3>Cookies y almacenamiento local</h3>
       <p><strong>Necesario para funcionar.</strong> RS Admin guarda en tu navegador (localStorage e IndexedDB) tu sesión de inicio, preferencias como el tema oscuro o el bloqueo de la app, y datos del negocio para que el sistema funcione. Sin esto la aplicación no puede operar y no requiere consentimiento.</p>
       <p><strong>Opcional.</strong> No usamos cookies publicitarias. Si se activa la analítica del sitio, solo se carga cuando pulsas «Aceptar» en el aviso de cookies de la aplicación; si pulsas «Rechazar opcionales» no se carga.</p>
-      <p><strong>Cambiar tu elección.</strong> Configurar cookies. También puedes borrar los datos del sitio desde los ajustes de tu navegador (esto cerrará tu sesión).</p>
+      <p><strong>Cambiar tu elección.</strong> Puedes hacerlo desde el enlace «Cookies» de la aplicación. También puedes borrar los datos del sitio desde los ajustes de tu navegador (esto cerrará tu sesión).</p>
 
       <h3>Términos de Servicio</h3>
       <p><strong>1. El servicio.</strong> RS Admin ofrece herramientas de inventario, ventas, cobranzas, gastos y reportes para tu negocio.</p>
@@ -1427,7 +1426,7 @@ iniciarSeguridadReal();
 </div>
 <script>
 // Cambia el correo de contacto aquí (el mismo que en index.html).
-var RS_LEGAL_CORREO = "TU_CORREO@AQUI.COM";
+var RS_LEGAL_CORREO = "rsadmin.oficial@gmail.com";
 function rsAbrirLegal(){var m=document.getElementById("rs-legal-modal");if(!m)return;var e=m.querySelectorAll(".rs-legal-correo");for(var i=0;i<e.length;i++)e[i].textContent=RS_LEGAL_CORREO;m.classList.add("rs-open");}
 function rsCerrarLegal(){var m=document.getElementById("rs-legal-modal");if(m)m.classList.remove("rs-open");}
 </script>
