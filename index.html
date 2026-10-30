@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="es"><head>
   <meta charset="UTF-8">
-  <!-- SEGURIDAD: política de contenido (CSP) y referrer. GitHub Pages ya sirve todo por HTTPS;
-       upgrade-insecure-requests fuerza HTTPS en cualquier recurso. Si añades un servicio externo
-       nuevo (otro CDN, otra API), debes agregar su dominio aquí o el navegador lo bloqueará. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com https://apis.google.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; font-src 'self' data:; media-src 'self' blob: data:; connect-src 'self' blob: data: https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://ve.dolarapi.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; worker-src 'self' blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; frame-src 'self' blob: data: https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <!-- SEGURIDAD ACTIVA: política de seguridad de contenido (CSP) y política de referrer -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self' blob: data: https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://ve.dolarapi.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self' https://*.firebaseapp.com blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- SEO / COMPARTIR: es un sistema privado con inicio de sesión, por eso no se indexa en buscadores -->
   <meta name="description" content="RS Admin: sistema de gestión para comercios. Punto de venta, inventario, cuentas por cobrar y por pagar, gastos y reportes desde tu celular o PC.">
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="index, follow">
   <meta name="author" content="RS Admin">
   <meta name="theme-color" content="#0052ff">
   <meta property="og:type" content="website">
@@ -2839,6 +2837,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <label>Contraseña</label>
           <input type="password" id="rs-login-password" maxlength="128" required placeholder="••••••••" autocomplete="current-password">
         </div>
+        <button type="button" class="rs-olvide" onclick="rsOlvideClave()">¿Olvidaste tu contraseña?</button>
         <button type="submit" class="rs-btn-auth" id="rs-btn-login">Ingresar</button>
       </form>
     </div>
@@ -2856,11 +2855,12 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
         <div class="rs-form-group">
           <label>Contraseña</label>
-          <input type="password" id="rs-register-password" maxlength="128" required placeholder="••••••••" minlength="6" autocomplete="new-password">
+          <input type="password" id="rs-register-password" maxlength="128" required placeholder="••••••••" minlength="8" autocomplete="new-password">
+          <small style="color:#64748b;font-size:12px;">Mínimo 8 caracteres, con letras y números.</small>
         </div>
         <div class="rs-form-group">
           <label>Confirmar Contraseña</label>
-          <input type="password" id="rs-register-password-confirm" maxlength="128" required placeholder="••••••••" minlength="6" autocomplete="new-password">
+          <input type="password" id="rs-register-password-confirm" maxlength="128" required placeholder="••••••••" minlength="8" autocomplete="new-password">
         </div>
         <label class="rs-legal-check">
           <input type="checkbox" id="rs-register-acepto" required>
@@ -2906,7 +2906,7 @@ document.addEventListener("DOMContentLoaded", function () {
       <p>Última actualización: octubre de 2026.</p>
 
       <h3>Aviso Legal</h3>
-      <p><strong>Titular.</strong> RS Admin es un sistema de administración para comercios desarrollado y operado por la empresa Richard Paiva y Sebastián Paiva. Contacto: <span class="rs-legal-correo"></span>.</p>
+      <p><strong>Titular.</strong> RS Admin es un sistema de administración para comercios. El servicio es operado por el equipo de RS Admin. Contacto: <span class="rs-legal-correo"></span>.</p>
       <p><strong>Naturaleza del servicio.</strong> RS Admin es una herramienta de gestión interna. No es una máquina fiscal ni un sistema de facturación autorizado por el SENIAT, y sus comprobantes no sustituyen documentos fiscales.</p>
       <p><strong>Propiedad intelectual.</strong> El software, su diseño, nombre y logotipos pertenecen a sus titulares. No se permite copiarlos, revenderlos ni distribuirlos sin autorización por escrito.</p>
       <p><strong>Responsabilidad sobre los datos.</strong> La veracidad y exactitud de la información que registras en tu negocio es tu responsabilidad.</p>
@@ -3596,6 +3596,9 @@ document.addEventListener("DOMContentLoaded", function () {
                   ⋮ Más acciones
                 </button>
                 <div id="inv-actions-dropdown" class="actions-menu-dropdown">
+                  <button type="button" id="btn-inv-compras" class="btn btn-help"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Lista de Compras Inteligente</button>
+                  <button type="button" id="btn-inv-precios" class="btn btn-help"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Revisar Márgenes de Precio</button>
+                  <button type="button" id="btn-inv-valor" class="btn btn-help"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Valor del Inventario</button>
                   <button type="button" id="btn-inv-pdf" class="btn btn-help"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg> Exportar PDF</button>
                   <button type="button" id="btn-inv-excel" class="btn btn-help"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Exportar Excel</button>
                   <button type="button" id="btn-inv-csv" class="btn btn-help"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Exportar CSV</button>
@@ -3862,10 +3865,13 @@ document.addEventListener("DOMContentLoaded", function () {
               <h2 style="font-size: 16px; font-weight: 800;">Cuentas por Cobrar &amp; Abonos</h2>
               <p style="font-size: 11px; color: #64748b;">Registro de créditos con fecha y hora de abonos</p>
             </div>
-            <button id="btn-open-new-credit" class="btn btn-primary">
-              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              <span>Nuevo Crédito</span>
-            </button>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end;">
+              <button type="button" id="btn-cobranza-wa" class="btn btn-help">Cobranza por WhatsApp</button>
+              <button id="btn-open-new-credit" class="btn btn-primary">
+                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Nuevo Crédito</span>
+              </button>
+            </div>
           </div>
 
           <!-- ============================================================ -->
@@ -4330,6 +4336,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
               <input type="date" id="arqueo-fecha" class="form-input" style="width: auto;">
               <button type="button" id="btn-arqueo-generar" class="btn btn-primary">Generar Arqueo</button>
+              <button type="button" id="btn-cierre-detallado" class="btn btn-help">🧾 Cierre Detallado</button><!-- RS_CIERRE_DETALLADO -->
             </div>
           </div>
 
@@ -4775,13 +4782,6 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="card" style="max-width: 500px; margin: 14px auto 0; background-color: #f8fafc;">
           <h2 style="font-size: 13px; font-weight: 800; margin-bottom: 6px;"><svg class="rs-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="12" y1="3" x2="12" y2="21"/><path d="M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0z"/><path d="M19 7l-3 7a3 3 0 0 0 6 0z"/><line x1="8" y1="21" x2="16" y2="21"/></svg> Aviso Legal</h2>
           <p style="font-size: 10.5px; color: #64748b; line-height: 1.55;">RS Admin es una herramienta de <strong>gestión interna</strong>. No es una máquina fiscal ni un sistema de facturación autorizado por el SENIAT, y sus comprobantes no sustituyen documentos fiscales. La veracidad, exactitud y legalidad de los datos contables y comerciales que se ingresen (ventas, gastos, tasa de cambio, impuestos e inventario) es responsabilidad exclusiva del usuario/propietario del negocio.</p>
-        </div>
-
-        <!-- CRÉDITOS DE AUTORÍA DEL SISTEMA -->
-        <div class="card" style="max-width: 500px; margin: 14px auto 0; text-align: center; background-color: #f8fafc;">
-          <p style="font-size: 11px; color: #94a3b8; font-weight: 600; letter-spacing: 0.3px;">
-            Hecho por empresa Richard Paiva y Sebastián Paiva
-          </p>
         </div>
       </section>
 
@@ -5357,9 +5357,6 @@ document.addEventListener("DOMContentLoaded", function () {
             <strong id="sidebar-tasa-txt" style="color: #34d399;">779.95 Bs</strong>
           </div>
           <button id="btn-sidebar-tasa" class="btn btn-primary" style="width: 100%; padding: 5px; font-size: 11px;">Cambiar Tasa</button>
-          <p style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #334155; text-align: center; font-size: 9.5px; color: #64748b; letter-spacing: 0.2px;">
-            Hecho por empresa Richard Paiva y Sebastián Paiva
-          </p>
         </div>
       </div>
       <div style="flex: 1;" id="sidebar-backdrop"></div>
@@ -5703,6 +5700,58 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
     </div>
 
+    <!-- MODAL: CIERRE DE CAJA DETALLADO POR MÉTODO DE PAGO (RS_CIERRE_DETALLADO) -->
+    <div id="modal-cierre-detallado" class="modal-overlay" style="display: none;">
+      <div class="modal-box" style="max-width: 460px;">
+        <div class="modal-header" style="background-color: #0f172a;">
+          <strong style="font-size: 14px;">🧾 Cierre de Caja Detallado</strong>
+          <button id="btn-close-modal-cd" type="button" class="btn-icon-box" style="background: none; border: none; color: #ffffff; width: 28px; height: 28px;">
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label>Fecha del cierre:</label>
+              <input type="date" id="cd-fecha" class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Ancho del ticket:</label>
+              <select id="cd-formato" class="form-select">
+                <option value="80mm">Ticket 80 mm</option>
+                <option value="58mm">Ticket 58 mm</option>
+              </select>
+            </div>
+          </div>
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-top: 10px;">
+            <div style="font-size: 12px; font-weight: 800; margin-bottom: 6px;">Cierre por método (lista cada venta)</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <select id="cd-metodo" class="form-select" style="flex: 1; min-width: 160px;">
+                <option value="efectivo">Efectivo (USD + Bs)</option>
+                <option value="Efectivo USD">Efectivo USD</option>
+                <option value="Efectivo Bs">Efectivo Bs</option>
+                <option value="Pago Móvil">Pago Móvil</option>
+                <option value="Zelle">Zelle</option>
+                <option value="Transferencia">Transferencia</option>
+                <option value="Punto de Venta">Punto de Venta</option>
+                <option value="Bio Pago">BioPago</option>
+                <option value="Pagos Combinados">Pagos Combinados</option>
+                <option value="Crédito (CxC)">Crédito (CxC)</option>
+                <option value="todos">Todos, uno tras otro</option>
+              </select>
+              <button type="button" id="btn-cd-metodo" class="btn btn-primary">🖨️ Imprimir este cierre</button>
+            </div>
+          </div>
+          <div id="cd-meta" style="font-size: 11px; color: #64748b;"></div>
+          <div id="cd-body"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btn-cd-cerrar" class="btn btn-help">Cerrar</button>
+          <button type="button" id="btn-cd-imprimir" class="btn btn-primary" style="background-color: #0f172a; border-color: #0f172a;">🖨️ Imprimir Cierre</button>
+        </div>
+      </div>
+    </div>
+
     <!-- MODAL: ALERTA DE CAJA CERRADA AL COBRAR (NUEVO) -->
     <div id="modal-alerta-caja-cerrada" class="modal-overlay" style="display: none;">
       <div class="modal-box" style="max-width: 380px;">
@@ -5868,6 +5917,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <li><b>Importar:</b> descarga la Plantilla de Carga, complétala (Nombre, Categoría, Tallas/Detalle, Presentación, Costo, Precios, Stock, Código de Barras, Unidad de Venta) y súbela. Si el nombre o el código ya existe, el producto se actualiza en lugar de duplicarse.</li>
                 <li>Un stock de 3 unidades o menos se marca en rojo como alerta.</li>
                 <li><b>Ubicación / Estante (opcional):</b> al registrar un producto puedes elegir «Estante 1», «Estante 2», etc. o dejar «Sin Ubicación». Para cambiarla después usa el botón 📍 de la fila; la ubicación se ve debajo del nombre.</li>
+                <li><b>Lista de Compras Inteligente, Revisar Márgenes de Precio y Valor del Inventario:</b> están en el menú «Más acciones» (solo Administrador). La lista de compras usa las ventas de los últimos 30 días para avisar qué se acaba en menos de 7 días y sugiere cuánto comprar para 14 días; se envía por WhatsApp o se copia. La revisión de márgenes lista los productos cuyo margen quedó por debajo del configurado y permite recalcular solo los que marques, con confirmación.</li>
                 <li>Solo el rol Administrador puede modificar el inventario, y cada ajuste queda en la auditoría.</li>
               </ul>
               <button type="button" class="btn btn-help rs-help-go" onclick="window.RS.ayudaIr('inventory')">Ir a Inventario →</button>
@@ -5879,7 +5929,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="rs-acc-body">
               <p>Es una tarjeta desplegable dentro de <b>Inventario</b> llamada "Producción y Paquetes". Sirve para llevar el control de kits, combos, paquetes e insumos que se arman o se elaboran por tandas.</p>
               <ol>
-                <li><b>+ Nuevo Paquete / Kit:</b> escribe el nombre y la categoría (elige una de la lista o escribe una nueva, por ejemplo "Kits", "Combos" o "Insumos"), cuántas unidades rinde cada tanda (<b>Rinde</b>), las <b>Unidades disponibles</b> actuales, el costo por unidad y el precio unitario en USD.</li>
+                <li><b>+ Nuevo Paquete / Kit:</b> escribe el nombre y la categoría (elige una de la lista o escribe una nueva, por ejemplo "Kits", "Combos" o "Insumos"), cuántas unidades rinde cada tanda (<b>Rinde</b>), las <b>Unidades disponibles</b> actuales, el costo por unidad y el precio unitario en USD. Si el kit nuevo tiene insumos y unidades disponibles mayores a 0, esas unidades se consideran armadas y los insumos se descuentan del inventario (si no alcanzan, no se guarda).</li>
                 <li><b>Margen:</b> el formulario lo calcula solo, como (precio − costo) ÷ costo × 100. Se ve en verde si es positivo y en rojo si es negativo.</li>
                 <li><b>Producir / Armar Kit:</b> elige el paquete y la cantidad de tandas. El sistema suma al inventario (y al punto de venta) lo que rinde cada tanda × el número de tandas, y descuenta los insumos definidos en el kit. Si falta algún insumo, avisa y no produce.</li>
                 <li><b>Tarjetas del listado:</b> muestran categoría, unidades que rinde, disponibles, precio y margen. Filtra con las fichas de categoría o con el buscador, y usa los botones <b>Producir</b>, <b>Editar</b> y <b>Eliminar</b>.</li>
@@ -5920,6 +5970,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <li>En el menú <b>Cuentas por Cobrar / Pagar</b> hay dos pestañas: <b>Por Cobrar</b> y <b>Por Pagar</b>.</li>
                 <li><b>Resumen superior:</b> Total General, Monto Vencido y Monto al Día. Filtra con las pestañas Todas, Vencidas y A Tiempo. El botón "Ver Total en la Calle" muestra todo el dinero pendiente por cobrar.</li>
                 <li><b>Nuevo Crédito:</b> elige un cliente existente o registra uno nuevo, busca el producto escribiendo su nombre, indica cantidad y fecha de vencimiento.</li>
+                <li><b>Cobranza por WhatsApp:</b> el botón junto a Nuevo Crédito lista las cuentas vencidas con su saldo y un mensaje ya redactado que le informa que su plazo de pago se consumió y le pide ponerse al día; con un toque se abre WhatsApp con el mensaje listo para enviar.</li>
                 <li><b>Ver &amp; Abonar</b> abre el Estado de Cuenta:
                   <ul>
                     <li>Arriba: cédula, vencimiento, Total Deuda, Abonado y Saldo.</li>
@@ -6379,7 +6430,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <div class="modal-body">
             <div class="form-group">
               <label>Nombre del Usuario:</label>
-              <input type="text" id="us-name" required="" class="form-input" placeholder="Ej: Sebastián Paiva">
+              <input type="text" id="us-name" required="" class="form-input" placeholder="Nombre del empleado">
             </div>
             <div class="form-group">
               <label>Rol:</label>
@@ -6872,6 +6923,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <option value="Zelle">Zelle</option>
                 <option value="Transferencia">Transferencia</option>
                 <option value="Punto de Venta">Punto de Venta</option>
+                <option value="Bio Pago">Bio Pago</option><!-- RS_MEJORA_2 -->
                 <option value="Pagos Combinados">Pagos Combinados</option>
               </select>
             </div>
@@ -8452,6 +8504,398 @@ document.addEventListener("DOMContentLoaded", function () {
           granTotalUsd: totalUsd + totalAbonosUsd,
           netoEsperadoUsd: totalUsd + totalAbonosUsd - totalGastosUsd
         };
+      }
+
+      // ============================================================
+      // RS_CIERRE_DETALLADO: Cierre de Caja Diario desglosado por método de pago,
+      // con ticket imprimible (58 / 80 mm). Solo LEE state.sales, state.cxc,
+      // state.gastos, state.tasa y state.config; no modifica ninguna venta,
+      // arqueo, reporte ni función existente.
+      //  - Cada venta cuenta UNA sola vez: en su método (si pagó con uno solo)
+      //    o en "Pagos Combinados" (si pagó con 2 o más métodos).
+      //  - Lo que quedó a crédito (CxC) NO es dinero cobrado: se muestra aparte
+      //    y no entra en el Gran Total cobrado.
+      //  - Los abonos de CxC cobrados ese día se muestran aparte (informativo).
+      // ============================================================
+      const RS_CD_METODOS = [
+        { key: "Efectivo USD", label: "Total Efectivo USD" },
+        { key: "Efectivo Bs", label: "Total Efectivo Bs" },
+        { key: "Pago Móvil", label: "Total Pago Móvil" },
+        { key: "Zelle", label: "Total Zelle" },
+        { key: "Transferencia", label: "Total Transferencia" },
+        { key: "Punto de Venta", label: "Total Punto de Venta" },
+        { key: "Bio Pago", label: "Total BioPago" }
+      ];
+
+      function rsCdEsc(v) {
+        return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
+      function rsCdRound2(n) { return Math.round(((Number(n) || 0) + 1e-9) * 100) / 100; }
+
+      // Unifica los nombres de método que guarda el sistema (con o sin tilde, "(VES)", etc.)
+      function rsCdNormMetodo(m) {
+        const t = String(m || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+        if (t.indexOf("credito") === 0) return "Crédito (CxC)";
+        if (t.indexOf("pago combinado") === 0 || t.indexOf("pagos combinados") === 0 || t.indexOf("pago mixto") === 0) return "Pagos Combinados";
+        if (t.indexOf("bio") !== -1 && t.indexOf("pago") !== -1) return "Bio Pago";
+        if (t.indexOf("efectivo") === 0) return (t.indexOf("bs") !== -1 || t.indexOf("bolivar") !== -1) ? "Efectivo Bs" : "Efectivo USD";
+        if (t.indexOf("movil") !== -1) return "Pago Móvil";
+        if (t.indexOf("zelle") !== -1) return "Zelle";
+        if (t.indexOf("transfer") !== -1) return "Transferencia";
+        if (t.indexOf("punto") !== -1) return "Punto de Venta";
+        return "Otros";
+      }
+
+      // Clasifica UNA venta: método único, pago combinado y/o parte a crédito
+      function rsCdClasificarVenta(s, tasaActual) {
+        const tUsd = Number(s.totalUsd) || 0;
+        const tBs = Number(s.totalBs) || 0;
+        const rate = (tUsd > 0 && tBs > 0) ? (tBs / tUsd) : (Number(tasaActual) || 0);
+        let partes = Array.isArray(s.payments) ? s.payments
+          .map(p => ({ m: rsCdNormMetodo(p.method), usd: Number(p.amount) || 0 }))
+          .filter(p => p.usd > 0 || p.m === "Pagos Combinados") : [];
+        if (!partes.length) partes = [{ m: rsCdNormMetodo(s.paymentMethod), usd: tUsd }];
+        let creditoUsd = 0;
+        const reales = [];
+        partes.forEach(p => { if (p.m === "Crédito (CxC)") creditoUsd += p.usd; else reales.push(p); });
+        if (!reales.length) return { rate, creditoUsd, totalReal: 0, metodo: null, reales, combinado: false, sinDesglose: false };
+        const distintos = Array.from(new Set(reales.map(p => p.m)));
+        const combinado = distintos.length >= 2 || distintos[0] === "Pagos Combinados";
+        return {
+          rate, creditoUsd,
+          totalReal: reales.reduce((a, p) => a + p.usd, 0),
+          metodo: combinado ? "Pagos Combinados" : distintos[0],
+          reales, combinado,
+          sinDesglose: distintos[0] === "Pagos Combinados"
+        };
+      }
+
+      function calcularCierreDetallado(fechaYMD) {
+        const tasaActual = Number(state.tasa) || 0;
+        const r = {
+          fecha: fechaYMD,
+          tasa: tasaActual,
+          ventas: 0,
+          porMetodo: {},   // { metodo: { usd, bs, n } }
+          combinado: { usd: 0, bs: 0, n: 0, partes: {} },
+          credito: { usd: 0, n: 0 },
+          abonos: { usd: 0, n: 0, porMetodo: {} },
+          gastosUsd: 0,
+          granTotalUsd: 0,
+          granTotalBs: 0
+        };
+        RS_CD_METODOS.forEach(m => { r.porMetodo[m.key] = { usd: 0, bs: 0, n: 0 }; });
+        r.porMetodo["Otros"] = { usd: 0, bs: 0, n: 0 };
+
+        (state.sales || []).forEach(s => {
+          if (parseFechaArqueoYMD(s.date) !== fechaYMD) return;
+          r.ventas++;
+          const k = rsCdClasificarVenta(s, tasaActual);
+          if (k.creditoUsd > 0) { r.credito.usd += k.creditoUsd; r.credito.n++; }
+          if (!k.reales.length) return;
+
+          if (k.combinado) {
+            r.combinado.usd += k.totalReal;
+            r.combinado.bs += k.totalReal * k.rate;
+            r.combinado.n++;
+            if (!k.sinDesglose) {
+              k.reales.forEach(p => {
+                const c = r.combinado.partes[p.m] || (r.combinado.partes[p.m] = { usd: 0, bs: 0 });
+                c.usd += p.usd; c.bs += p.usd * k.rate;
+              });
+            }
+          } else {
+            const b = r.porMetodo[k.metodo] || (r.porMetodo[k.metodo] = { usd: 0, bs: 0, n: 0 });
+            b.usd += k.totalReal; b.bs += k.totalReal * k.rate; b.n++;
+          }
+        });
+
+        // Abonos de Cuentas por Cobrar cobrados ese día (informativo)
+        const sumaAbono = (p) => {
+          if (!p || p.inicial || parseFechaArqueoYMD(p.date) !== fechaYMD) return;
+          r.abonos.n++;
+          const partes = (Array.isArray(p.parts) && p.parts.length)
+            ? p.parts.map(x => ({ m: rsCdNormMetodo(x.method), usd: Number(x.usd != null ? x.usd : x.amount) || 0 }))
+            : [{ m: rsCdNormMetodo(p.method), usd: Number(p.amount) || 0 }];
+          partes.forEach(x => {
+            r.abonos.usd += x.usd;
+            r.abonos.porMetodo[x.m] = (r.abonos.porMetodo[x.m] || 0) + x.usd;
+          });
+        };
+        (state.cxc || []).forEach(c => {
+          (c.payments || []).forEach(sumaAbono);
+          (c.ciclosCerrados || []).forEach(ci => (ci.payments || []).forEach(sumaAbono));
+        });
+
+        (state.gastos || []).forEach(g => { if (g.date === fechaYMD) r.gastosUsd += Number(g.amount) || 0; });
+
+        let gUsd = r.combinado.usd, gBs = r.combinado.bs;
+        Object.keys(r.porMetodo).forEach(k => { gUsd += r.porMetodo[k].usd; gBs += r.porMetodo[k].bs; });
+        r.granTotalUsd = rsCdRound2(gUsd);
+        r.granTotalBs = rsCdRound2(gBs);
+        return r;
+      }
+
+      function rsCdNombreCajero() {
+        try { if (typeof homeNombreUsuario === "function") { const n = homeNombreUsuario(); if (n) return n; } } catch (e) { /* sin nombre */ }
+        return "—";
+      }
+
+      // Filas [{label, usd, bs, sub, bold}] reutilizadas por la pantalla y por el ticket
+      function rsCdFilas(r) {
+        const filas = [];
+        RS_CD_METODOS.forEach(m => {
+          const b = r.porMetodo[m.key] || { usd: 0, bs: 0, n: 0 };
+          filas.push({ label: m.label, usd: b.usd, bs: b.bs, n: b.n });
+        });
+        const o = r.porMetodo["Otros"];
+        if (o && o.usd > 0) filas.push({ label: "Total Otros métodos", usd: o.usd, bs: o.bs, n: o.n });
+        filas.push({ label: "Total Pagos Combinados", usd: r.combinado.usd, bs: r.combinado.bs, n: r.combinado.n });
+        Object.keys(r.combinado.partes).forEach(k => {
+          const p = r.combinado.partes[k];
+          filas.push({ label: "· de ello: " + k, usd: p.usd, bs: p.bs, sub: true });
+        });
+        return filas;
+      }
+
+      function rsCdRenderModal() {
+        const fechaEl = document.getElementById("cd-fecha");
+        const body = document.getElementById("cd-body");
+        const meta = document.getElementById("cd-meta");
+        if (!fechaEl || !body) return;
+        if (!fechaEl.value) fechaEl.value = rsHoyYMD();
+        const r = calcularCierreDetallado(fechaEl.value);
+        window.__rsCdActual = r;
+
+        if (meta) meta.innerHTML = "Cajero: <strong>" + rsCdEsc(rsCdNombreCajero()) + "</strong> &nbsp;|&nbsp; Ventas del día: <strong>" + r.ventas + "</strong> &nbsp;|&nbsp; Tasa: <strong>" + Number(r.tasa).toFixed(2) + " Bs/$</strong>";
+
+        const filaHtml = (f) => `
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: ${f.sub ? "2px 0 2px 12px" : "6px 0"}; ${f.sub ? "" : "border-bottom: 1px dashed #e2e8f0;"} font-size: ${f.sub ? "11px" : "12.5px"}; ${f.sub ? "color: #64748b;" : ""}">
+            <span style="font-weight: ${f.sub ? "600" : "700"};">${rsCdEsc(f.label)}${f.n ? ` <span style="font-size: 10px; color: #94a3b8;">(${f.n})</span>` : ""}</span>
+            <span style="text-align: right;"><strong>${formatUSD(f.usd)}</strong><br><span style="font-size: 10.5px; color: #64748b;">${formatBS(f.bs)}</span></span>
+          </div>`;
+
+        const abonosTxt = Object.keys(r.abonos.porMetodo).map(k => `${rsCdEsc(k)}: ${formatUSD(r.abonos.porMetodo[k])}`).join(" · ");
+
+        body.innerHTML = `
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 12px; margin-top: 6px;">
+            ${rsCdFilas(r).map(filaHtml).join("")}
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; padding: 8px 10px; background-color: #0f172a; color: #ffffff; border-radius: 10px;">
+              <span style="font-weight: 800; font-size: 13px;">GRAN TOTAL GENERAL DEL DÍA</span>
+              <span style="text-align: right;"><strong style="font-size: 15px;">${formatUSD(r.granTotalUsd)}</strong><br><span style="font-size: 10.5px; color: #cbd5e1;">${formatBS(r.granTotalBs)}</span></span>
+            </div>
+          </div>
+          <div style="font-size: 11px; color: #64748b; line-height: 1.6; margin-top: 8px;">
+            <div>Ventas a crédito (CxC) del día, aún por cobrar: <strong style="color: #b45309;">${formatUSD(r.credito.usd)}</strong> (no incluido en el Gran Total)</div>
+            <div>Abonos de CxC cobrados hoy: <strong style="color: #059669;">${formatUSD(r.abonos.usd)}</strong>${abonosTxt ? " — " + abonosTxt : ""}</div>
+            <div>Gastos del día: <strong style="color: #9a3412;">${formatUSD(r.gastosUsd)}</strong></div>
+          </div>`;
+      }
+
+      function rsCdAbrirModal() {
+        const fechaEl = document.getElementById("cd-fecha");
+        if (fechaEl) fechaEl.value = rsHoyYMD();
+        rsCdRenderModal();
+        document.getElementById("modal-cierre-detallado").style.display = "flex";
+      }
+      function rsCdCerrarModal() {
+        const m = document.getElementById("modal-cierre-detallado");
+        if (m) m.style.display = "none";
+      }
+
+      function rsCdCss(ancho, fs) {
+        return `
+  @page { size: ${ancho} auto; margin: 2mm; }
+  * { box-sizing: border-box; }
+  body { width: ${ancho}; margin: 0 auto; padding: 2mm; font-family: "Courier New", Courier, monospace; font-size: ${fs}; color: #000; }
+  .c { text-align: center; }
+  .t { text-align: center; font-weight: 800; font-size: 1.15em; margin: 4px 0; }
+  .l { border-top: 1px dashed #000; margin: 5px 0; }
+  .f { display: flex; justify-content: space-between; gap: 6px; padding: 1.5px 0; }
+  .f.s { padding-left: 8px; font-size: 0.92em; }
+  .v { text-align: right; white-space: nowrap; }
+  small { font-size: 0.85em; }
+  .g { font-weight: 800; font-size: 1.1em; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 3px 0; margin: 4px 0; }
+  .firma { margin-top: 16px; text-align: center; }
+`;
+      }
+
+      function rsCdHtmlTicket(r, formato) {
+        const ancho = formato === "58mm" ? "48mm" : "72mm";
+        const fs = formato === "58mm" ? "10px" : "11.5px";
+        const nombre = rsCdEsc((state.config && state.config.name) || "RS Admin");
+        const rif = (state.config && state.config.rif) ? `<div class="c">RIF: ${rsCdEsc(state.config.rif)}</div>` : "";
+        const fila = (f) => `<div class="f${f.sub ? " s" : ""}"><span>${rsCdEsc(f.label)}</span><span class="v">${formatUSD(f.usd)}<br><small>${formatBS(f.bs)}</small></span></div>`;
+        const abonosTxt = Object.keys(r.abonos.porMetodo).map(k => `<div class="f s"><span>· ${rsCdEsc(k)}</span><span class="v">${formatUSD(r.abonos.porMetodo[k])}</span></div>`).join("");
+        return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Cierre de Caja ${rsCdEsc(formatFechaCorta(r.fecha))}</title>
+<style>
+${rsCdCss(ancho, fs)}
+</style></head><body>
+  <div class="c"><strong>${nombre}</strong></div>${rif}
+  <div class="l"></div>
+  <div class="t">CIERRE DE CAJA</div>
+  <div class="f"><span>Fecha cierre:</span><span class="v">${rsCdEsc(formatFechaCorta(r.fecha))}</span></div>
+  <div class="f"><span>Impreso:</span><span class="v">${rsCdEsc(getNowFormatted())}</span></div>
+  <div class="f"><span>Cajero:</span><span class="v">${rsCdEsc(rsCdNombreCajero())}</span></div>
+  <div class="f"><span>Tasa:</span><span class="v">${Number(r.tasa).toFixed(2)} Bs/$</span></div>
+  <div class="f"><span>Ventas del día:</span><span class="v">${r.ventas}</span></div>
+  <div class="l"></div>
+  ${rsCdFilas(r).map(fila).join("")}
+  <div class="f g"><span>GRAN TOTAL DEL DÍA</span><span class="v">${formatUSD(r.granTotalUsd)}<br><small>${formatBS(r.granTotalBs)}</small></span></div>
+  <div class="l"></div>
+  <div class="f"><span>Crédito (CxC) por cobrar:</span><span class="v">${formatUSD(r.credito.usd)}</span></div>
+  <div class="f"><span>Abonos CxC cobrados:</span><span class="v">${formatUSD(r.abonos.usd)}</span></div>
+  ${abonosTxt}
+  <div class="f"><span>Gastos del día:</span><span class="v">${formatUSD(r.gastosUsd)}</span></div>
+  <div class="l"></div>
+  <div class="firma">______________________<br>Firma del cajero</div>
+  <div class="c" style="margin-top:6px;">DOCUMENTO NO FISCAL</div>
+  <script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script>
+</body></html>`;
+      }
+
+      function rsCdImprimir() {
+        const fechaEl = document.getElementById("cd-fecha");
+        const fmtEl = document.getElementById("cd-formato");
+        const r = calcularCierreDetallado((fechaEl && fechaEl.value) || rsHoyYMD());
+        rsCdAbrirImpresion(rsCdHtmlTicket(r, (fmtEl && fmtEl.value) || "80mm"));
+      }
+
+      function rsCdAbrirImpresion(html) {
+        const w = window.open("", "_blank", "width=380,height=650");
+        if (w) {
+          w.document.open(); w.document.write(html); w.document.close();
+          return;
+        }
+        // Ventana emergente bloqueada: se imprime desde un marco oculto
+        try {
+          const fr = document.createElement("iframe");
+          fr.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;";
+          document.body.appendChild(fr);
+          fr.contentWindow.document.open(); fr.contentWindow.document.write(html); fr.contentWindow.document.close();
+          setTimeout(function () { try { fr.contentWindow.focus(); fr.contentWindow.print(); } catch (e) { /* sin impresión */ } }, 400);
+          setTimeout(function () { try { fr.remove(); } catch (e) { /* ya quitado */ } }, 60000);
+        } catch (e) {
+          showToast("No se pudo abrir la impresión. Habilita las ventanas emergentes.", "error");
+        }
+      }
+
+
+      // ------------------------------------------------------------
+      // CIERRE POR MÉTODO: ticket con CADA venta de un método (o de todos,
+      // uno tras otro). Misma clasificación que el cierre detallado.
+      // ------------------------------------------------------------
+      function rsCdHora(fecha) {
+        const m = String(fecha || "").match(/[,\s]\s*(\d{1,2}:\d{2})(?::\d{2})?\s*([ap]\.?\s?m\.?)?/i);
+        return m ? (m[1] + (m[2] ? " " + m[2].replace(/[\s.]/g, "").toLowerCase() : "")) : "";
+      }
+
+      function rsCdVentasPorMetodo(fechaYMD) {
+        const tasaActual = Number(state.tasa) || 0;
+        const b = {};
+        const add = (key, v) => {
+          const x = b[key] || (b[key] = { ventas: [], usd: 0, bs: 0 });
+          x.ventas.push(v); x.usd += v.usd; x.bs += v.bs;
+        };
+        (state.sales || []).forEach(s => {
+          if (parseFechaArqueoYMD(s.date) !== fechaYMD) return;
+          const k = rsCdClasificarVenta(s, tasaActual);
+          const base = { id: s.id || "", hora: rsCdHora(s.date), cliente: s.clientName || "Cliente General" };
+          if (k.reales.length) {
+            add(k.metodo, Object.assign({}, base, {
+              usd: k.totalReal, bs: k.totalReal * k.rate,
+              partes: k.combinado && !k.sinDesglose ? k.reales.map(p => ({ m: p.m, usd: p.usd, bs: p.usd * k.rate })) : []
+            }));
+          }
+          if (k.creditoUsd > 0) {
+            add("Crédito (CxC)", Object.assign({}, base, { usd: k.creditoUsd, bs: k.creditoUsd * k.rate, partes: [] }));
+          }
+        });
+        return b;
+      }
+
+      // sel: "efectivo" | "todos" | nombre exacto de un método
+      function rsCdHtmlTicketMetodo(fechaYMD, sel, formato) {
+        const datos = rsCdVentasPorMetodo(fechaYMD);
+        const tasa = Number(state.tasa) || 0;
+        const ancho = formato === "58mm" ? "48mm" : "72mm";
+        const fs = formato === "58mm" ? "10px" : "11.5px";
+        const nombre = rsCdEsc((state.config && state.config.name) || "RS Admin");
+        const rif = (state.config && state.config.rif) ? `<div class="c">RIF: ${rsCdEsc(state.config.rif)}</div>` : "";
+
+        let claves, titulo;
+        if (sel === "todos") {
+          claves = RS_CD_METODOS.map(m => m.key).concat(["Otros", "Pagos Combinados", "Crédito (CxC)"]);
+          titulo = "TODOS LOS MÉTODOS";
+        } else if (sel === "efectivo") {
+          claves = ["Efectivo USD", "Efectivo Bs"];
+          titulo = "EFECTIVO (USD + Bs)";
+        } else {
+          claves = [sel];
+          titulo = String(sel).toUpperCase();
+        }
+
+        let totUsd = 0, totBs = 0, totN = 0, cuerpo = "";
+        claves.forEach(k => {
+          const x = datos[k];
+          if (sel === "todos" && !x) return;
+          const ventas = x ? x.ventas : [];
+          const filas = ventas.map(v => `
+  <div class="f"><span>#${rsCdEsc(v.id)} ${rsCdEsc(v.hora)}</span><span class="v">${formatUSD(v.usd)}<br><small>${formatBS(v.bs)}</small></span></div>
+  <div class="f s"><span>${rsCdEsc(v.cliente)}</span></div>
+  ${v.partes.map(p => `<div class="f s"><span>· ${rsCdEsc(p.m)}</span><span class="v">${formatUSD(p.usd)}</span></div>`).join("")}`).join("");
+          cuerpo += `
+  ${claves.length > 1 ? `<div class="l"></div><div class="t">${rsCdEsc(k.toUpperCase())}</div>` : ""}
+  ${filas || '<div class="c">Sin ventas en esta fecha</div>'}
+  <div class="f g"><span>Subtotal (${ventas.length})</span><span class="v">${formatUSD(x ? x.usd : 0)}<br><small>${formatBS(x ? x.bs : 0)}</small></span></div>`;
+          if (k !== "Crédito (CxC)") { totUsd += x ? x.usd : 0; totBs += x ? x.bs : 0; totN += ventas.length; }
+        });
+
+        const pie = claves.length > 1 ? `
+  <div class="l"></div>
+  <div class="f g"><span>TOTAL COBRADO (${totN})</span><span class="v">${formatUSD(totUsd)}<br><small>${formatBS(totBs)}</small></span></div>
+  ${sel === "todos" ? '<div class="c"><small>El crédito (CxC) no suma: aún no se cobra.</small></div>' : ""}` : "";
+
+        return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Cierre ${rsCdEsc(titulo)} ${rsCdEsc(formatFechaCorta(fechaYMD))}</title>
+<style>
+${rsCdCss(ancho, fs)}
+</style></head><body>
+  <div class="c"><strong>${nombre}</strong></div>${rif}
+  <div class="l"></div>
+  <div class="t">CIERRE DE CAJA<br>${rsCdEsc(titulo)}</div>
+  <div class="f"><span>Fecha cierre:</span><span class="v">${rsCdEsc(formatFechaCorta(fechaYMD))}</span></div>
+  <div class="f"><span>Impreso:</span><span class="v">${rsCdEsc(getNowFormatted())}</span></div>
+  <div class="f"><span>Cajero:</span><span class="v">${rsCdEsc(rsCdNombreCajero())}</span></div>
+  <div class="f"><span>Tasa:</span><span class="v">${tasa.toFixed(2)} Bs/$</span></div>
+  ${cuerpo}${pie}
+  <div class="l"></div>
+  <div class="firma">______________________<br>Firma del cajero</div>
+  <div class="c" style="margin-top:6px;">DOCUMENTO NO FISCAL</div>
+  <script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script>
+</body></html>`;
+      }
+
+      function rsCdImprimirMetodo() {
+        const fechaEl = document.getElementById("cd-fecha");
+        const fmtEl = document.getElementById("cd-formato");
+        const selEl = document.getElementById("cd-metodo");
+        rsCdAbrirImpresion(rsCdHtmlTicketMetodo((fechaEl && fechaEl.value) || rsHoyYMD(), (selEl && selEl.value) || "efectivo", (fmtEl && fmtEl.value) || "80mm"));
+      }
+
+      // Eventos delegados: funcionan aunque la vista de Caja se vuelva a dibujar
+      if (!window.__rsCdWired) {
+        window.__rsCdWired = true;
+        document.addEventListener("click", function (e) {
+          const t = e.target && e.target.closest ? e.target.closest("#btn-cierre-detallado, #btn-cd-imprimir, #btn-cd-metodo, #btn-cd-cerrar, #btn-close-modal-cd") : null;
+          if (!t) return;
+          if (t.id === "btn-cierre-detallado") rsCdAbrirModal();
+          else if (t.id === "btn-cd-imprimir") rsCdImprimir();
+          else if (t.id === "btn-cd-metodo") rsCdImprimirMetodo();
+          else rsCdCerrarModal();
+        });
+        document.addEventListener("change", function (e) {
+          if (e.target && e.target.id === "cd-fecha") rsCdRenderModal();
+        });
       }
 
       // ------------------------------------------------------------
@@ -11759,17 +12203,63 @@ const msgCosto = (infoProm.hayCosto && Math.abs((Number(product.cost) || 0) - co
       // ============================================================
       let ncMode = "existing";
 
+      // RS_MEJORA_1: el selector de "Nuevo Crédito" lee del MISMO listado que el
+      // módulo Clientes (state.clients). Además incluye (sin duplicar) a los
+      // clientes que ya tengan una cuenta en Cuentas por Cobrar pero no estén
+      // en Clientes, para que nadie desaparezca de la lista.
+      function ncNorm(t) { return String(t == null ? "" : t).trim().toLowerCase(); }
+      function ncEsc(v) {
+        return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+      function ncListaClientesCredito() {
+        const lista = (state.clients || []).map(c => ({
+          value: c.id,
+          name: c.name || "",
+          cedula: c.cedula || "",
+          phone: c.phone || "",
+          email: c.email || "",
+          location: c.address || ""
+        }));
+        (state.cxc || []).forEach(a => {
+          const nn = ncNorm(a.clientName), cc = ncNorm(a.clientCedula);
+          const yaEsta = lista.some(c => (cc && ncNorm(c.cedula) === cc) || (nn && ncNorm(c.name) === nn));
+          if (!yaEsta) {
+            lista.push({
+              value: a.id,
+              name: a.clientName || "",
+              cedula: a.clientCedula || "",
+              phone: a.clientPhone || "",
+              email: a.clientEmail || "",
+              location: a.clientLocation || ""
+            });
+          }
+        });
+        return lista;
+      }
+      function ncBuscarClienteLista(valor) {
+        if (!valor) return null;
+        return ncListaClientesCredito().find(c => c.value === valor) || null;
+      }
+
       function renderClientSelectOptions() {
         const select = document.getElementById("nc-client-select");
         if (!select) return;
 
-        if (state.cxc.length === 0) {
+        const lista = ncListaClientesCredito();
+        // Si la lista no cambió, no se reescribe (evita cerrar el desplegable al tocarlo).
+        const firma = lista.map(c => c.value + "|" + c.name + "|" + c.cedula).join(";");
+        if (select.getAttribute("data-nc-firma") === firma && select.options.length > 0) return;
+        select.setAttribute("data-nc-firma", firma);
+
+        if (lista.length === 0) {
           select.innerHTML = `<option value="">-- No hay clientes registrados --</option>`;
           return;
         }
 
+        const previo = select.value;
         select.innerHTML = `<option value="">-- Selecciona un cliente --</option>` +
-          state.cxc.map(c => `<option value="${c.id}">${c.clientName}${c.clientCedula ? ' — ' + c.clientCedula : ''}</option>`).join("");
+          lista.map(c => `<option value="${ncEsc(c.value)}">${ncEsc(c.name)}${c.cedula ? ' — ' + ncEsc(c.cedula) : ''}</option>`).join("");
+        if (previo && lista.some(c => c.value === previo)) select.value = previo;
       }
 
       // ============================================================
@@ -11907,9 +12397,9 @@ const msgCosto = (infoProm.hayCosto && Math.abs((Number(product.cost) || 0) - co
           return;
         }
 
-        const posible = state.cxc.find(c => {
-          const cName = (c.clientName || "").trim().toLowerCase();
-          const cCedula = (c.clientCedula || "").trim().toLowerCase();
+        const posible = ncListaClientesCredito().find(c => {
+          const cName = (c.name || "").trim().toLowerCase();
+          const cCedula = (c.cedula || "").trim().toLowerCase();
           if (cedulaVal && cCedula && cCedula === cedulaVal) return true;
           if (nameVal.length >= 3 && cName && (cName.includes(nameVal) || nameVal.includes(cName))) return true;
           return false;
@@ -11917,13 +12407,14 @@ const msgCosto = (infoProm.hayCosto && Math.abs((Number(product.cost) || 0) - co
 
         if (posible) {
           warningBox.style.display = "block";
-          warningBox.innerHTML = `⚠️ Ya existe un cliente similar: <strong>${posible.clientName}</strong> (${posible.clientCedula || 'sin cédula'}). ` +
+          warningBox.innerHTML = `⚠️ Ya existe un cliente similar: <strong>${posible.name}</strong> (${posible.cedula || 'sin cédula'}). ` +
             `<button type="button" id="nc-use-suggested" class="btn btn-help" style="padding: 2px 8px; font-size: 10px; margin-left: 6px;">Usar este cliente</button>`;
 
           document.getElementById("nc-use-suggested").onclick = function () {
             switchNcTab("existing");
             const select = document.getElementById("nc-client-select");
-            select.value = posible.id;
+            renderClientSelectOptions();
+            select.value = posible.value;
             select.dispatchEvent(new Event("change"));
           };
         } else {
@@ -13350,8 +13841,8 @@ const msgCosto = (infoProm.hayCosto && Math.abs((Number(product.cost) || 0) - co
       // por lo que saldos, arqueo y estados de cuenta siguen igual.
       // ============================================================
       const METODO_PAGOS_COMBINADOS = "Pagos Combinados";
-      const METODOS_COMBINADOS_CUENTAS = ["Efectivo USD", "Efectivo Bs", "Pago Móvil (VES)", "Zelle", "Transferencia", "Punto de Venta"];
-      const METODOS_COMB_EN_BS = ["Efectivo Bs", "Pago Móvil (VES)", "Transferencia", "Punto de Venta"];
+      const METODOS_COMBINADOS_CUENTAS = ["Efectivo USD", "Efectivo Bs", "Pago Móvil (VES)", "Zelle", "Transferencia", "Punto de Venta", "Bio Pago"]; // RS_MEJORA_2
+      const METODOS_COMB_EN_BS = ["Efectivo Bs", "Pago Móvil (VES)", "Transferencia", "Punto de Venta", "Bio Pago"]; // RS_MEJORA_2
       const COMB_MAX_FILAS = 6;
       const combState = { cxc: [], cxp: [] };
 
@@ -20462,7 +20953,7 @@ ${state.config.name || 'RS Moda & Estilo'}
         // Nuevo Crédito Modal (con selector inteligente de cliente)
         document.getElementById("btn-open-new-credit").onclick = () => {
           renderClientSelectOptions();
-          switchNcTab(state.cxc.length > 0 ? "existing" : "new");
+          switchNcTab(ncListaClientesCredito().length > 0 ? "existing" : "new");
           document.getElementById("nc-existing-info").style.display = "none";
           document.getElementById("nc-product-select").value = "";
           document.getElementById("nc-product-search").value = "";
@@ -20508,19 +20999,44 @@ ${state.config.name || 'RS Moda & Estilo'}
 
         document.getElementById("nc-client-select").addEventListener("change", function () {
           const infoBox = document.getElementById("nc-existing-info");
-          const client = state.cxc.find(c => c.id === this.value);
-          if (!client) {
+          const sel = ncBuscarClienteLista(this.value);
+          if (!sel) {
             infoBox.style.display = "none";
             return;
           }
-          const pending = client.totalAmount - client.paidAmount;
+          const cuenta = state.cxc.find(c => c.id === sel.value) || buscarCreditoExistente(sel.cedula, sel.name);
+          const pendingTxt = cuenta
+            ? `💵 Saldo pendiente actual: <strong>${formatUSD(cuenta.totalAmount - cuenta.paidAmount)}</strong><br/>
+            ⏰ Vencimiento actual: <strong>${formatFechaCorta(cuenta.dueDate)}</strong>`
+            : `💵 Sin deuda previa registrada.`;
           infoBox.style.display = "block";
           infoBox.innerHTML = `
-            📱 Teléfono: <strong>${client.clientPhone || 'No registrado'}</strong><br/>
-            🪪 Cédula: <strong>${client.clientCedula || 'No registrada'}</strong><br/>
-            💵 Saldo pendiente actual: <strong>${formatUSD(pending)}</strong><br/>
-            ⏰ Vencimiento actual: <strong>${formatFechaCorta(client.dueDate)}</strong>
+            📱 Teléfono: <strong>${sel.phone || 'No registrado'}</strong><br/>
+            🪪 Cédula: <strong>${sel.cedula || 'No registrada'}</strong><br/>
+            ${pendingTxt}
           `;
+        });
+
+        // RS_MEJORA_1: mantiene la lista al día (tiempo real) cada vez que se toca el desplegable
+        ["focus", "mousedown", "touchstart"].forEach(function (ev) {
+          document.getElementById("nc-client-select").addEventListener(ev, renderClientSelectOptions, { passive: true });
+        });
+
+        // RS_MEJORA_3: pistola / escáner USB (modo teclado) en el buscador de prenda de "Nuevo Crédito".
+        // Un código EXACTO + Enter selecciona la prenda y evita que el Enter envíe el formulario.
+        // Si lo escrito no es un código de barras, todo funciona como siempre.
+        ncProductSearch.addEventListener("keydown", function (e) {
+          if (e.key !== "Enter") return;
+          const code = this.value.trim();
+          if (!code) return;
+          const prodEsc = state.products.find(p => p.barcode && p.barcode === code);
+          if (!prodEsc) return;
+          e.preventDefault();
+          if (prodEsc.stock <= 0) {
+            showToast(`"${prodEsc.name}" está agotado.`, "error");
+            return;
+          }
+          seleccionarPrendaCredito(prodEsc.id);
         });
 
         document.getElementById("nc-name").addEventListener("input", verificarPosibleDuplicadoNC);
@@ -20554,17 +21070,21 @@ ${state.config.name || 'RS Moda & Estilo'}
               alert("Selecciona un cliente existente, o cambia a la pestaña 'Nuevo Cliente'.");
               return;
             }
-            const clienteSeleccionado = state.cxc.find(c => c.id === selectedId);
+            // RS_MEJORA_1: el cliente se toma del listado real de Clientes; si ya tiene una
+            // cuenta abierta en Cuentas por Cobrar se le suma el crédito, si no se crea.
+            const clienteSeleccionado = ncBuscarClienteLista(selectedId);
             if (!clienteSeleccionado) {
               alert("El cliente seleccionado no fue encontrado.");
               return;
             }
-            existingId = clienteSeleccionado.id;
-            name = clienteSeleccionado.clientName;
-            cedula = clienteSeleccionado.clientCedula;
-            phone = clienteSeleccionado.clientPhone;
-            email = clienteSeleccionado.clientEmail || "";
-            location = clienteSeleccionado.clientLocation || "";
+            const cuentaPrevia = state.cxc.find(c => c.id === clienteSeleccionado.value) ||
+              buscarCreditoExistente(clienteSeleccionado.cedula, clienteSeleccionado.name);
+            existingId = cuentaPrevia ? cuentaPrevia.id : null;
+            name = clienteSeleccionado.name;
+            cedula = clienteSeleccionado.cedula;
+            phone = clienteSeleccionado.phone;
+            email = clienteSeleccionado.email || "";
+            location = clienteSeleccionado.location || "";
           } else {
             name = document.getElementById("nc-name").value.trim();
             cedula = document.getElementById("nc-cedula").value.trim();
@@ -22204,15 +22724,15 @@ ${state.config.name || 'RS Moda & Estilo'}
         URL.revokeObjectURL(url);
       }
       function rsDatosCompletos() {
-        const datos = {};
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (k && k.indexOf("rs_clothes_") === 0) {
-            try { datos[k] = JSON.parse(localStorage.getItem(k)); } catch (e) { datos[k] = localStorage.getItem(k); }
-          }
-        }
-        return datos;
-      }
+    const datos = {};
+    // Incluye también los datos grandes del almacenamiento ampliado y funciona con el aislamiento por usuario
+    const pref = window.__RS_UID ? "u_" + window.__RS_UID + "__" : "";
+    const todo = (typeof rsListarClavesRS === "function") ? rsListarClavesRS(pref) : {};
+    Object.keys(todo).forEach(function (k) {
+      try { datos[k] = JSON.parse(todo[k]); } catch (e) { datos[k] = todo[k]; }
+    });
+    return datos;
+  }
       function rsRespaldoCompletoJSON() {
         const paquete = { app: "RS Admin", tipo: "respaldo-completo", backupVersion: 2, exportedAt: new Date().toISOString(), exportedBy: rsUsuarioActual().name, data: rsDatosCompletos() };
         rsDescargar(new Blob([JSON.stringify(paquete, null, 2)], { type: "application/json" }), "rs-admin-respaldo-completo-" + new Date().toISOString().slice(0, 10) + ".json");
@@ -22974,6 +23494,31 @@ ${state.config.name || 'RS Moda & Estilo'}
           if (window.RS.esUnidadFraccionable(ip.unidadVenta)) return c + " " + ip.unidadVenta;
           return c + (c === 1 ? " ud" : " uds");
         }
+        // Valida (y opcionalmente aplica) el descuento de insumos para N tandas, de forma atómica:
+        // trabaja sobre copias y solo escribe en el inventario real si TODOS los insumos alcanzan.
+        function descontarInsumos(r, tandas, aplicar) {
+          const ins = (r && r.insumos) || [];
+          const clones = {};
+          const usados = [];
+          for (let i = 0; i < ins.length; i++) {
+            const ip = state.products.find(x => x.id === ins[i].pid);
+            if (!ip) return { ok: false, msg: "El insumo \"" + (ins[i].nombre || "?") + "\" ya no existe en el inventario." };
+            const c = clones[ip.id] || (clones[ip.id] = Object.assign({}, ip));
+            const it = itemInsumo(ins[i], ip, tandas);
+            if (it.quantity > rsMaxCantidadItem(it, c) + 1e-9) {
+              return { ok: false, msg: "Insumo insuficiente: " + ip.name + " (necesitas " + descCantidad(ip, it.quantity, it.vendidoPorUnidad) + ", hay " + rsFormatearStockProducto(c) + ")." };
+            }
+            rsDescontarStockItem(c, it);
+            if (usados.indexOf(ip.id) < 0) usados.push(ip.id);
+          }
+          if (aplicar) {
+            usados.forEach(id => {
+              const real = state.products.find(x => x.id === id);
+              if (real) real.stock = clones[id].stock;
+            });
+          }
+          return { ok: true, usados: usados.length };
+        }
         function itemInsumo(ins, ip, tandas) {
           return {
             quantity: (Number(ins.cant) || 0) * tandas,
@@ -23002,9 +23547,17 @@ ${state.config.name || 'RS Moda & Estilo'}
             return cambio;
           },
           // Crea o actualiza el producto del kit (guardado del formulario). Devuelve el id.
-          guardarKit: function (r, disp) {
+          // Si es un kit NUEVO con unidades disponibles > 0 y con insumos, esas unidades se consideran
+          // armadas ahora: se descuentan los insumos (unidades / rinde = tandas) antes de crear el producto.
+          guardarKit: function (r, disp, esNuevo) {
             let p = productoDe(r);
-            if (!p) { p = crearProducto(r, disp); }
+            if (!p) {
+              if (esNuevo && disp > 0 && (r.insumos || []).length) {
+                const d = descontarInsumos(r, disp / Math.max(1, Number(r.rinde) || 1), true);
+                if (!d.ok) throw new Error(d.msg);
+              }
+              p = crearProducto(r, disp);
+            }
             else {
               const precioViejo = Number(p.price) || 0;
               p.name = r.nombre;
@@ -23017,6 +23570,11 @@ ${state.config.name || 'RS Moda & Estilo'}
             }
             refrescar();
             return p.id;
+          },
+          // Valida que los insumos alcancen para las unidades iniciales de un kit nuevo (sin modificar nada).
+          validarInsumosIniciales: function (r, disp) {
+            if (!(disp > 0) || !(r.insumos || []).length) return { ok: true };
+            return descontarInsumos(r, disp / Math.max(1, Number(r.rinde) || 1), false);
           },
           // Producir N tandas: valida insumos, descuenta insumos y suma el kit.
           producir: function (r, tandas) {
@@ -23086,6 +23644,183 @@ ${state.config.name || 'RS Moda & Estilo'}
           }
         };
       })();
+
+      // ============================================================
+      // VALOR TOTAL DEL INVENTARIO: existencias x costo y existencias x precio de venta (USD y Bs.)
+      // Solo lectura: no modifica ningún dato. El stock de productos por caja/bulto está en cajas y
+      // su costo/precio es por caja, así que stock x costo es exacto en todos los casos.
+      // ============================================================
+      window.RS.valorInventario = function () {
+        const esAdmin = (typeof rsEsAdministrador === "function") ? rsEsAdministrador() : true;
+        if (!esAdmin) return { restringido: true };
+        const r2 = n => Math.round((Number(n) || 0) * 100) / 100;
+        let costo = 0, venta = 0, conStock = 0, sinCosto = 0, unidades = 0;
+        (state.products || []).forEach(p => {
+          const st = Number(p.stock) || 0;
+          if (!(st > 0)) return;
+          const c = Number(p.cost) || 0;
+          const v = Number(p.price) || 0;
+          conStock++;
+          unidades += st;
+          if (!(c > 0)) sinCosto++;
+          costo += st * c;
+          venta += st * v;
+        });
+        const tasa = Number(state.tasa) || 0;
+        costo = r2(costo); venta = r2(venta);
+        return {
+          restringido: false, tasa: tasa, productosConStock: conStock, productosSinCosto: sinCosto,
+          costoUSD: costo, ventaUSD: venta, gananciaUSD: r2(venta - costo),
+          costoBS: r2(costo * tasa), ventaBS: r2(venta * tasa), gananciaBS: r2((venta - costo) * tasa)
+        };
+      };
+
+      // ============================================================
+      // ASISTENTES NUEVOS: 1) Lista de compras inteligente, 2) Revisión de márgenes de precio,
+      // 3) Cobranza por WhatsApp. Son de consulta; lo único que escribe datos es "preciosAplicar",
+      // y solo sobre los productos que el Administrador marque y confirme.
+      // ============================================================
+      function rsAsistenteEsAdmin() { return (typeof rsEsAdministrador === "function") ? rsEsAdministrador() : true; }
+      function rsTelefonoWhatsApp(raw) {
+        let tel = String(raw || "").replace(/\D/g, "");
+        // Formato local venezolano (0412...) a internacional (58412...), requerido por wa.me
+        if (tel.length === 11 && tel.charAt(0) === "0") tel = "58" + tel.slice(1);
+        return tel;
+      }
+
+      // 1) LISTA DE COMPRAS: ventas de los últimos 30 días -> ritmo diario -> días que alcanza el stock.
+      // Sugiere comprar lo necesario para cubrir 14 días de los productos que alcanzan menos de 7.
+      window.RS.listaCompras = function () {
+        if (!rsAsistenteEsAdmin()) return { restringido: true };
+        const VENTANA = 30, BASE_MIN = 7, UMBRAL_DIAS = 7, OBJETIVO_DIAS = 14;
+        const hoy = tacHoyYMD();
+        const vendido = {};
+        let masAntigua = null;
+        (state.sales || []).forEach(v => {
+          const f = parseFechaArqueoYMD(v.date);
+          const d = f ? tacDiasEntre(f, hoy) : null;
+          if (d === null || d < 0 || d >= VENTANA) return;
+          if (masAntigua === null || d > masAntigua) masAntigua = d;
+          (v.items || []).forEach(it => {
+            let q = Number(it.quantity) || 0;
+            const n = Math.floor(Number(it.unidadesPorCaja) || 0);
+            if (it.vendidoPorUnidad === true && n >= 2) q = q / n; // unidades sueltas -> cajas
+            vendido[it.id] = (vendido[it.id] || 0) + q;
+          });
+        });
+        const base = Math.max(BASE_MIN, Math.min(VENTANA, (masAntigua === null ? 0 : masAntigua) + 1));
+        const tasa = Number(state.tasa) || 0;
+        const items = [];
+        let totalUSD = 0;
+        (state.products || []).forEach(p => {
+          if (p.kitId) return; // los kits se arman en Producción y Paquetes, no se compran
+          const vend = vendido[p.id] || 0;
+          if (!(vend > 0)) return;
+          const porDia = vend / base;
+          const stock = Number(p.stock) || 0;
+          const dias = stock / porDia;
+          if (dias >= UMBRAL_DIAS) return;
+          const falta = porDia * OBJETIVO_DIAS - stock;
+          if (!(falta > 0)) return;
+          const fraccion = !!(p.unidadVenta && window.RS.esUnidadFraccionable && window.RS.esUnidadFraccionable(p.unidadVenta));
+          const sugerida = fraccion ? Math.ceil(falta * 10) / 10 : Math.ceil(falta - 1e-9);
+          const costoUSD = Math.round(sugerida * (Number(p.cost) || 0) * 100) / 100;
+          totalUSD += costoUSD;
+          items.push({
+            id: p.id, nombre: p.name, stockTxt: rsFormatearStockProducto(p), porDia: Math.round(porDia * 100) / 100,
+            dias: Math.round(dias * 10) / 10, sugerida: sugerida, unidad: fraccion ? String(p.unidadVenta) : "", costoUSD: costoUSD
+          });
+        });
+        items.sort((a, b) => a.dias - b.dias);
+        totalUSD = Math.round(totalUSD * 100) / 100;
+        return {
+          restringido: false, items: items, base: base, tasa: tasa, totalUSD: totalUSD, totalBS: Math.round(totalUSD * tasa * 100) / 100,
+          negocio: (state.config && state.config.name) || "",
+          proveedores: (state.providers || []).map(p => ({ id: p.id, nombre: p.name, tel: rsTelefonoWhatsApp(p.phone) }))
+        };
+      };
+
+      // 2) REVISIÓN DE PRECIOS: productos con costo cuyo margen real quedó por debajo del % configurado
+      // para su presentación (Configuración > Márgenes). Misma fórmula que "Recalcular Todo el Inventario".
+      const RS_KEY_TASA_REVISADA = "rs_clothes_tasa_revisada";
+      window.RS.preciosRevisar = function () {
+        if (!rsAsistenteEsAdmin()) return { restringido: true };
+        const redondear2 = n => Math.round(n * 100) / 100;
+        const items = [];
+        (state.products || []).forEach(p => {
+          const costo = Number(p.cost) || 0;
+          if (!(costo > 0)) return;
+          const pres = p.presentation || "Unidad";
+          const m = state.margenes[pres] || DEFAULT_MARGENES["Unidad"];
+          const precio = Number(p.price) || 0;
+          const credito = (p.priceCredito != null) ? Number(p.priceCredito) || 0 : precio;
+          const margenActual = (precio - costo) / costo * 100;
+          const margenCredito = (credito - costo) / costo * 100;
+          if (margenActual >= m.contado - 0.5 && margenCredito >= m.credito - 0.5) return;
+          items.push({
+            id: p.id, nombre: p.name, costo: costo, precio: precio, credito: credito,
+            margenActual: Math.round(margenActual * 10) / 10, margenMeta: m.contado,
+            sugerido: redondear2(costo * (1 + m.contado / 100)), sugeridoCredito: redondear2(costo * (1 + m.credito / 100))
+          });
+        });
+        items.sort((a, b) => a.margenActual - b.margenActual);
+        const tasa = Number(state.tasa) || 0;
+        let tasaPrevia = null;
+        try { const v = parseFloat(localStorage.getItem(RS_KEY_TASA_REVISADA)); if (isFinite(v) && v > 0) tasaPrevia = v; } catch (e) {}
+        try { localStorage.setItem(RS_KEY_TASA_REVISADA, String(tasa)); } catch (e) {}
+        return { restringido: false, items: items, tasa: tasa, tasaPrevia: tasaPrevia };
+      };
+      // Aplica los precios sugeridos solo a los ids recibidos (la interfaz pide confirmación antes).
+      window.RS.preciosAplicar = function (ids) {
+        if (!rsAsistenteEsAdmin()) return { ok: false, cantidad: 0 };
+        const set = {};
+        (ids || []).forEach(id => { set[id] = true; });
+        let cantidad = 0;
+        (state.products || []).forEach(p => {
+          if (!set[p.id]) return;
+          const costo = Number(p.cost) || 0;
+          if (!(costo > 0)) return;
+          const m = state.margenes[p.presentation || "Unidad"] || DEFAULT_MARGENES["Unidad"];
+          p.price = Math.round(costo * (1 + m.contado / 100) * 100) / 100;
+          p.priceCredito = Math.round(costo * (1 + m.credito / 100) * 100) / 100;
+          cantidad++;
+        });
+        if (cantidad > 0) { saveState(); try { rsRefrescarVistas(); } catch (e) {} }
+        return { ok: true, cantidad: cantidad };
+      };
+
+      // 3) COBRANZA: cuentas por cobrar vencidas con su mensaje de WhatsApp ya redactado.
+      window.RS.cobranzaLista = function () {
+        const tasa = Number(state.tasa) || 0;
+        const negocio = (state.config && state.config.name) || "nuestro negocio";
+        const items = [];
+        let total = 0;
+        (state.cxc || []).forEach(item => {
+          const c = cxcClasificar(item);
+          if (c.estado !== "vencida") return;
+          let telRaw = item.clientPhone;
+          if (!telRaw) {
+            const nom = String(item.clientName || "").trim().toLowerCase();
+            const cl = (state.clients || []).find(x => String(x.name || "").trim().toLowerCase() === nom);
+            if (cl) telRaw = cl.phone;
+          }
+          const tel = rsTelefonoWhatsApp(telRaw);
+          const dias = Math.abs(c.dias);
+          const nombre = item.clientName || "cliente";
+          const mensaje = "Hola " + nombre + ", le saludamos de " + negocio + ". Le informamos que el plazo que se le otorgó para pagar su cuenta " +
+            "se ha consumido: venció el " + formatFechaCorta(String(item.dueDate).slice(0, 10)) + ", hace " + dias + (dias === 1 ? " día" : " días") +
+            ", y el tiempo límite ya se cumplió. Su saldo pendiente es de " + formatUSD(c.saldo) + " (" + formatBS(c.saldo * tasa) + "). " +
+            "Le pedimos ponerse al día con el pago a la brevedad. Si ya lo realizó, por favor envíenos el comprobante; " +
+            "si necesita coordinar una fecha, responda a este mensaje. Gracias por su atención.";
+          total += c.saldo;
+          items.push({
+            id: item.id, nombre: nombre, saldo: c.saldo, saldoBS: c.saldo * tasa, diasVencido: dias, tel: tel,
+            url: "https://wa.me/" + tel + "?text=" + encodeURIComponent(mensaje)
+          });
+        });
+        items.sort((a, b) => b.diasVencido - a.diasVencido);
+        return { items: items, total: total, totalBS: total * tasa };
+      };
     })();
   </script>
 
@@ -23166,10 +23901,10 @@ let rsDb = null;
 // en vez de fallar en silencio.
 // ----------------------------------------------------------------------------
 // FIREBASE_DISABLED_START: preflight check y conexión real a Firebase, desactivados para modo de diseño local
-// ===== MODO_DESARROLLO (TEMPORAL) =====
+// ===== MODO_DESARROLLO =====
 // true  = bypass de inicio de sesión: abre directo el sistema, sin correo ni contraseña (solo para pruebas).
-// false = PRODUCCIÓN: Firebase y login obligatorio. CAMBIAR A false ANTES DE PUBLICAR.
-const MODO_DESARROLLO = false;
+// false = PRODUCCIÓN: Firebase y login obligatorio. DEBE estar en false para publicar.
+const MODO_DESARROLLO = false; /* PRODUCCIÓN: login con correo y contraseña activo */
 const RS_LOCAL_DESIGN_MODE = MODO_DESARROLLO;
 
 if (!RS_LOCAL_DESIGN_MODE) {
@@ -23228,8 +23963,120 @@ if (!firebase.apps.length) {
 }
 rsAuth = firebase.auth();
 rsDb = firebase.firestore();
+// RS_MEJORA_4: persistencia local de Firestore (caché en IndexedDB). Permite consultar
+// los datos ya descargados aunque el equipo se quede sin internet.
+try {
+  rsDb.enablePersistence({ synchronizeTabs: true }).catch(function (err) {
+    console.warn("Persistencia offline de Firestore no disponible (" + (err && err.code) + "). El sistema sigue funcionando con los datos guardados en este equipo.");
+  });
+} catch (e) { console.warn("Persistencia offline de Firestore no disponible:", e); }
 }
 // FIREBASE_DISABLED_END
+
+// ----------------------------------------------------------------------------
+// RS_MEJORA_4) MODO SIN CONEXIÓN (OFFLINE)
+// El sistema ya guarda cada venta, crédito o cliente primero en este equipo
+// (localStorage / IndexedDB) y luego sube una copia a Firebase. Este bloque:
+//   - marca los cambios que aún no se subieron (sobreviven aunque cierres la app),
+//   - NO intenta subir mientras no hay internet y muestra el aviso "Modo Offline",
+//   - al volver la conexión sube todo automáticamente (la copia en la nube es UN
+//     solo documento que se reemplaza completo: no se puede duplicar información),
+//   - evita que, al abrir la app, una copia vieja de la nube pise cambios locales
+//     que todavía no se habían subido.
+// ----------------------------------------------------------------------------
+function rsEstaOnline() {
+  try { return navigator.onLine !== false; } catch (e) { return true; }
+}
+function rsHayPendiente(uid) {
+  try { return !!localStorage.getItem("rsoff_pend_" + uid); } catch (e) { return false; }
+}
+function rsMarcarPendiente() {
+  const uid = window.__RS_UID;
+  if (!uid || window.__rsPendMarcado === uid) return;
+  try { localStorage.setItem("rsoff_pend_" + uid, String(Date.now())); window.__rsPendMarcado = uid; } catch (e) {}
+}
+function rsLimpiarPendiente() {
+  const uid = window.__RS_UID;
+  if (!uid) return;
+  try { localStorage.removeItem("rsoff_pend_" + uid); } catch (e) {}
+  window.__rsPendMarcado = null;
+}
+function rsTieneDatosLocales(uid) {
+  try { return Object.keys(rsListarClavesRS("u_" + uid + "__")).length > 0; } catch (e) { return false; }
+}
+
+function rsMostrarOffline(si) {
+  try {
+    let el = document.getElementById("rs-offline-pill");
+    if (!si) { if (el) el.style.display = "none"; return; }
+    if (!document.body) return;
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "rs-offline-pill";
+      el.className = "rs-offline-pill";
+      el.setAttribute("role", "status");
+      el.style.cssText = "position:fixed;left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:89;" +
+        "display:flex;align-items:center;gap:6px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;" +
+        "border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:700;pointer-events:none;" +
+        "box-shadow:0 1px 4px rgba(0,0,0,0.12);";
+      el.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>Modo Offline';
+      document.body.appendChild(el);
+    }
+    el.style.display = "flex";
+  } catch (e) {}
+}
+
+function rsAvisoRed(msg, tipo) {
+  try {
+    const c = document.getElementById("toast-container");
+    if (!c) return;
+    const t = document.createElement("div");
+    t.className = "toast-box" + (tipo === "success" ? " toast-success" : tipo === "error" ? " toast-error" : "");
+    t.textContent = msg;
+    c.appendChild(t);
+    requestAnimationFrame(function () { t.classList.add("show"); });
+    setTimeout(function () { t.classList.remove("show"); setTimeout(function () { t.remove(); }, 300); }, 3200);
+  } catch (e) {}
+}
+
+// Reintenta subir los cambios pendientes (solo si hay internet y sesión).
+function rsReintentarSync() {
+  try {
+    if (!rsEstaOnline() || !window.__RS_UID || typeof rsDb === "undefined" || !rsDb) return;
+    if (rsHayPendiente(window.__RS_UID)) rsSyncToCloud();
+  } catch (e) {}
+}
+
+(function () {
+  function iniciar() { if (!rsEstaOnline()) rsMostrarOffline(true); }
+  if (document.body) iniciar(); else document.addEventListener("DOMContentLoaded", iniciar);
+
+  window.addEventListener("offline", function () {
+    window.__rsAvisoSync = true;
+    rsMostrarOffline(true);
+  });
+  window.addEventListener("online", function () {
+    rsMostrarOffline(false);
+    if (window.__RS_UID && rsHayPendiente(window.__RS_UID)) rsAvisoRed("Conexión restablecida: sincronizando datos…", "success");
+    setTimeout(rsReintentarSync, 1200);   // se espera un instante a que la red se estabilice
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") {
+      if (!rsEstaOnline()) rsMostrarOffline(true);
+      rsReintentarSync();
+    }
+  });
+  // Red de seguridad: solo reintenta si un envío anterior falló o se saltó por falta de internet.
+  setInterval(function () { if (window.__rsReintentar) rsReintentarSync(); }, 45000);
+
+  // Abrir la app SIN internet (después de haberla usado antes) requiere el archivo sw.js junto a index.html.
+  // Si ese archivo no existe, simplemente se ignora y el resto funciona igual.
+  try {
+    if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol) && !RS_LOCAL_DESIGN_MODE) {
+      window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+    }
+  } catch (e) {}
+})();
 
 // ----------------------------------------------------------------------------
 // 2) AISLAMIENTO DE localStorage POR USUARIO (namespacing transparente)
@@ -23239,6 +24086,105 @@ rsDb = firebase.firestore();
 // quede automáticamente aislada bajo un namespace único por UID de Firebase.
 // El código original sigue llamando a localStorage.getItem/setItem exactamente
 // igual que siempre — nunca se entera de este cambio.
+// ----------------------------------------------------------------------------
+// 2.0) ALMACENAMIENTO AMPLIADO (ETAPA 1): las claves grandes (inventario, ventas,
+// clientes...) pasan a IndexedDB cuando superan RS_GRANDE caracteres, porque
+// localStorage solo aguanta ~5 MB. Las claves chicas siguen igual que siempre en
+// localStorage. El código original no se entera: sigue usando localStorage.
+// Si el navegador no tiene IndexedDB, todo funciona como antes.
+// ----------------------------------------------------------------------------
+const RS_MEM = new Map();          // clave real ("u_<uid>__rs_clothes_x") -> texto (solo claves grandes)
+const RS_GRANDE = 200000;          // desde este tamaño (caracteres) una clave pasa a IndexedDB
+let rsIdb = null, rsIdbTimer = null, rsIdbFallos = 0;
+const rsIdbPend = new Map();       // clave -> texto | null (null = borrar), pendiente de escribir
+
+function rsIdbAbrir(uid) {
+  return new Promise(function (resolve) {
+    try {
+      if (!window.indexedDB) { resolve(null); return; }
+      var rq = window.indexedDB.open("rs_admin_" + uid, 1);
+      rq.onupgradeneeded = function () { try { rq.result.createObjectStore("kv"); } catch (e) {} };
+      rq.onsuccess = function () { resolve(rq.result); };
+      rq.onerror = function () { resolve(null); };
+      rq.onblocked = function () { resolve(null); };
+    } catch (e) { resolve(null); }
+  });
+}
+
+// Devuelve "ok" (cargado), "sin" (no hay IndexedDB: se trabaja como antes) o "error" (se abrió pero no se pudo leer).
+function rsIdbCargar(uid) {
+  return rsIdbAbrir(uid).then(function (db) {
+    if (!db) return "sin";
+    return new Promise(function (resolve) {
+      try {
+        var tx = db.transaction("kv", "readonly");
+        var rq = tx.objectStore("kv").openCursor();
+        rq.onsuccess = function (e) {
+          var c = e.target.result;
+          if (c) { RS_MEM.set(c.key, c.value); c.continue(); }
+        };
+        tx.oncomplete = function () { rsIdb = db; resolve("ok"); };
+        tx.onerror = tx.onabort = function () { resolve("error"); };
+      } catch (e) { resolve("error"); }
+    });
+  }).then(function (r) {
+    try { if (r === "ok" && navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+    return r;
+  });
+}
+
+function rsIdbProgramar() { if (rsIdbTimer) return; rsIdbTimer = setTimeout(rsIdbVaciar, 150); }
+
+function rsIdbFalloEscritura() {
+  rsIdbFallos++;
+  if (rsIdbFallos < 4) { setTimeout(rsIdbProgramar, 2000); return; }
+  if (!window.__rsAvisoIdb) {
+    window.__rsAvisoIdb = true;
+    alert("⚠️ No se pudo guardar en el almacenamiento ampliado del dispositivo (puede estar lleno). Haz «Exportar Copia de Seguridad» ahora y libera espacio.");
+  }
+}
+
+function rsIdbVaciar() {
+  rsIdbTimer = null;
+  if (!rsIdb || !rsIdbPend.size) return;
+  var lote = Array.from(rsIdbPend.entries());
+  try {
+    var tx = rsIdb.transaction("kv", "readwrite");
+    var os = tx.objectStore("kv");
+    lote.forEach(function (p) { if (p[1] === null) os.delete(p[0]); else os.put(p[1], p[0]); });
+    tx.oncomplete = function () {
+      lote.forEach(function (p) { if (rsIdbPend.get(p[0]) === p[1]) rsIdbPend.delete(p[0]); });
+      rsIdbFallos = 0;
+    };
+    tx.onerror = tx.onabort = function () { rsIdbFalloEscritura(); };
+  } catch (e) { rsIdbFalloEscritura(); }
+}
+try {
+  window.addEventListener("pagehide", rsIdbVaciar);
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") rsIdbVaciar(); });
+} catch (e) {}
+
+// Devuelve { claveOriginal: texto } con TODAS las claves del sistema del usuario
+// (las de localStorage y las grandes de IndexedDB). pref = "u_<uid>__" (o "" sin login).
+function rsListarClavesRS(pref) {
+  var out = {}, base = (pref || "") + RS_STORAGE_PREFIX;
+  for (var i = 0; i < localStorage.length; i++) {
+    var raw = localStorage.key(i);
+    if (raw && raw.indexOf(base) === 0) out[raw.substring((pref || "").length)] = localStorage.getItem(raw);
+  }
+  RS_MEM.forEach(function (v, k) { if (k.indexOf(base) === 0) out[k.substring((pref || "").length)] = v; });
+  return out;
+}
+
+// Borra por completo el almacenamiento ampliado de un usuario (al borrar su cuenta).
+function rsIdbBorrarTodo(uid) {
+  try {
+    RS_MEM.clear(); rsIdbPend.clear();
+    if (rsIdb) { try { rsIdb.close(); } catch (e) {} rsIdb = null; }
+    if (window.indexedDB) window.indexedDB.deleteDatabase("rs_admin_" + uid);
+  } catch (e) { /* ignorar */ }
+}
+
 (function () {
   // Si el navegador bloqueó localStorage, el bloque de arranque instaló un
   // respaldo en memoria: se parchea ese objeto en vez de Storage.prototype.
@@ -23246,28 +24192,47 @@ rsDb = firebase.firestore();
   const _getItem = _objetivo.getItem;
   const _setItem = _objetivo.setItem;
   const _removeItem = _objetivo.removeItem;
-
   function rsScopedKey(key) {
     if (window.__RS_UID && typeof key === "string" && key.indexOf(RS_STORAGE_PREFIX) === 0) {
       return "u_" + window.__RS_UID + "__" + key;
     }
     return key;
   }
-
   _objetivo.getItem = function (key) {
-    return _getItem.call(this, rsScopedKey(key));
+    const scoped = rsScopedKey(key);
+    if (RS_MEM.size && RS_MEM.has(scoped)) return RS_MEM.get(scoped);
+    return _getItem.call(this, scoped);
   };
-
   _objetivo.setItem = function (key, value) {
     const scoped = rsScopedKey(key);
-    _setItem.call(this, scoped, value);
-    if (window.__RS_UID && typeof key === "string" && key.indexOf(RS_STORAGE_PREFIX) === 0) {
+    const esRS = window.__RS_UID && typeof key === "string" && key.indexOf(RS_STORAGE_PREFIX) === 0;
+    if (esRS && rsIdb) {
+      const texto = String(value);
+      if (texto.length >= RS_GRANDE) {
+        // Clave grande: vive en IndexedDB (y en memoria); se quita la copia vieja de localStorage
+        RS_MEM.set(scoped, texto); rsIdbPend.set(scoped, texto); rsIdbProgramar();
+        try { _removeItem.call(this, scoped); } catch (e) {}
+        rsScheduleCloudSync();
+        return;
+      }
+      if (RS_MEM.has(scoped)) { RS_MEM.delete(scoped); rsIdbPend.set(scoped, null); rsIdbProgramar(); }
+      try {
+        _setItem.call(this, scoped, texto);
+      } catch (e) {
+        // localStorage lleno: se guarda en el almacenamiento ampliado
+        RS_MEM.set(scoped, texto); rsIdbPend.set(scoped, texto); rsIdbProgramar();
+        try { _removeItem.call(this, scoped); } catch (e2) {}
+      }
       rsScheduleCloudSync();
+      return;
     }
+    _setItem.call(this, scoped, value);
+    if (esRS) rsScheduleCloudSync();
   };
-
   _objetivo.removeItem = function (key) {
-    _removeItem.call(this, rsScopedKey(key));
+    const scoped = rsScopedKey(key);
+    if (RS_MEM.has(scoped)) { RS_MEM.delete(scoped); rsIdbPend.set(scoped, null); rsIdbProgramar(); }
+    _removeItem.call(this, scoped);
   };
 })();
 
@@ -23299,6 +24264,10 @@ function rsSesionPerdida() {
 // ----------------------------------------------------------------------------
 function rsScheduleCloudSync() {
   if (window.__rsBorrando) return; // borrado de cuenta en curso: no volver a subir datos
+  // RS_MEJORA_4: cada cambio queda marcado como "pendiente de subir" hasta que Firebase lo confirme
+  window.__rsGen = (window.__rsGen || 0) + 1;
+  rsMarcarPendiente();
+  if (!rsEstaOnline()) { window.__rsReintentar = true; rsMostrarOffline(true); }
   clearTimeout(rsSyncTimer);
   rsSyncTimer = setTimeout(rsSyncToCloud, 1500); // debounce: agrupa escrituras rápidas
 }
@@ -23307,16 +24276,17 @@ async function rsSyncToCloud() {
   if (window.__rsBorrando) return;
   if (!window.__RS_UID) return;
   if (!rsUsuarioValido(window.__RS_UID)) { rsSesionPerdida(); return; }
-  const uid = rsAuth.currentUser.uid;
-  const prefix = "u_" + uid + "__" + RS_STORAGE_PREFIX;
-  const snapshot = {};
-  for (let i = 0; i < localStorage.length; i++) {
-    const rawKey = localStorage.key(i);
-    if (rawKey && rawKey.indexOf(prefix) === 0) {
-      const originalKey = rawKey.substring(("u_" + uid + "__").length);
-      snapshot[originalKey] = localStorage.getItem(rawKey);
-    }
+  // RS_MEJORA_4: sin internet no se intenta subir; los datos ya están guardados en este equipo
+  if (!rsEstaOnline()) {
+    rsMarcarPendiente();
+    window.__rsReintentar = true;
+    window.__rsAvisoSync = true;
+    rsMostrarOffline(true);
+    return;
   }
+  const genEnvio = window.__rsGen || 0;
+  const uid = rsAuth.currentUser.uid;
+  const snapshot = rsListarClavesRS("u_" + uid + "__");
   // Firestore rechaza documentos de más de ~1 MB: avisar en vez de fallar en silencio
   try {
     const tamBytes = new Blob([JSON.stringify(snapshot)]).size;
@@ -23324,26 +24294,46 @@ async function rsSyncToCloud() {
       console.error("Respaldo en la nube omitido: " + tamBytes + " bytes superan el límite de 1 MB de Firestore.");
       if (!window.__rsAvisoTamNube) {
         window.__rsAvisoTamNube = true;
-        alert("⚠️ Tus datos (" + Math.round(tamBytes / 1024) + " KB) superan el límite de 1 MB del respaldo en la nube, por lo que NO se están sincronizando. Reduce las fotos de productos o usa «Exportar Copia de Seguridad».");
+        alert("⚠️ Tus datos (" + Math.round(tamBytes / 1024) + " KB) ya superan el límite de 1 MB del respaldo en la nube actual. Siguen guardándose completos en este dispositivo, pero NO se están copiando a la nube. Usa «Exportar Copia de Seguridad» con frecuencia.");
       }
       return;
     }
   } catch (e) { /* si no se puede medir, se intenta igual */ }
   try {
-    await rsDb.collection("users").doc(uid).collection("appData").doc("backup").set({
-      userId: uid,
-      snapshot: snapshot,
-      updatedAt: new Date().toISOString()
-    });
+    // RS_MEJORA_4: si hay "internet" pero no llega a Firebase, no se queda esperando para siempre
+    await Promise.race([
+      rsDb.collection("users").doc(uid).collection("appData").doc("backup").set({
+        userId: uid,
+        snapshot: snapshot,
+        updatedAt: new Date().toISOString()
+      }),
+      new Promise(function (_, reject) { setTimeout(function () { reject(new Error("tiempo de espera agotado")); }, 25000); })
+    ]);
+    // Se quita la marca de pendiente solo si no hubo cambios nuevos mientras se subía
+    if ((window.__rsGen || 0) === genEnvio) { rsLimpiarPendiente(); window.__rsReintentar = false; }
+    rsMostrarOffline(false);
+    if (window.__rsAvisoSync) { window.__rsAvisoSync = false; rsAvisoRed("Datos sincronizados con la nube", "success"); }
   } catch (err) {
     console.error("Error al sincronizar con Firestore:", err);
+    rsMarcarPendiente();
+    window.__rsReintentar = true;
   }
 }
 
 async function rsHydrateFromCloud(uid) {
   if (!rsUsuarioValido(uid)) return;
+  // RS_MEJORA_4: si en este equipo hay cambios que todavía no se subieron (por ejemplo, se trabajó sin
+  // internet), NO se reemplazan con la copia vieja de la nube: primero se suben.
+  if (rsHayPendiente(uid)) {
+    window.__rsReintentar = true;
+    window.__rsAvisoSync = true;
+    setTimeout(rsReintentarSync, 2000);
+    return;
+  }
   try {
     const doc = await rsDb.collection("users").doc(uid).collection("appData").doc("backup").get();
+    // Sin conexión Firestore responde con su caché (puede estar desactualizada): no pisa datos locales.
+    if (doc.exists && doc.metadata && doc.metadata.fromCache && rsTieneDatosLocales(uid)) return;
     if (doc.exists) {
       const data = doc.data();
       // Defensa extra: si el respaldo declara otro dueño, no se carga.
@@ -23366,6 +24356,22 @@ async function rsHydrateFromCloud(uid) {
 // ----------------------------------------------------------------------------
 function rsStartOriginalApp() {
   if (rsAppStarted) return;
+  // ETAPA 1: antes de arrancar, se cargan los datos grandes del almacenamiento ampliado
+  if (window.__RS_UID && window.__RS_IDB_LISTO !== window.__RS_UID) {
+    if (window.__RS_IDB_CARGANDO) return;
+    window.__RS_IDB_CARGANDO = true;
+    var uidCarga = window.__RS_UID;
+    rsIdbCargar(uidCarga).then(function (r) {
+      window.__RS_IDB_CARGANDO = false;
+      if (r === "error") {
+        rsShowFatalScreen("No se pudo abrir tu almacenamiento", "Cierra la aplicación y vuelve a abrirla. Tus datos no se han perdido. Si el problema sigue, escribe a soporte.");
+        return;
+      }
+      window.__RS_IDB_LISTO = uidCarga;
+      rsStartOriginalApp();
+    });
+    return;
+  }
   rsAppStarted = true;
   window.__RS_APP_STARTED = true;
 
@@ -23478,6 +24484,7 @@ async function rsHandleRegister(event) {
     rsShowAuthMessage("Las contraseñas no coinciden.", "error");
     return;
   }
+  var rsErrClave = rsValidarClave(password); if (rsErrClave) { rsShowAuthMessage(rsErrClave, "error"); return; }
   var rsAcepto = document.getElementById("rs-register-acepto");
   if (!rsAcepto || !rsAcepto.checked) {
     rsShowAuthMessage("Debes aceptar la Política de Privacidad y los Términos de Servicio.", "error");
@@ -23610,6 +24617,7 @@ async function rsEjecutarBorrarDatos() {
     }
     var rm = Storage.prototype.removeItem;
     borrar.forEach(function (key) { try { rm.call(localStorage, key); } catch (e) {} });
+    rsIdbBorrarTodo(uid);
   } catch (e) { /* ignorar */ }
   try { await user.delete(); } catch (e) { /* los datos ya se borraron; se cierra sesión igual */ }
   try { await rsAuth.signOut(); } catch (e) {}
@@ -23623,7 +24631,8 @@ function rsTranslateAuthError(error) {
     "auth/wrong-password": "Contraseña incorrecta.",
     "auth/email-already-in-use": "Ese correo ya está registrado.",
     "auth/invalid-email": "Correo electrónico inválido.",
-    "auth/weak-password": "La contraseña debe tener al menos 6 caracteres.",
+    "auth/weak-password": "La contraseña es muy débil. Usa al menos 8 caracteres con letras y números.",
+    "auth/too-many-requests": "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.",
     "auth/invalid-credential": "Credenciales inválidas.",
     "auth/api-key-not-valid.-please-pass-a-valid-api-key.": "La API Key de Firebase no es válida. Revisa rsFirebaseConfig.",
     "auth/configuration-not-found": "Falta activar el método Email/Contraseña en Firebase Authentication."
@@ -24186,7 +25195,7 @@ rsAuth.onAuthStateChanged(async function (user) {
       "rs/ya-en-equipo": "Ese correo ya está en tu equipo. Usa \"Editar permisos\" o \"Activar\" en su ficha.",
       "auth/email-already-in-use": "Ese correo ya está registrado. Usa otro correo o pídele a esa persona que use \"Olvidé mi contraseña\".",
       "auth/invalid-email": "El correo no es válido.",
-      "auth/weak-password": "La contraseña es muy débil: usa al menos 6 caracteres.",
+      "auth/weak-password": "La contraseña es muy débil: usa al menos 8 caracteres con letras y números.",
       "auth/operation-not-allowed": "El registro por correo y contraseña no está habilitado en Firebase Authentication.",
       "auth/network-request-failed": "Sin conexión a internet. Revisa tu red e intenta de nuevo.",
       "auth/too-many-requests": "Demasiados intentos. Espera unos minutos e intenta de nuevo.",
@@ -24205,7 +25214,7 @@ rsAuth.onAuthStateChanged(async function (user) {
     if (!nombre) return toast("Escribe el nombre del empleado.", true);
     if (email === clave(u.email)) return toast("No puedes registrarte como tu propio empleado.", true);
     if (!permisos.length) return toast("Marca al menos una función permitida.", true);
-    if (!editando && pass.length < 6) return toast("La contraseña temporal debe tener al menos 6 caracteres.", true);
+    if (!editando) { var errClave = rsValidarClave(pass); if (errClave) return toast(errClave, true); }
     if (btn.disabled) return;
     btn.disabled = true;
     var sec = null, authCreada = false, readmision = false;
@@ -24377,11 +25386,7 @@ rsAuth.onAuthStateChanged(async function (user) {
     var dueno = STAFF ? STAFF.ownerUid : (u && u.uid);
     if (!dueno || !window.__RS_UID) return;
     if (window.__RS_UID !== dueno || !rsUsuarioValido(dueno)) { rsSesionPerdida(); return; }
-    var pref = "u_" + dueno + "__", snapshot = {};
-    for (var i = 0; i < localStorage.length; i++) {
-      var raw = localStorage.key(i);
-      if (raw && raw.indexOf(pref + RS_STORAGE_PREFIX) === 0) snapshot[raw.substring(pref.length)] = localStorage.getItem(raw);
-    }
+    var pref = "u_" + dueno + "__", snapshot = rsListarClavesRS(pref);
     try {
       var tam = new Blob([JSON.stringify(snapshot)]).size;
       if (tam > 1000000) { console.error("Respaldo en la nube omitido: " + tam + " bytes superan el límite de 1 MB de Firestore."); return; }
@@ -24712,6 +25717,52 @@ rsAuth.onAuthStateChanged(async function (user) {
   </div>
 </div>
 
+<!-- Modales: asistentes nuevos -->
+<div id="rs-inv-compras-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header dark" style="background:#0052ff;">
+      <strong style="font-size:14px;">Lista de Compras Inteligente</strong>
+      <button type="button" class="btn-icon-box" data-rs-close="rs-inv-compras-modal" style="background:none;border:none;color:#fff;width:28px;height:28px;">✕</button>
+    </div>
+    <div class="modal-body" id="rs-inv-compras-body" style="font-size:12px;color:#334155;line-height:1.55;"></div>
+    <div class="modal-footer" style="display:flex;justify-content:flex-end;"><button type="button" class="btn btn-primary" data-rs-close="rs-inv-compras-modal" style="background:#0052ff;border-color:#0052ff;">Cerrar</button></div>
+  </div>
+</div>
+
+<div id="rs-inv-precios-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header dark" style="background:#0052ff;">
+      <strong style="font-size:14px;">Revisión de Márgenes de Precio</strong>
+      <button type="button" class="btn-icon-box" data-rs-close="rs-inv-precios-modal" style="background:none;border:none;color:#fff;width:28px;height:28px;">✕</button>
+    </div>
+    <div class="modal-body" id="rs-inv-precios-body" style="font-size:12px;color:#334155;line-height:1.55;"></div>
+    <div class="modal-footer" style="display:flex;justify-content:flex-end;"><button type="button" class="btn btn-primary" data-rs-close="rs-inv-precios-modal" style="background:#0052ff;border-color:#0052ff;">Cerrar</button></div>
+  </div>
+</div>
+
+<div id="rs-inv-cobranza-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header dark" style="background:#0052ff;">
+      <strong style="font-size:14px;">Cobranza por WhatsApp</strong>
+      <button type="button" class="btn-icon-box" data-rs-close="rs-inv-cobranza-modal" style="background:none;border:none;color:#fff;width:28px;height:28px;">✕</button>
+    </div>
+    <div class="modal-body" id="rs-inv-cobranza-body" style="font-size:12px;color:#334155;line-height:1.55;"></div>
+    <div class="modal-footer" style="display:flex;justify-content:flex-end;"><button type="button" class="btn btn-primary" data-rs-close="rs-inv-cobranza-modal" style="background:#0052ff;border-color:#0052ff;">Cerrar</button></div>
+  </div>
+</div>
+
+<!-- Modal: Valor total del inventario -->
+<div id="rs-inv-valor-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header dark" style="background:#0052ff;">
+      <strong style="font-size:14px;">¿Cuánta plata hay en inventario?</strong>
+      <button type="button" class="btn-icon-box" data-rs-close="rs-inv-valor-modal" style="background:none;border:none;color:#fff;width:28px;height:28px;">✕</button>
+    </div>
+    <div class="modal-body" id="rs-inv-valor-body" style="font-size:12px;color:#334155;line-height:1.55;"></div>
+    <div class="modal-footer" style="display:flex;justify-content:flex-end;"><button type="button" class="btn btn-primary" data-rs-close="rs-inv-valor-modal" style="background:#0052ff;border-color:#0052ff;">Cerrar</button></div>
+  </div>
+</div>
+
 <!-- Modal: Ayuda Recetas -->
 <div id="rs-rec-modal-help" class="modal-overlay" style="display: none;">
   <div class="modal-box">
@@ -24721,7 +25772,7 @@ rsAuth.onAuthStateChanged(async function (user) {
     </div>
     <div class="modal-body" style="font-size:12px;color:#334155;line-height:1.55;">
       <p><b>Paquete / kit:</b> un producto que se elabora por tandas. Define cuántas unidades rinde cada tanda, su costo y su precio de venta.</p>
-      <p style="margin-top:8px;"><b>Producir / Armar Kit:</b> suma al inventario (y al punto de venta) lo que rinde el paquete × el número de tandas, y descuenta del inventario los insumos definidos para cada tanda.</p>
+      <p style="margin-top:8px;"><b>Producir / Armar Kit:</b> suma al inventario (y al punto de venta) lo que rinde el paquete × el número de tandas, y descuenta del inventario los insumos definidos para cada tanda. Si creas un kit nuevo con unidades disponibles, los insumos de esas unidades también se descuentan al guardarlo.</p>
       <p style="margin-top:8px;"><b>Margen:</b> (precio − costo) ÷ costo × 100. Verde si es positivo, rojo si es negativo.</p>
     </div>
     <div class="modal-footer" style="display:flex;justify-content:flex-end;"><button type="button" class="btn btn-primary" data-rs-close="rs-rec-modal-help" style="background:#0052ff;border-color:#0052ff;">Entendido</button></div>
@@ -24908,9 +25959,18 @@ rsAuth.onAuthStateChanged(async function (user) {
       rec = data; arr.unshift(data);
     }
     var P = puente();
-    if (P && rec) { try { rec.productId = P.guardarKit(rec, data.disp); } catch (e) { console.error(e); } }
+    // Kit nuevo con unidades ya armadas: los insumos deben alcanzar antes de guardar nada
+    if (!editId && P && data.disp > 0 && data.insumos.length) {
+      var chk = P.validarInsumosIniciales(data, data.disp);
+      if (!chk.ok) { aviso(chk.msg); return; }
+    }
+    if (P && rec) {
+      try { rec.productId = P.guardarKit(rec, data.disp, !editId); }
+      catch (e) { console.error(e); aviso(e && e.message ? e.message : "No se pudo guardar el kit en el inventario"); return; }
+    }
     guardar(KEY_REC, arr);
-    cerrar("rs-rec-modal-form"); renderRecetas(); aviso("Paquete / Kit guardado");
+    cerrar("rs-rec-modal-form"); renderRecetas();
+    aviso(!editId && data.disp > 0 && data.insumos.length ? "Paquete / Kit guardado · insumos descontados del inventario" : "Paquete / Kit guardado");
   }
 
   function resumenFab() {
@@ -25101,10 +26161,164 @@ rsAuth.onAuthStateChanged(async function (user) {
   document.addEventListener("click", function (e) {
     var c = e.target.closest("[data-rs-close]");
     if (c) cerrar(c.getAttribute("data-rs-close"));
-    if (e.target.classList && e.target.classList.contains("modal-overlay") && /^rs-(rec|idea)/.test(e.target.id)) cerrar(e.target.id);
+    if (e.target.classList && e.target.classList.contains("modal-overlay") && /^rs-(rec|idea|inv)/.test(e.target.id)) cerrar(e.target.id);
   });
 
-  function init() { initRecetas(); initHome(); }
+  /* ======================= VALOR TOTAL DEL INVENTARIO ======================= */
+  function bs(n) { return "Bs. " + Number(n || 0).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function initValorInventario() {
+    var btn = $("btn-inv-valor"); if (!btn) return;
+    btn.addEventListener("click", function () {
+      var f = window.RS && window.RS.valorInventario;
+      if (typeof f !== "function") { aviso("El inventario aún no está listo. Intenta de nuevo en un momento"); return; }
+      var v;
+      try { v = f(); } catch (e) { console.error(e); aviso("No se pudo calcular el valor del inventario"); return; }
+      if (v.restringido) { aviso("Solo el Administrador puede ver el valor del inventario"); return; }
+      function caja(titulo, usdV, bsV, color) {
+        return '<div class="rs-rec-stat" style="text-align:left;padding:10px 12px;"><small>' + titulo + '</small>' +
+          '<strong style="font-size:16px;' + (color ? "color:" + color + ";" : "") + '">' + usd(usdV) + '</strong>' +
+          '<div style="font-size:12px;font-weight:700;color:#64748b;">' + bs(bsV) + '</div></div>';
+      }
+      var html = '<div style="display:grid;gap:8px;">' +
+        caja("Valor a precio de costo", v.costoUSD, v.costoBS) +
+        caja("Valor a precio de venta (contado)", v.ventaUSD, v.ventaBS) +
+        caja("Ganancia potencial", v.gananciaUSD, v.gananciaBS, v.gananciaUSD >= 0 ? "#059669" : "#e11d48") +
+        '</div>' +
+        '<p style="margin-top:10px;font-size:11px;color:#64748b;">Productos con existencia: <b>' + v.productosConStock + '</b> · Tasa usada: <b>' + bs(v.tasa) + '</b> por USD.</p>';
+      if (v.productosSinCosto > 0) {
+        html += '<p style="margin-top:6px;font-size:11px;color:#b45309;">' + v.productosSinCosto + (v.productosSinCosto === 1 ? " producto con existencia no tiene" : " productos con existencia no tienen") + ' costo registrado, por eso no suman en el valor a costo.</p>';
+      }
+      $("rs-inv-valor-body").innerHTML = html;
+      abrir("rs-inv-valor-modal");
+    });
+  }
+
+  /* ======================= ASISTENTES: COMPRAS, PRECIOS, COBRANZA ======================= */
+  function llamar(nombre) {
+    var f = window.RS && window.RS[nombre];
+    if (typeof f !== "function") { aviso("El sistema aún no está listo. Intenta de nuevo en un momento"); return null; }
+    try { return f.apply(null, Array.prototype.slice.call(arguments, 1)); }
+    catch (e) { console.error(e); aviso("No se pudo completar la consulta"); return null; }
+  }
+  var cache = { compras: null, precios: null, cobranza: null };
+  function cantTxt(i) { return i.sugerida + (i.unidad ? " " + i.unidad : (i.sugerida === 1 ? " ud" : " uds")); }
+  var filaStyle = 'border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;margin-bottom:6px;';
+
+  function textoCompras(d, tel) {
+    var lineas = d.items.map(function (i) { return "- " + i.nombre + ": " + cantTxt(i); });
+    return "Hola, le escribe " + (d.negocio || "su cliente") + ". Necesito cotizar y pedir lo siguiente:\n" + lineas.join("\n") + "\nQuedo atento. Gracias.";
+  }
+  function abrirCompras() {
+    var d = llamar("listaCompras"); if (!d) return;
+    if (d.restringido) { aviso("Solo el Administrador puede ver la lista de compras"); return; }
+    cache.compras = d;
+    var html;
+    if (!d.items.length) {
+      html = '<p>Por ahora ningún producto con ventas recientes se está acabando. Cuando uno alcance para menos de 7 días, aparecerá aquí.</p>';
+    } else {
+      html = '<p style="margin-bottom:8px;color:#64748b;">Basado en las ventas de los últimos ' + d.base + ' días. Se sugiere comprar lo necesario para cubrir 14 días.</p>' +
+        d.items.map(function (i) {
+          return '<div style="' + filaStyle + '"><div><b>' + esc(i.nombre) + '</b> · comprar <b>' + esc(cantTxt(i)) + '</b></div>' +
+            '<div style="font-size:11px;color:#64748b;">Hay ' + esc(i.stockTxt) + ' · vende ~' + i.porDia + ' por día · alcanza ~' + i.dias + ' días · costo est. ' + usd(i.costoUSD) + '</div></div>';
+        }).join("") +
+        '<div class="rs-margin-preview" style="margin-top:8px;">Total estimado: ' + usd(d.totalUSD) + ' · ' + bs(d.totalBS) + '</div>' +
+        '<div class="form-group" style="margin-top:10px;"><label>Enviar a proveedor (opcional)</label><select id="rs-compras-prov" class="form-input"><option value="">Elegir contacto en WhatsApp</option>' +
+        d.proveedores.map(function (p, k) { return '<option value="' + k + '">' + esc(p.nombre) + (p.tel ? "" : " (sin teléfono)") + '</option>'; }).join("") + '</select></div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">' +
+        '<button type="button" class="btn btn-primary" data-compras="wa" style="background:#0052ff;border-color:#0052ff;">Enviar por WhatsApp</button>' +
+        '<button type="button" class="btn btn-help" data-compras="copiar">Copiar lista</button></div>';
+    }
+    $("rs-inv-compras-body").innerHTML = html;
+    abrir("rs-inv-compras-modal");
+  }
+  function accionCompras(act) {
+    var d = cache.compras; if (!d || !d.items.length) return;
+    var texto = textoCompras(d);
+    if (act === "copiar") {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto).then(function () { aviso("Lista copiada"); }, function () { aviso("No se pudo copiar la lista"); });
+      } else { aviso("Tu navegador no permite copiar automáticamente"); }
+      return;
+    }
+    var sel = $("rs-compras-prov"), prov = sel && sel.value !== "" ? d.proveedores[parseInt(sel.value, 10)] : null;
+    window.open("https://wa.me/" + (prov && prov.tel ? prov.tel : "") + "?text=" + encodeURIComponent(texto), "_blank", "noopener");
+  }
+
+  function abrirPrecios() {
+    var d = llamar("preciosRevisar"); if (!d) return;
+    if (d.restringido) { aviso("Solo el Administrador puede revisar los márgenes"); return; }
+    cache.precios = d;
+    var html = '<p style="margin-bottom:8px;color:#64748b;">Tasa actual: <b>' + bs(d.tasa) + '</b>' +
+      (d.tasaPrevia && Math.abs(d.tasaPrevia - d.tasa) > 0.0001 ? ' · en tu última revisión era ' + bs(d.tasaPrevia) : '') +
+      '. Se listan los productos con costo registrado cuyo margen quedó por debajo del configurado para su presentación.</p>';
+    if (!d.items.length) {
+      html += '<p>Todos los productos con costo cumplen el margen configurado.</p>';
+    } else {
+      html += d.items.map(function (i) {
+        return '<label style="' + filaStyle + 'display:flex;gap:8px;align-items:flex-start;cursor:pointer;">' +
+          '<input type="checkbox" data-precio-id="' + esc(i.id) + '" style="margin-top:3px;">' +
+          '<span><b>' + esc(i.nombre) + '</b><br><span style="font-size:11px;color:#64748b;">Margen ' + i.margenActual + '% (meta ' + i.margenMeta + '%) · precio ' + usd(i.precio) +
+          ' &rarr; sugerido <b style="color:#0052ff;">' + usd(i.sugerido) + '</b> · costo ' + usd(i.costo) + '</span></span></label>';
+      }).join("") +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">' +
+        '<button type="button" class="btn btn-help" data-precios="todos">Seleccionar todos</button>' +
+        '<button type="button" class="btn btn-primary" data-precios="aplicar" style="background:#0052ff;border-color:#0052ff;">Aplicar a seleccionados</button></div>' +
+        '<p style="margin-top:6px;font-size:10px;color:#94a3b8;">Al aplicar, se recalculan el precio de contado y el de crédito con los márgenes de Configuración. No cambia nada hasta que confirmes.</p>';
+    }
+    $("rs-inv-precios-body").innerHTML = html;
+    abrir("rs-inv-precios-modal");
+  }
+  function accionPrecios(act) {
+    var cajas = Array.prototype.slice.call($("rs-inv-precios-body").querySelectorAll("[data-precio-id]"));
+    if (act === "todos") {
+      var todos = cajas.every(function (c) { return c.checked; });
+      cajas.forEach(function (c) { c.checked = !todos; });
+      return;
+    }
+    var ids = cajas.filter(function (c) { return c.checked; }).map(function (c) { return c.getAttribute("data-precio-id"); });
+    if (!ids.length) { aviso("Marca al menos un producto"); return; }
+    if (!confirm("Se actualizarán los precios de " + ids.length + (ids.length === 1 ? " producto" : " productos") + " con los márgenes configurados. ¿Continuar?")) return;
+    var r = llamar("preciosAplicar", ids); if (!r) return;
+    aviso(r.cantidad ? "Precios actualizados en " + r.cantidad + (r.cantidad === 1 ? " producto" : " productos") : "No se actualizó ningún producto");
+    abrirPrecios();
+  }
+
+  function abrirCobranza() {
+    var d = llamar("cobranzaLista"); if (!d) return;
+    cache.cobranza = d;
+    var html;
+    if (!d.items.length) {
+      html = '<p>No hay cuentas por cobrar vencidas. Cuando una venga vencida, aparecerá aquí con su mensaje listo para enviar.</p>';
+    } else {
+      html = '<div class="rs-margin-preview" style="margin-bottom:8px;">' + d.items.length + (d.items.length === 1 ? " cuenta vencida" : " cuentas vencidas") + ' · ' + usd(d.total) + ' · ' + bs(d.totalBS) + '</div>' +
+        d.items.map(function (i, k) {
+          return '<div style="' + filaStyle + 'display:flex;gap:8px;align-items:center;justify-content:space-between;">' +
+            '<div style="min-width:0;"><b>' + esc(i.nombre) + '</b><br><span style="font-size:11px;color:#64748b;">Vencida hace ' + i.diasVencido + (i.diasVencido === 1 ? " día" : " días") + ' · ' + usd(i.saldo) + ' (' + bs(i.saldoBS) + ')' + (i.tel ? "" : " · sin teléfono") + '</span></div>' +
+            '<button type="button" class="btn btn-primary" data-cobro="' + k + '" style="background:#0052ff;border-color:#0052ff;flex-shrink:0;">' + (i.tel ? "Enviar" : "Elegir contacto") + '</button></div>';
+        }).join("");
+    }
+    $("rs-inv-cobranza-body").innerHTML = html;
+    abrir("rs-inv-cobranza-modal");
+  }
+
+  function initAsistentes() {
+    var b1 = $("btn-inv-compras"), b2 = $("btn-inv-precios"), b3 = $("btn-cobranza-wa");
+    if (b1) b1.addEventListener("click", abrirCompras);
+    if (b2) b2.addEventListener("click", abrirPrecios);
+    if (b3) b3.addEventListener("click", abrirCobranza);
+    var c = $("rs-inv-compras-body");
+    if (c) c.addEventListener("click", function (e) { var b = e.target.closest("[data-compras]"); if (b) accionCompras(b.getAttribute("data-compras")); });
+    var p = $("rs-inv-precios-body");
+    if (p) p.addEventListener("click", function (e) { var b = e.target.closest("[data-precios]"); if (b) accionPrecios(b.getAttribute("data-precios")); });
+    var o = $("rs-inv-cobranza-body");
+    if (o) o.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-cobro]"); if (!b || !cache.cobranza) return;
+      var it = cache.cobranza.items[parseInt(b.getAttribute("data-cobro"), 10)];
+      if (it) window.open(it.url, "_blank", "noopener");
+    });
+  }
+
+  function init() { initRecetas(); initValorInventario(); initAsistentes(); initHome(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
 </script>
@@ -27686,4 +28900,73 @@ html[data-rs-theme="dark"] .rs-profile-dropdown .rs-pd-item:hover { background: 
 })();
 </script>
 
+<script>
+
+  /* ---- Regla de contraseñas nuevas: mínimo 8 caracteres, con letras y números ---- */
+  function rsValidarClave(p) {
+    p = String(p || "");
+    if (p.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
+    if (!/[A-Za-z\u00C0-\u017F]/.test(p)) return "La contraseña debe incluir al menos una letra.";
+    if (!/[0-9]/.test(p)) return "La contraseña debe incluir al menos un número.";
+    if (/^(12345678|123456789|password|contrase.a1|abcd1234|qwerty123)$/i.test(p)) return "Esa contraseña es muy común. Elige otra.";
+    return "";
+  }
+
+  /* ---- ¿Olvidaste tu contraseña? Envía el correo de recuperación de Firebase ---- */
+  var RS_OLVIDE_T = 0;
+  async function rsOlvideClave() {
+    var el = document.getElementById("rs-login-email");
+    var email = (el && el.value || "").trim();
+    if (!email) { rsShowAuthMessage("Escribe tu correo arriba y vuelve a pulsar «¿Olvidaste tu contraseña?».", "error"); if (el) el.focus(); return; }
+    if (typeof rsAuth === "undefined" || !rsAuth) { rsShowAuthMessage("El acceso no está disponible en este momento. Inténtalo más tarde.", "error"); return; }
+    if (Date.now() - RS_OLVIDE_T < 30000) { rsShowAuthMessage("Ya enviamos un correo. Espera unos segundos antes de pedir otro.", "error"); return; }
+    rsShowAuthMessage("Enviando correo...", "loading");
+    try {
+      rsAuth.languageCode = "es";
+      await rsAuth.sendPasswordResetEmail(email);
+      RS_OLVIDE_T = Date.now();
+      rsShowAuthMessage("Si ese correo está registrado, te enviamos un enlace para crear una contraseña nueva. Revisa también la carpeta de spam.", "success");
+    } catch (e) {
+      var c = e && e.code;
+      if (c === "auth/invalid-email") rsShowAuthMessage("El correo no es válido.", "error");
+      else if (c === "auth/too-many-requests") rsShowAuthMessage("Demasiados intentos. Espera unos minutos e inténtalo de nuevo.", "error");
+      else if (c === "auth/network-request-failed") rsShowAuthMessage("Sin conexión a internet. Revisa tu red.", "error");
+      else rsShowAuthMessage("Si ese correo está registrado, te enviamos un enlace para crear una contraseña nueva.", "success");
+    }
+  }
+
+  /* ---- Ojo para ver/ocultar contraseñas (no toca PIN ni lógica existente) ---- */
+  (function () {
+    var SKIP = /^(cfg-bloqueo-pin|rsx-lock-pin)/;
+    var ICON_ON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    var ICON_OFF = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+    var st = document.createElement("style");
+    st.textContent = ".rs-pw-wrap{position:relative;display:block;width:100%}" +
+      ".rs-pw-eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:none;border:0;color:#64748b;cursor:pointer;border-radius:8px;padding:0}" +
+      ".rs-pw-eye:focus-visible{outline:2px solid currentColor}" +
+      ".rs-olvide{background:none;border:0;padding:0;font:inherit;font-size:13px;font-weight:600;color:#0052ff;cursor:pointer;align-self:flex-end;text-decoration:underline}";
+    document.head.appendChild(st);
+    function envolver(inp) {
+      if (!inp || inp.getAttribute("data-rs-ojo") || SKIP.test(inp.id || "") || !inp.parentNode) return;
+      inp.setAttribute("data-rs-ojo", "1");
+      var w = document.createElement("span"); w.className = "rs-pw-wrap";
+      inp.parentNode.insertBefore(w, inp); w.appendChild(inp);
+      inp.style.width = "100%"; inp.style.boxSizing = "border-box"; inp.style.paddingRight = "46px";
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "rs-pw-eye"; b.setAttribute("aria-label", "Mostrar contraseña"); b.innerHTML = ICON_ON;
+      b.addEventListener("click", function () {
+        var ver = inp.type === "password";
+        inp.type = ver ? "text" : "password";
+        b.innerHTML = ver ? ICON_OFF : ICON_ON;
+        b.setAttribute("aria-label", ver ? "Ocultar contraseña" : "Mostrar contraseña");
+      });
+      w.appendChild(b);
+    }
+    function barrer() { var l = document.querySelectorAll('input[type="password"]'); for (var i = 0; i < l.length; i++) envolver(l[i]); }
+    var t = null;
+    function programar() { if (t) return; t = setTimeout(function () { t = null; barrer(); }, 250); }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", barrer); else barrer();
+    try { new MutationObserver(programar).observe(document.body, { childList: true, subtree: true }); } catch (e) {}
+  })();
+</script>
 </body></html>
