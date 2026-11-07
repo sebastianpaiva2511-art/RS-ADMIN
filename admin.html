@@ -10,11 +10,12 @@
 <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-storage-compat.js"></script>
 <!-- Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
 <style>
-:root{--brand:#d91e63;--brand2:#9c27b0;--grad:linear-gradient(135deg,#d91e63,#9c27b0);--ink:#0f172a;--text:#475569;--muted:#64748b;--line:#e2e8f0;--bg:#f6f7fb;--card:#fff;--tint:#fdf2f7;--ok:#16a34a;--warn:#d97706;--bad:#dc2626;--r:14px}
+:root{--brand:#0a2a9e;--brand2:#061b6e;--grad:linear-gradient(135deg,#0a2a9e,#061b6e);--ink:#0f172a;--text:#475569;--muted:#64748b;--line:#e2e8f0;--bg:#f6f7fb;--card:#fff;--tint:#eaefff;--ok:#16a34a;--warn:#d97706;--bad:#dc2626;--r:14px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
 button,input,select{font-family:inherit}
@@ -75,10 +76,10 @@ button,input,select{font-family:inherit}
 .field{display:flex;flex-direction:column;gap:6px;min-width:0}
 .field label{font-size:13px;font-weight:600;color:#334155}
 .field input,.field select,.search{padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;background:#fff;width:100%}
-.field input:focus,.field select:focus,.search:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(217,30,99,.12)}
+.field input:focus,.field select:focus,.search:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(10,42,158,.14)}
 .field input[readonly]{background:var(--bg)}
 .field textarea{padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;background:#fff;width:100%;font-family:inherit;resize:vertical;min-height:76px}
-.field textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(217,30,99,.12)}
+.field textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(10,42,158,.14)}
 .field .hint{font-size:12px;color:var(--muted)}
 .switch{position:relative;width:44px;height:26px;flex:none}
 .switch input{position:absolute;inset:0;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
@@ -90,11 +91,11 @@ button,input,select{font-family:inherit}
 .banner-preview{margin-top:10px;padding:10px 14px;border-radius:9px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:13px;font-weight:600}
 .banner-preview.off{background:var(--bg);border-color:var(--line);color:var(--muted);font-weight:500}
 .acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
-.btn-ext{background:var(--tint);color:var(--brand);border-color:#f9c6dc}.btn-ext:hover{background:#fbe4ef}
+.btn-ext{background:var(--tint);color:var(--brand);border-color:#c3cffa}.btn-ext:hover{background:#dbe4ff}
 .status-pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
 .status-pill.on{background:#fee2e2;color:#991b1b}.status-pill.off{background:#dcfce7;color:#166534}
 .btn{padding:10px 18px;border:1px solid transparent;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:box-shadow .15s}
-.btn-primary{background:var(--grad);color:#fff}.btn-primary:hover{box-shadow:0 6px 16px rgba(217,30,99,.28)}
+.btn-primary{background:var(--grad);color:#fff}.btn-primary:hover{box-shadow:0 6px 16px rgba(10,42,158,.32)}
 .btn-secondary{background:#fff;color:#334155;border-color:#cbd5e1}.btn-secondary:hover{background:var(--bg)}
 .btn-sm{padding:6px 12px;font-size:12px}
 .btn-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
@@ -198,7 +199,7 @@ tbody tr:hover{background:#fafbfd}
     <form class="auth-form" onsubmit="handleAdminLogin(event)">
       <div class="field"><label for="admin-email">Correo electrónico</label><input type="email" id="admin-email" required placeholder="tu@correo.com"></div>
       <div class="field"><label for="admin-password">Contraseña</label><input type="password" id="admin-password" required placeholder="••••••••"></div>
-      <button type="button" class="rs-olvide" onclick="adminOlvideClave()" style="color:#d91e63">¿Olvidaste tu contraseña?</button>
+      <button type="button" class="rs-olvide" onclick="adminOlvideClave()" style="color:#0a2a9e">¿Olvidaste tu contraseña?</button>
       <button type="submit" class="btn-auth" id="btn-admin-login">Ingresar</button>
     </form>
     <button type="button" class="rs-legal-link" onclick="rsAbrirLegal()">Aviso legal y Política de Privacidad</button>
@@ -238,8 +239,8 @@ tbody tr:hover{background:#fafbfd}
           <button class="btn btn-secondary btn-sm" onclick="showExpiringUsers()">Ver usuarios</button>
         </div>
         <div class="kpis">
-          <div class="kpi"><div class="kpi-icon" style="background:#fdf2f7;color:#d91e63"><svg class="i"><use href="#i-users"/></svg></div><div><div class="kpi-label">Usuarios totales</div><div class="kpi-value" id="stat-total-users">0</div><div class="kpi-delta" id="d-users"></div></div></div>
-          <div class="kpi"><div class="kpi-icon" style="background:#f3e8ff;color:#9c27b0"><svg class="i"><use href="#i-price"/></svg></div><div><div class="kpi-label">Ingresos mensuales</div><div class="kpi-value" id="stat-revenue">$0</div><div class="kpi-delta" id="d-rev"></div></div></div>
+          <div class="kpi"><div class="kpi-icon" style="background:#eaefff;color:#0a2a9e"><svg class="i"><use href="#i-users"/></svg></div><div><div class="kpi-label">Usuarios totales</div><div class="kpi-value" id="stat-total-users">0</div><div class="kpi-delta" id="d-users"></div></div></div>
+          <div class="kpi"><div class="kpi-icon" style="background:#dbe4ff;color:#061b6e"><svg class="i"><use href="#i-price"/></svg></div><div><div class="kpi-label">Ingresos mensuales</div><div class="kpi-value" id="stat-revenue">$0</div><div class="kpi-delta" id="d-rev"></div></div></div>
           <div class="kpi"><div class="kpi-icon" style="background:#dcfce7;color:#16a34a"><svg class="i"><use href="#i-check"/></svg></div><div><div class="kpi-label">Suscripciones activas</div><div class="kpi-value" id="stat-paid-users">0</div><div class="kpi-delta" id="d-subs"></div></div></div>
           <div class="kpi"><div class="kpi-icon" style="background:#fef3c7;color:#d97706"><svg class="i"><use href="#i-clock"/></svg></div><div><div class="kpi-label">Pagos pendientes</div><div class="kpi-value" id="stat-overdue">0</div><div class="kpi-delta neg" id="d-over"></div></div></div>
         </div>
@@ -765,9 +766,9 @@ function renderCharts() {
   const base = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
     scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#eef2f7' }, ticks: { precision: 0 } } } };
   drawChart('growth', 'chart-growth', { type: 'line', data: { labels: rows.map(r => r.label), datasets: [{ label: 'Usuarios', data: rows.map(r => r.users),
-    borderColor: '#d91e63', backgroundColor: 'rgba(217,30,99,.10)', fill: true, tension: .35, pointRadius: 3, pointBackgroundColor: '#d91e63' }] }, options: base });
+    borderColor: '#0a2a9e', backgroundColor: 'rgba(10,42,158,.10)', fill: true, tension: .35, pointRadius: 3, pointBackgroundColor: '#0a2a9e' }] }, options: base });
   drawChart('revenue', 'chart-revenue', { type: 'bar', data: { labels: all.map(r => r.label), datasets: [{ label: 'Ingresos (USD)', data: all.map(r => +r.revenue.toFixed(2)),
-    backgroundColor: '#9c27b0', borderRadius: 6, maxBarThickness: 34 }] }, options: base });
+    backgroundColor: '#0a2a9e', borderRadius: 6, maxBarThickness: 34 }] }, options: base });
   const counts = Object.keys(STATUS).map(k => USERS.filter(u => u.paymentStatus === k).length);
   drawChart('status', 'chart-status', { type: 'doughnut', data: { labels: Object.values(STATUS), datasets: [{ data: counts, backgroundColor: Object.keys(STATUS).map(k => STATUS_COLOR[k]), borderWidth: 2, borderColor: '#fff' }] },
     options: { responsive: true, maintainAspectRatio: false, cutout: '64%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true } } } } });
@@ -1054,8 +1055,8 @@ function renderActivityDetail() {
   const summary = '<div class="card"><div class="act-head"><div class="cell-user">' + userCell(u) + '</div>' + badge(u.paymentStatus) + '</div>' +
     '<h2>Resumen del negocio</h2><p class="sub" style="margin-bottom:14px">Actividad registrada de este usuario</p><div class="kpis" style="margin-bottom:0">' +
     kpi('#dcfce7', '#16a34a', 'i-check', 'Ventas realizadas', all.count, count('product_added') + ' productos agregados · ' + count('price_change') + ' cambios de precio · ' + count('stock_change') + ' de stock') +
-    kpi('#f3e8ff', '#9c27b0', 'i-price', 'Ingresos', money(all.revenue), 'Total de ventas registradas') +
-    kpi('#fdf2f7', '#d91e63', 'i-reports', 'Ganancia neta estimada', money(all.profit), 'Según costo o margen de contado') +
+    kpi('#dbe4ff', '#061b6e', 'i-price', 'Ingresos', money(all.revenue), 'Total de ventas registradas') +
+    kpi('#eaefff', '#0a2a9e', 'i-reports', 'Ganancia neta estimada', money(all.profit), 'Según costo o margen de contado') +
     kpi('#fef3c7', '#d97706', 'i-dash', 'Producto más vendido', top ? esc(top.name) : '-', top ? top.units + ' unidades · ' + money(top.revenue) : 'Sin ventas aún', true) + '</div></div>';
 
   const topRows = cur.top.slice(0, 5).map(p => '<tr><td class="cell-main"><b style="color:var(--ink)">' + esc(p.name) + '</b></td><td class="num" data-label="Unidades">' + p.units + '</td><td class="num" data-label="Ingresos">' + money(p.revenue) + '</td></tr>').join('');
@@ -1366,6 +1367,149 @@ iniciarSeguridadReal();
 })();
 </script>
 
+<!-- ============================================================ -->
+<!-- RS ADMIN · CONSTANCIAS LEGALES (respaldos en Firebase)       -->
+<!-- Bloque aditivo: agrega la sección "Constancias" al menú.     -->
+<!-- Lista las constancias firmadas (colección "constancias") y   -->
+<!-- descarga el PDF guardado en Firebase Storage.                -->
+<!-- ============================================================ -->
+<style id="rs-constancias-css">
+.cl-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.cl-chip{padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;background:var(--tint);color:var(--brand)}
+.cl-chip.bad{background:#fee2e2;color:#991b1b}
+.cl-ced{font-variant-numeric:tabular-nums;white-space:nowrap}
+.cl-sha{display:block;font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace;margin-top:2px}
+@media (max-width:860px){.nav button{min-width:0;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+</style>
+<script id="rs-constancias-js">
+(function () {
+  "use strict";
+  var LISTA = [], limite = 25;
+
+  TITLES.constancias = "Constancias Legales";
+
+  // ---------- Menú lateral + sección ----------
+  var nav = document.getElementById("nav");
+  var btn = document.createElement("button");
+  btn.setAttribute("data-view", "constancias");
+  btn.innerHTML = '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>Constancias';
+  nav.insertBefore(btn, nav.querySelector('[data-view="settings"]'));
+
+  var sec = document.createElement("section");
+  sec.id = "view-constancias";
+  sec.className = "view";
+  sec.innerHTML =
+    '<div class="card">' +
+      '<div class="card-head"><div><h2>Constancias Legales</h2><p class="sub">Respaldo de cada cliente que aceptó los términos y firmó la constancia. El PDF firmado queda guardado en la nube y puedes descargarlo cuando lo necesites.</p></div>' +
+      '<button class="btn btn-secondary btn-sm" id="cl-refrescar" onclick="RSCL.cargar()">Actualizar</button></div>' +
+      '<div class="cl-chips" id="cl-resumen"></div>' +
+      '<div class="toolbar" style="margin-bottom:14px"><input class="search" id="cl-buscar" type="search" placeholder="Buscar por nombre, correo o cédula" aria-label="Buscar constancias" autocomplete="off"></div>' +
+      '<div class="table-wrap"><table class="rt"><thead><tr><th>Cliente</th><th>Cédula</th><th>Fecha</th><th>Hora</th><th class="num">Acciones</th></tr></thead>' +
+      '<tbody id="cl-body"><tr><td colspan="5" class="empty">Abre esta sección para cargar las constancias.</td></tr></tbody></table></div>' +
+      '<div class="more"><button class="btn btn-secondary btn-sm" id="cl-mas" style="display:none">Mostrar más</button></div>' +
+    '</div>';
+  document.querySelector("main.content").appendChild(sec);
+
+  document.getElementById("cl-buscar").addEventListener("input", function () { limite = 25; pintar(); });
+  document.getElementById("cl-mas").addEventListener("click", function () { limite += 25; pintar(); });
+
+  // ---------- Utilidades ----------
+  function fechaHora(c) {
+    var d = toDate(c.aceptadoEn || c.creadoEn);
+    if (!d) return { fecha: c.fecha || "-", hora: c.hora || "-", ts: 0 };
+    return {
+      fecha: d.toLocaleDateString("es-VE", { day: "2-digit", month: "2-digit", year: "numeric" }),
+      hora: d.toLocaleTimeString("es-VE", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+      ts: d.getTime()
+    };
+  }
+  function nombreArchivo(c) {
+    var base = String(c.nombre || c.email || "cliente").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40) || "cliente";
+    var ced = String(c.cedula || "").replace(/[^a-zA-Z0-9]/g, "");
+    return "Constancia_" + base + (ced ? "_" + ced : "") + ".pdf";
+  }
+
+  // ---------- Carga y pintado ----------
+  async function cargar() {
+    var body = document.getElementById("cl-body"), b = document.getElementById("cl-refrescar");
+    if (!db || !currentAdmin) return;
+    b.disabled = true;
+    body.innerHTML = '<tr><td colspan="5" class="empty">Cargando constancias...</td></tr>';
+    try {
+      var snap = await db.collection("constancias").orderBy("aceptadoEn", "desc").limit(500).get();
+      LISTA = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+    } catch (e) {
+      console.error("Error cargando constancias:", e);
+      LISTA = [];
+      body.innerHTML = '<tr><td colspan="5" class="empty">No se pudieron cargar las constancias. Revisa que las reglas de Firestore incluyan la colección "constancias" (ver reglas-firebase.txt).</td></tr>';
+      document.getElementById("cl-resumen").innerHTML = "";
+      b.disabled = false;
+      return;
+    }
+    b.disabled = false;
+    pintar();
+  }
+
+  function pintar() {
+    var q = document.getElementById("cl-buscar").value.trim().toLowerCase();
+    var lista = LISTA.filter(function (c) {
+      return !q || [c.nombre, c.email, c.cedula].join(" ").toLowerCase().indexOf(q) !== -1;
+    });
+    var sinPdf = LISTA.filter(function (c) { return !c.storagePath; }).length;
+    document.getElementById("cl-resumen").innerHTML =
+      '<span class="cl-chip">Constancias respaldadas: ' + (LISTA.length - sinPdf) + '</span>' +
+      (sinPdf ? '<span class="cl-chip bad">Sin PDF: ' + sinPdf + '</span>' : "");
+    var body = document.getElementById("cl-body");
+    body.innerHTML = lista.length ? lista.slice(0, limite).map(function (c) {
+      var t = fechaHora(c), id = esc(c.id);
+      var sha = c.sha256 ? '<span class="cl-sha" title="Huella SHA-256 del PDF">SHA-256: ' + esc(String(c.sha256).slice(0, 16)) + '…</span>' : "";
+      var accion = c.storagePath
+        ? '<button class="btn btn-primary btn-sm" onclick="RSCL.descargar(\'' + id + '\', this)">Descargar PDF</button>'
+        : '<span class="badge st-overdue">Sin PDF</span>';
+      return '<tr><td class="cell-main"><div class="cell-user"><div class="avatar">' + esc(initials({ displayName: c.nombre, email: c.email })) + '</div><div><b>' + esc(c.nombre || "-") + '</b><span>' + esc(c.email || "-") + '</span>' + sha + '</div></div></td>' +
+        '<td data-label="Cédula" class="cl-ced">' + esc(c.cedula || "-") + '</td>' +
+        '<td data-label="Fecha">' + esc(t.fecha) + '</td>' +
+        '<td data-label="Hora">' + esc(t.hora) + '</td>' +
+        '<td class="num" data-label="Acciones"><div class="acts">' + accion + '</div></td></tr>';
+    }).join("") : '<tr><td colspan="5" class="empty">' + (LISTA.length ? "No hay constancias que coincidan con la búsqueda" : "Aún no hay constancias firmadas") + '</td></tr>';
+    document.getElementById("cl-mas").style.display = lista.length > limite ? "inline-flex" : "none";
+  }
+
+  // ---------- Descarga del PDF firmado ----------
+  window.RSCL = {
+    cargar: cargar,
+    descargar: async function (id, el) {
+      var c = LISTA.find(function (x) { return x.id === id; });
+      if (!c || !c.storagePath) return showToast("Esta constancia no tiene PDF respaldado", "error");
+      if (typeof firebase === "undefined" || typeof firebase.storage !== "function") return showToast("Firebase Storage no está cargado. Recarga la página.", "error");
+      var texto = el ? el.textContent : "";
+      if (el) { el.disabled = true; el.textContent = "Preparando..."; }
+      try {
+        var url = await firebase.storage().ref(c.storagePath).getDownloadURL();
+        var a = document.createElement("a");
+        a.href = url; a.download = nombreArchivo(c); a.rel = "noopener";
+        document.body.appendChild(a); a.click(); a.remove();
+        showToast("Descargando constancia…", "success");
+      } catch (e) {
+        console.error("Error descargando constancia:", e);
+        var m = e && e.code === "storage/object-not-found" ? "El archivo PDF no existe en Storage"
+              : e && e.code === "storage/unauthorized" ? "Sin permiso: revisa las reglas de Storage (ver reglas-firebase.txt)"
+              : "No se pudo descargar el PDF";
+        showToast(m, "error");
+      }
+      if (el) { el.disabled = false; el.textContent = texto; }
+    }
+  };
+
+  // ---------- Conexión con funciones existentes (sin modificarlas) ----------
+  var _switch = switchAdminView;
+  switchAdminView = function (name) {
+    _switch(name);
+    if (name === "constancias") cargar();
+  };
+})();
+</script>
+
 <style>
 .rs-legal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;z-index:100000;padding:16px}
 .rs-legal-overlay.rs-open{display:flex}
@@ -1376,7 +1520,7 @@ iniciarSeguridadReal();
 .rs-legal-body{padding:16px 20px 24px;overflow-y:auto;font-size:13px;line-height:1.6;color:#334155}
 .rs-legal-body h3{font-size:14px;font-weight:800;color:#0f172a;margin:18px 0 6px}
 .rs-legal-body p{margin:0 0 8px}.rs-legal-body ul{margin:0 0 8px 18px;padding:0}
-.rs-legal-link{background:none;border:0;color:#4f46e5;font-weight:600;cursor:pointer;font-size:12px;text-decoration:underline;margin-top:10px;width:100%}
+.rs-legal-link{background:none;border:0;color:#0a2a9e;font-weight:600;cursor:pointer;font-size:12px;text-decoration:underline;margin-top:10px;width:100%}
 </style>
 <div id="rs-legal-modal" class="rs-legal-overlay" onclick="if(event.target===this)rsCerrarLegal();">
   <div class="rs-legal-box" role="dialog" aria-modal="true" aria-labelledby="rs-legal-title">
@@ -1455,7 +1599,7 @@ function rsCerrarLegal(){var m=document.getElementById("rs-legal-modal");if(m)m.
     st.textContent = ".rs-pw-wrap{position:relative;display:block;width:100%}" +
       ".rs-pw-eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:none;border:0;color:#64748b;cursor:pointer;border-radius:8px;padding:0}" +
       ".rs-pw-eye:focus-visible{outline:2px solid currentColor}" +
-      ".rs-olvide{background:none;border:0;padding:0;font:inherit;font-size:13px;font-weight:600;color:#d91e63;cursor:pointer;align-self:flex-end;text-decoration:underline}";
+      ".rs-olvide{background:none;border:0;padding:0;font:inherit;font-size:13px;font-weight:600;color:#0a2a9e;cursor:pointer;align-self:flex-end;text-decoration:underline}";
     document.head.appendChild(st);
     function envolver(inp) {
       if (!inp || inp.getAttribute("data-rs-ojo") || SKIP.test(inp.id || "") || !inp.parentNode) return;
