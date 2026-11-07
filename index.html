@@ -2754,6 +2754,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
   <!-- Configuración e inicialización de RS-ADMIN -->
   <script>
@@ -3030,6 +3031,11 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="rs-form-group">
           <label>Confirmar Contraseña</label>
           <input type="password" id="rs-register-password-confirm" maxlength="128" required placeholder="••••••••" minlength="8" autocomplete="new-password">
+        </div>
+        <div class="rs-form-group">
+          <label>Firma digital (dibújala con el mouse, el trackpad o el dedo) *</label>
+          <canvas id="rs-register-firma" width="720" height="240" aria-label="Recuadro de firma digital" style="display:block;width:100%;aspect-ratio:3/1;touch-action:none;cursor:crosshair;background:#fff;border:1.5px dashed #0052ff;border-radius:10px;"></canvas>
+          <button type="button" id="rs-register-firma-borrar" class="rs-olvide" style="margin-top:6px;">Borrar / limpiar firma</button>
         </div>
         <label class="rs-legal-check">
           <input type="checkbox" id="rs-register-acepto" required>
@@ -26425,6 +26431,13 @@ async function rsHandleRegister(event) {
     return;
   }
 
+  var rsPadReg = window.__rsPadReg || null;
+  if (rsPadReg && rsPadReg.puntos() < 8) {
+    rsShowAuthMessage("Dibuja tu firma en el recuadro para aceptar la constancia.", "error");
+    return;
+  }
+  var rsFirmaReg = rsPadReg ? rsPadReg.png() : null;
+
   btn.disabled = true;
   rsShowAuthMessage("Creando cuenta...", "loading");
 
@@ -26435,7 +26448,7 @@ async function rsHandleRegister(event) {
     var rsReg = null;
     try {
       if (typeof rsConstruirConstancia === "function") {
-        rsReg = await rsConstruirConstancia({ uid: cred.user.uid, nombre: name, documento: rsDocVal, email: email });
+        rsReg = await rsConstruirConstancia({ uid: cred.user.uid, nombre: name, documento: rsDocVal, email: email, firma: rsFirmaReg });
       }
     } catch (eC) { console.warn("RS: no se pudo construir la constancia:", eC); }
     const rsUserRef = rsDb.collection("users").doc(cred.user.uid);
@@ -26464,6 +26477,12 @@ async function rsHandleRegister(event) {
         await rsUserRef.set(rsBase);
       }
       if (typeof rsRespaldarConstancia === "function") await rsRespaldarConstancia(rsReg);
+      try { localStorage.setItem("rsx_terms_" + cred.user.uid, JSON.stringify(rsReg.constancia)); } catch (eL) {}
+      // PDF firmado -> Firebase Storage + enlace en Firestore (no bloquea el registro si falla)
+      if (typeof rsSubirConstanciaPDF === "function") {
+        rsShowAuthMessage("Generando y respaldando tu constancia firmada...", "loading");
+        await rsSubirConstanciaPDF(rsReg);
+      }
     } else {
       await rsUserRef.set(rsBase);
     }
@@ -30442,6 +30461,7 @@ html[data-rs-theme="dark"] .rs-sop-clara{background:#0052ff;border-color:#0052ff
 
     var slug = String(c.nombre || "cliente").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40) || "cliente";
     var archivo = "Constancia_Aceptacion_" + slug + "_v" + (c.version || "") + ".pdf";
+    if (modo === "blob") return doc.output("blob");
     if (modo === "imprimir") {
       try {
         doc.autoPrint();
@@ -30520,6 +30540,57 @@ html[data-rs-theme="dark"] .rs-sop-clara{background:#0052ff;border-color:#0052ff
     if (c && c.firma) { window.rsConstanciaPDF(c, modo, muestra, c.firma); return; }   // firma ya registrada con la constancia
     window.rsPedirFirma(function (f) { window.rsConstanciaPDF(c, modo, muestra, f); });
   }
+
+  // ---- Pad del formulario de registro ----
+  function initPadRegistro() {
+    var cv = $("rs-register-firma");
+    if (!cv || window.__rsPadReg) return;
+    window.__rsPadReg = montarPad(cv);
+    var b = $("rs-register-firma-borrar");
+    if (b) b.onclick = function () { window.__rsPadReg.limpiar(); };
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initPadRegistro); else initPadRegistro();
+
+  // ---- Respaldo en la nube del PDF firmado ----
+  // Storage:   constancias/{uid}/Constancia_{uid}_v{version}.pdf
+  // Firestore: termsAcceptances/{uid}_{version}  -> pdfUrl, pdfPath, pdfNombre, pdfTamano, pdfSubidoEn
+  //            users/{uid}                       -> termsPdfUrl, termsPdfPath (acceso rápido)
+  // Devuelve { pdfUrl, pdfPath, ... } o null si no se pudo (nunca lanza error).
+  window.rsSubirConstanciaPDF = async function (r) {
+    if (window.__rsSubiendoPdf) return null;
+    window.__rsSubiendoPdf = true;
+    try {
+      if (!r || !r.constancia || typeof rsDb === "undefined" || !rsDb) return null;
+      if (typeof firebase === "undefined" || typeof firebase.storage !== "function") {
+        console.warn("RS: Firebase Storage no está cargado; el PDF no se respaldó en la nube.");
+        return null;
+      }
+      var c = r.constancia;
+      var blob = window.rsConstanciaPDF(c, "blob", false, c.firma || null);
+      if (!blob) return null;
+      var nombre = "Constancia_" + c.uid + "_v" + c.version + ".pdf";
+      var path = "constancias/" + c.uid + "/" + nombre;
+      var ref = firebase.storage().ref(path);
+      await ref.put(blob, {
+        contentType: "application/pdf",
+        customMetadata: { uid: c.uid, email: c.email || "", documento: c.documento || "", version: c.version || "", sello: c.selloConstancia || "" }
+      });
+      var url = await ref.getDownloadURL();
+      var meta = { pdfUrl: url, pdfPath: path, pdfNombre: nombre, pdfTamano: blob.size };
+      try {
+        await rsDb.collection("termsAcceptances").doc(c.uid + "_" + c.version).set(
+          Object.assign({}, meta, { pdfSubidoEn: firebase.firestore.FieldValue.serverTimestamp() }), { merge: true });
+      } catch (e1) { console.warn("RS: enlace del PDF no guardado en 'termsAcceptances':", e1 && e1.code); }
+      try {
+        await rsDb.collection("users").doc(c.uid).set({ termsPdfUrl: url, termsPdfPath: path }, { merge: true });
+      } catch (e2) { console.warn("RS: enlace del PDF no guardado en la ficha del usuario:", e2 && e2.code); }
+      try { localStorage.setItem("rsx_pdf_" + c.uid + "_" + c.version, url); } catch (e3) {}
+      return meta;
+    } catch (e) {
+      console.warn("RS: no se pudo subir el PDF de la constancia (se reintentará en el próximo ingreso):", e && (e.code || e.message));
+      return null;
+    } finally { window.__rsSubiendoPdf = false; }
+  };
 
   // Botones de Configuración: modo = "descargar" | "imprimir"
   window.rsConstanciaAccion = async function (modo) {
@@ -30606,10 +30677,12 @@ html[data-rs-theme="dark"] .rs-sop-clara{background:#0052ff;border-color:#0052ff
       } catch (e) { console.warn("RS: no se pudo guardar la constancia en la ficha del usuario:", e && e.code); }
       var respaldo = await window.rsRespaldarConstancia(r);
       try { localStorage.setItem("rsx_terms_" + user.uid, JSON.stringify(r.constancia)); } catch (e2) {}
+      var pdfNube = (!esMuestra) ? await window.rsSubirConstanciaPDF(r) : null;
       $("rs-acep-form").style.display = "none";
       $("rs-acep-listo").style.display = "block";
       $("rs-acep-fecha").textContent = fmtFecha(r.constancia.fechaISO, r.constancia.zona);
       if (esMuestra) $("rs-acep-aviso").textContent = "Modo de pruebas: constancia de muestra, no se guardó en la nube.";
+      else if ((guardado || respaldo) && !pdfNube) $("rs-acep-aviso").textContent = "Constancia registrada, pero el PDF firmado no se pudo subir a la nube. Se reintentará automáticamente en tu próximo ingreso.";
       else if (!guardado && !respaldo) $("rs-acep-aviso").textContent = "No se pudo guardar la constancia en la nube. Quedó guardada en este equipo y se volverá a solicitar en tu próximo ingreso. Descarga el PDF ahora como respaldo.";
       $("rs-acep-pdf").onclick = function () { conFirma(r.constancia, "descargar", esMuestra); };
       $("rs-acep-print").onclick = function () { conFirma(r.constancia, "imprimir", esMuestra); };
@@ -30627,7 +30700,15 @@ html[data-rs-theme="dark"] .rs-sop-clara{background:#0052ff;border-color:#0052ff
           var s = await rsDb.collection("users").doc(user.uid).get();
           if (!s.exists) return;                                   // empleados: no tienen ficha propia
           var d = s.data() || {};
-          if (d.termsVersion === versionLegal() && d.termsAcceptance) return;
+          if (d.termsVersion === versionLegal() && d.termsAcceptance) {
+            // Reintento: constancia firmada cuyo PDF aún no está respaldado en Storage
+            var ta = d.termsAcceptance;
+            if (!d.termsPdfUrl && ta && ta.firma && ta.uid === user.uid) {
+              var ta2 = Object.assign({}, ta); delete ta2.servidorEn;
+              window.rsSubirConstanciaPDF({ constancia: ta2, texto: "" });
+            }
+            return;
+          }
           var local = null; try { local = JSON.parse(localStorage.getItem("rsx_terms_" + user.uid) || "null"); } catch (e) {}
           if (local && local.version === versionLegal()) return;   // ya aceptó en este equipo (la nube pendiente de reglas)
           window.rsMostrarAceptacion(user, d);
